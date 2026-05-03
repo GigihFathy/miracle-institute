@@ -34,6 +34,6 @@ class CertificatePanel extends Component
 
         return view('livewire.certificates.certificate-panel', [
             'certificates' => $certificates,
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }

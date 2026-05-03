@@ -17,8 +17,20 @@
             @endforeach
         </div>
 
-        <button wire:click="save" class="px-5 py-3 rounded-xl bg-slate-900 text-white">
-            Save Roles
-        </button>
+        <div class="flex items-center justify-between">
+            <a
+                href="{{ route('admin.users.index') }}"
+                class="px-4 py-2 border rounded-xl text-sm hover:bg-slate-50"
+            >
+                ← Back
+            </a>
+
+            <button
+                wire:click="save"
+                class="px-5 py-3 rounded-xl bg-slate-900 text-white"
+            >
+                Save Roles
+            </button>
+        </div>
     </div>
 </div>

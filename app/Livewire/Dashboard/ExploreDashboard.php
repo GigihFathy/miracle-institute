@@ -54,6 +54,6 @@ class ExploreDashboard extends Component
             'featured' => $featured,
             'courses' => $courses,
             'studyPrograms' => StudyProgram::orderBy('title')->get(),
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }

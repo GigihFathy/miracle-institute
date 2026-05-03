@@ -8,7 +8,6 @@
                     <th class="py-2">Attempt</th>
                     <th>Score</th>
                     <th>Status</th>
-                    <th>Duration</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -21,9 +20,6 @@
                             <span class="{{ $attempt->passed ? 'text-green-600' : 'text-red-600' }}">
                                 {{ $attempt->passed ? 'Passed' : 'Failed' }}
                             </span>
-                        </td>
-                        <td>
-                            {{ gmdate('i:s', $attempt->duration_seconds ?? 0) }}
                         </td>
                         <td>{{ $attempt->created_at->format('d M Y') }}</td>
                     </tr>

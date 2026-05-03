@@ -22,6 +22,6 @@ class AssessmentResult extends Component
 
     public function render()
     {
-        return view('livewire.assessments.result');
+        return view('livewire.assessments.result')->layout('layouts.learning');
     }
 }

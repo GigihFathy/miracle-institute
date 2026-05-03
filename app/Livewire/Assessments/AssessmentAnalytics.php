@@ -33,6 +33,6 @@ class AssessmentAnalytics extends Component
             'stats' => $stats,
             'best' => $best,
             'passRate' => $passRate
-        ]);
+        ])->layout('layouts.learning');
     }
 }

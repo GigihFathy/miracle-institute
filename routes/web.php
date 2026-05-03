@@ -22,6 +22,9 @@ use App\Livewire\Dashboard\MyLearning;
 use App\Livewire\Frontend\LandingPage;
 use App\Livewire\Sessions\AttendanceButton;
 use App\Livewire\Topics\TopicPlayer;
+use App\Livewire\Mentor\Dashboard\MentorDashboard;
+use App\Livewire\Mentor\Topics\TopicIndex as MentorTopicIndex;
+use App\Livewire\Mentor\Topics\TopicWorkspace;
 use App\Livewire\Admin\Assessments\AssessmentIndex as AdminAssessmentIndex;
 use App\Livewire\Admin\Assessments\QuestionManager;
 use App\Livewire\Admin\Certificates\CertificateIndex;
@@ -46,6 +49,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    // if (!auth()->user()->hasRole(session('active_role'))) {
+    //     return redirect()->route('dashboard');
+    // }
+
     Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
@@ -82,8 +89,30 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
             return redirect()->route('admin.dashboard');
         }
 
+        if ($activeRole === 'disciples') {
+            return redirect()->route('mentor.dashboard');
+        }
+
         return redirect()->route('explore.dashboard');
     })->name('dashboard');
+
+    Route::prefix('mentor')
+    ->name('mentor.')
+    ->middleware(['role:disciples'])
+    ->group(function () {
+        Route::get('/dashboard', MentorDashboard::class)
+            ->middleware('permission:manage_topics')
+            ->name('dashboard');
+
+        Route::get('/topics', MentorTopicIndex::class)
+            ->middleware('permission:manage_topics')
+            ->name('topics.index');
+
+        Route::get('/topics/{slug}', TopicWorkspace::class)
+            ->middleware('permission:manage_topics')
+            ->name('topics.show');
+
+    });
 
     Route::middleware(['role:student,disciples'])->group(function () {
         Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');

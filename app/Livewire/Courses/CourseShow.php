@@ -73,6 +73,6 @@ class CourseShow extends Component
 
     public function render()
     {
-        return view('livewire.courses.course-show')->layout('layouts.student');
+        return view('livewire.courses.course-show')->layout('layouts.learning');
     }
 }

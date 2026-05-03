@@ -32,6 +32,6 @@ class AssessmentIndex extends Component
         return view('livewire.assessments.assessment-index', [
             'assessments' => $assessments,
             'latestAttempts' => $latestAttempts,
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }

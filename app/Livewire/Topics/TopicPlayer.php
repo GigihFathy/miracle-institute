@@ -125,6 +125,6 @@ class TopicPlayer extends Component
             'activeMaterial' => $activeMaterial,
             'materialUrl' => $materialUrl,
             'topicStatus' => $topicStatus,
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }

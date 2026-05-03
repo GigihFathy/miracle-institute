@@ -1,3 +1,7 @@
+@php
+    $isMentor = session('active_role') === 'disciples';
+@endphp
+
 <div class="space-y-6">
     <section class="rounded-3xl bg-white border p-6 sm:p-8 space-y-4">
         <div class="flex items-start justify-between gap-4">
@@ -7,6 +11,13 @@
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-bold mt-2">{{ $topic->name }}</h1>
                 <p class="text-slate-600 mt-3 max-w-3xl">{{ $topic->description }}</p>
+
+                @if(session('active_role') === 'disciples' && auth()->user()->can('manage_topics'))
+                    <a href="{{ route('mentor.topics.show', $topic->slug) }}"
+                    class="inline-flex px-4 py-2 rounded-xl border text-sm">
+                        Open Mentor Workspace
+                    </a>
+                @endif
             </div>
 
             @if($topicCertificate)

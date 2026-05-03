@@ -16,6 +16,7 @@ class RoleSwitcher extends Component
         'roleSwitched' => '$refresh',
     ];
 
+    
     public function mount(RoleService $roleService)
     {
         if (!Auth::check()) {
@@ -33,14 +34,20 @@ class RoleSwitcher extends Component
 
     public function switchRole(RoleService $roleService, string $roleName)
     {
-        $roleService->switchRole(Auth::user(), $roleName);
+        $user = Auth::user();
+
+        $roleService->switchRole($user, $roleName);
 
         $this->activeRole = $roleName;
-        // $this->emitUp('roleSwitched', $roleName);
-        $this->dispatch('roleSwitched', role: $roleName);
 
-        return redirect()->to(url()->previous());
+        return match ($roleName) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'disciples' => redirect()->route('mentor.dashboard'),
+            'student' => redirect()->route('explore.dashboard'),
+            default => redirect()->route('dashboard'),
+        };
     }
+    
 
     public function render()
     {

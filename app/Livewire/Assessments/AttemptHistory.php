@@ -19,6 +19,6 @@ class AttemptHistory extends Component
 
         return view('livewire.assessments.attempt-history', [
             'attempts' => $attempts
-        ]);
+        ])->layout('layouts.learning');
     }
 }

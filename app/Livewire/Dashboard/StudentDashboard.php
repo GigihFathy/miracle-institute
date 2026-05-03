@@ -53,6 +53,6 @@ class StudentDashboard extends Component
             'enrollments',
             'upcomingSessions',
             'latestCertificates'
-        ))->layout('layouts.student');
+        ))->layout('layouts.learning');
     }
 }

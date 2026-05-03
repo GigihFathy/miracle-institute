@@ -20,23 +20,9 @@ class RoleService
         return true;
     }
 
-    public function getActiveRole(?User $user): ?Role
+    public function getActiveRole($user): string
     {
-        if (!$user) {
-            return null;
-        }
-
-        $sessionRole = session('active_role');
-
-        if ($sessionRole) {
-            $role = $user->roles->firstWhere('name', $sessionRole);
-
-            if ($role) {
-                return $role;
-            }
-        }
-
-        // fallback
-        return $user->roles->first();
+        return session('active_role')
+            ?? $user->roles->pluck('name')->first();
     }
 }

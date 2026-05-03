@@ -18,8 +18,7 @@
 
         @if($assessment)
             <div class="space-y-6 mt-8">
-                @livewire('assessments.analytics', ['assessmentId' => $assessment->id])
-                @livewire('assessments.leaderboard', ['assessmentId' => $assessment->id])
+                @livewire('assessments.assessment-analytics', ['assessmentId' => $assessment->id])
                 @livewire('assessments.attempt-history', ['assessmentId' => $assessment->id])
             </div>
         @endif

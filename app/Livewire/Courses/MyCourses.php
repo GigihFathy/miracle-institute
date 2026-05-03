@@ -54,6 +54,6 @@ class MyCourses extends Component
 
         return view('livewire.courses.my-courses', [
             'enrollments' => $enrollments,
-        ])->layout('layouts.student')->layout('layouts.student');
+        ])->layout('layouts.learning')->layout('layouts.learning');
     }
 }

@@ -13,13 +13,13 @@ class CourseIndex extends Component
     use WithAdminTableState;
 
     public ?string $editingId = null;
-    public string $study_program_id = '';
-    public string $title = '';
-    public string $slug = '';
-    public string $poster = '';
-    public int $credit = 1;
-    public int $quota = 0;
-    public string $description = '';
+    public string $study_program_id;
+    public string $title;
+    public string $slug;
+    public string $poster;
+    public int $credit;
+    public int $quota;
+    public string $description;
     public string $status = 'active';
 
     protected function rules(): array
@@ -103,8 +103,6 @@ class CourseIndex extends Component
     private function resetForm(): void
     {
         $this->reset(['editingId', 'study_program_id', 'title', 'slug', 'poster', 'credit', 'quota', 'description', 'status']);
-        $this->credit = 1;
-        $this->quota = 0;
         $this->status = 'active';
     }
 }

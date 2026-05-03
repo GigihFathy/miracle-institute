@@ -26,6 +26,6 @@ class ArticleShow extends Component
 
         return view('livewire.frontend.article-show', [
             'related' => $related,
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }

@@ -7,21 +7,22 @@ use App\Models\Course;
 use App\Models\Topic;
 use App\Models\User;
 use Livewire\Component;
+use Illuminate\Support\Str;
 
 class TopicIndex extends Component
 {
     use WithAdminTableState;
 
     public ?string $editingId = null;
-    public string $course_id = '';
-    public string $teacher_id = '';
-    public string $name = '';
-    public string $category = '';
-    public string $description = '';
-    public string $poster = '';
+    public string $course_id;
+    public string $teacher_id;
+    public string $name;
+    public string $category;
+    public string $description;
+    public string $poster;
     public string $visibility = 'Public';
     public string $status = 'active';
-    public int $sort_order = 0;
+    public int $sort_order;
 
     protected function rules(): array
     {
@@ -63,13 +64,18 @@ class TopicIndex extends Component
     {
         $this->validate();
 
+        $course = Course::with('studyProgram')->find($this->course_id);
+        
+        $categoryName = $course->studyProgram->title ?? $this->category;
+
         Topic::updateOrCreate(
             ['id' => $this->editingId],
             [
                 'course_id' => $this->course_id,
                 'teacher_id' => $this->teacher_id,
                 'name' => $this->name,
-                'category' => $this->category,
+                'category' => $categoryName,
+                'slug' => Str::slug($this->name),
                 'description' => $this->description,
                 'poster' => $this->poster,
                 'visibility' => $this->visibility,
@@ -94,7 +100,11 @@ class TopicIndex extends Component
                 ->latest()
                 ->paginate($this->perPage),
             'courses' => Course::orderBy('title')->get(),
-            'teachers' => User::orderBy('first_name')->get(),
+            'teachers' => User::whereHas('roles', function ($q) {
+                $q->where('name', 'disciples');
+            })
+            ->orderBy('first_name')
+            ->get(),
         ])->layout('layouts.admin');
     }
 
@@ -103,6 +113,5 @@ class TopicIndex extends Component
         $this->reset(['editingId', 'course_id', 'teacher_id', 'name', 'category', 'description', 'poster', 'visibility', 'status', 'sort_order']);
         $this->visibility = 'Public';
         $this->status = 'active';
-        $this->sort_order = 0;
     }
 }

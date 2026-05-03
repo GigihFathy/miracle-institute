@@ -76,12 +76,6 @@ return [
                 'ability' => 'manage_topics',
             ],
             [
-                'label' => 'Sessions',
-                'route' => 'admin.sessions.index',
-                'roles' => ['admin'],
-                'ability' => 'manage_topics',
-            ],
-            [
                 'label' => 'Materials',
                 'route' => 'admin.materials.index',
                 'roles' => ['admin'],

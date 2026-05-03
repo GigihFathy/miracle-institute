@@ -16,15 +16,13 @@ class CourseCatalog extends Component
 
     public string $studyProgram = '';
     public string $sort = 'latest';
-    public string $level = '';
 
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'studyProgram' => ['except' => ''],
-        'sort' => ['except' => 'latest'],
-        'level' => ['except' => ''],
-        'perPage' => ['except' => 9],
-    ];
+    // protected $queryString = [
+    //     'search' => ['except' => ''],
+    //     'studyProgram' => ['except' => ''],
+    //     'sort' => ['except' => 'latest'],
+    //     'perPage' => ['except' => 9],
+    // ];
 
     public function updatedStudyProgram(): void
     {
@@ -32,11 +30,6 @@ class CourseCatalog extends Component
     }
 
     public function updatedSort(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedLevel(): void
     {
         $this->resetPage();
     }
@@ -64,10 +57,7 @@ class CourseCatalog extends Component
             ->withCount('topics')
             ->where('status', 'active')
             ->when($this->search, fn ($q) => $q->where('title', 'like', '%' . $this->search . '%'))
-            ->when($this->studyProgram, fn ($q) => $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram)))
-            ->when($this->level === 'beginner', fn ($q) => $q->where('credit', '<=', 3))
-            ->when($this->level === 'intermediate', fn ($q) => $q->whereBetween('credit', [4, 5]))
-            ->when($this->level === 'advanced', fn ($q) => $q->where('credit', '>=', 6));
+            ->when($this->studyProgram, fn ($q) => $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram)));
 
         if ($this->sort === 'title') {
             $query->orderBy('title');
@@ -81,6 +71,6 @@ class CourseCatalog extends Component
             'courses' => $query->paginate($this->perPage),
             'studyPrograms' => StudyProgram::orderBy('title')->get(),
             'enrolledCourseIds' => $enrolledCourseIds,
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }

@@ -24,6 +24,6 @@ class ArticleIndex extends Component
 
         return view('livewire.frontend.article-index', [
             'articles' => $articles,
-        ])->layout('layouts.student');
+        ])->layout('layouts.learning');
     }
 }
