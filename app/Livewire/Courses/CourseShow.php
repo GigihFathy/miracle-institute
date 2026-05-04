@@ -20,37 +20,62 @@ class CourseShow extends Component
     public array $topicCertificates = [];
     public array $topicStatusMap;
 
+    public bool $isGuest = true;
+
     public function mount(string $slug)
     {
         $this->course = Course::with([
             'studyProgram',
-            'topics.materials',
-            'topics.sessions',
-            'topics.assessments',
+            'topics' => fn ($q) => $q->withCount(['materials', 'sessions']),
         ])->where('slug', $slug)->firstOrFail();
 
-        $enrollment = auth()->user()
-            ->courseEnrollments()
+        if (!auth()->check()) {
+            $this->enrolled = false;
+            $this->topicStatusMap = [];
+            $this->topicCertificates = [];
+            return;
+        }
+        
+        $user = auth()->user();
+
+        if (!$user) {
+            $this->isGuest = true;
+            $this->enrolled = false;
+            $this->courseCertificate = null;
+            $this->topicStatusMap = [];
+            $this->topicCertificates = [];
+            return;
+        }
+
+        $this->isGuest = false;
+
+        $enrollment = $user->courseEnrollments()
             ->where('course_id', $this->course->id)
             ->first();
 
         $this->enrolled = (bool) $enrollment;
 
-        $this->courseCertificate = Certificate::where('user_id', auth()->id())
+        if (!$this->enrolled) {
+            return;
+        }
+
+        $this->course->load([
+            'topics.materials',
+            'topics.sessions',
+            'topics.assessments',
+        ]);
+
+        $this->courseCertificate = Certificate::where('user_id', $user->id)
             ->where('type', 'course')
             ->where('course_id', $this->course->id)
             ->latest()
             ->first();
 
-        $this->topicStatusMap = [];
+        $this->topicStatusMap = TopicProgress::where('course_enrollment_id', $enrollment->id)
+            ->pluck('status', 'topic_id')
+            ->toArray();
 
-        if ($enrollment) {
-            $this->topicStatusMap = TopicProgress::where('course_enrollment_id', $enrollment->id)
-                ->pluck('status', 'topic_id')
-                ->toArray();
-        }
-
-        $this->topicCertificates = Certificate::where('user_id', auth()->id())
+        $this->topicCertificates = Certificate::where('user_id', $user->id)
             ->where('type', 'topic')
             ->where('course_id', $this->course->id)
             ->get()
@@ -60,11 +85,16 @@ class CourseShow extends Component
 
     public function enroll(CourseService $courseService)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
         $this->authorize('enroll', $this->course);
 
         try {
             $courseService->enrollUser(auth()->id(), $this->course->id);
             $this->enrolled = true;
+
             session()->flash('success', 'Course berhasil diikuti.');
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());

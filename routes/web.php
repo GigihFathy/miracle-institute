@@ -39,7 +39,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', LandingPage::class)->name('home');
+Route::get('/', function () {
+    return redirect()->route('explore.dashboard');
+})->name('home');
+
+Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');
+
+Route::get('/courses', CourseCatalog::class)->name('courses.index');
+Route::get('/courses/{slug}', CourseShow::class)->name('courses.show');
+
+Route::get('/articles', ArticleIndex::class)->name('articles.index');
+Route::get('/articles/{article}', ArticleShow::class)->name('articles.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
@@ -115,11 +125,8 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
     });
 
     Route::middleware(['role:student,disciples'])->group(function () {
-        Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');
-        Route::get('/learning', MyLearning::class)->name('learning.dashboard');
 
-        Route::get('/courses', CourseCatalog::class)->name('courses.index');
-        Route::get('/courses/{slug}', CourseShow::class)->name('courses.show');
+        Route::get('/learning', MyLearning::class)->name('learning.dashboard');
 
         Route::get('/topics/{slug}', TopicPlayer::class)
             ->middleware('topic.access:slug')
@@ -128,11 +135,11 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
         Route::get('/assessments', AssessmentIndex::class)->name('assessments.index');
 
         Route::get('/assessments/{assessment}', AssessmentTaker::class)
-        ->middleware('assessment.access:assessment')
-        ->name('assessments.take');
+            ->middleware('assessment.access:assessment')
+            ->name('assessments.take');
 
         Route::get('/assessments/{attempt}/result', AssessmentResult::class)
-        ->name('assessments.result');
+            ->name('assessments.result');
 
         Route::get('/certificates', CertificatePanel::class)
             ->name('certificates.index');
@@ -145,9 +152,6 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
 
         Route::get('/certificates/topic/{topic}/claim', [CertificateClaimController::class, 'topic'])
             ->name('certificates.topic.claim');
-
-        Route::get('/articles', ArticleIndex::class)->name('articles.index');
-        Route::get('/articles/{article}', ArticleShow::class)->name('articles.show');
     });
 
     Route::prefix('admin')

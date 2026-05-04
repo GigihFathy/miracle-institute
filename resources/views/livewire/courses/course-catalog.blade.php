@@ -70,15 +70,22 @@
                                 Manage
                             </a>
                         @else
-                            @if($enrolled)
-                                <span class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs">
-                                    Enrolled
-                                </span>
+                            @if(auth()->check())
+                                @if($enrolled)
+                                    <span class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs">
+                                        Enrolled
+                                    </span>
+                                @else
+                                    <button wire:click="enroll('{{ $course->id }}')"
+                                            class="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm">
+                                        Enroll
+                                    </button>
+                                @endif
                             @else
-                                <button wire:click="enroll('{{ $course->id }}')"
-                                        class="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm">
-                                    Enroll
-                                </button>
+                                <a href="{{ route('login') }}"
+                                class="px-4 py-2 border rounded-xl text-sm">
+                                    Login to enroll
+                                </a>
                             @endif
                         @endif
                     </div>

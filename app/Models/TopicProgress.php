@@ -31,4 +31,11 @@ class TopicProgress extends Model
     {
         return $this->belongsTo(Topic::class);
     }
+
+    public function scopeForUser($query, $userId)
+    {
+        return $query->whereHas('courseEnrollment', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        });
+    }
 }

@@ -36,6 +36,10 @@ class CourseCatalog extends Component
 
     public function enroll(CourseService $courseService, string $courseId)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
         $course = Course::findOrFail($courseId);
         $this->authorize('enroll', $course);
 
@@ -51,21 +55,28 @@ class CourseCatalog extends Component
     public function render()
     {
         $user = auth()->user();
-        $enrolledCourseIds = CourseEnrollment::where('user_id', $user->id)->pluck('course_id')->all();
+
+        $enrolledCourseIds = [];
+
+        if ($user) {
+            $enrolledCourseIds = CourseEnrollment::where('user_id', $user->id)
+                ->pluck('course_id')
+                ->all();
+        }
 
         $query = Course::with('studyProgram')
             ->withCount('topics')
             ->where('status', 'active')
             ->when($this->search, fn ($q) => $q->where('title', 'like', '%' . $this->search . '%'))
-            ->when($this->studyProgram, fn ($q) => $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram)));
+            ->when($this->studyProgram, fn ($q) =>
+                $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram))
+            );
 
-        if ($this->sort === 'title') {
-            $query->orderBy('title');
-        } elseif ($this->sort === 'topics') {
-            $query->orderByDesc('topics_count');
-        } else {
-            $query->latest();
-        }
+        match ($this->sort) {
+            'title' => $query->orderBy('title'),
+            'topics' => $query->orderByDesc('topics_count'),
+            default => $query->latest(),
+        };
 
         return view('livewire.courses.course-catalog', [
             'courses' => $query->paginate($this->perPage),

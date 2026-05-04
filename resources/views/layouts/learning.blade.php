@@ -29,8 +29,10 @@
 
             {{ $slot }}
         </main>
-    </div>
 
+        @include('layouts.partials.footer')
+    </div>
+    
     @livewireScripts
     @stack('scripts')
 </body>

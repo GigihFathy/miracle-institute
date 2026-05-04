@@ -69,15 +69,22 @@
                 <!-- ACTION -->
                 <div class="flex gap-3">
                     @if(!$isMentor)
-                        @if($enrolled)
-                            <span class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm">
-                                Enrolled
-                            </span>
+                        @if(!auth()->check())
+                            <a href="{{ route('login') }}"
+                            class="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm">
+                                Login to enroll
+                            </a>
                         @else
-                            <button wire:click="enroll"
-                                    class="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm">
-                                Enroll
-                            </button>
+                            @if($enrolled)
+                                <span class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-sm">
+                                    Enrolled
+                                </span>
+                            @else
+                                <button wire:click="enroll"
+                                        class="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm">
+                                    Enroll
+                                </button>
+                            @endif
                         @endif
                     @else
                         <span class="px-4 py-2 bg-slate-100 rounded-xl text-sm">
@@ -148,9 +155,7 @@
                             @endif
                         @endif
                     </div>
-
                 </div>
-
             @endforeach
         </div>
     </section>
