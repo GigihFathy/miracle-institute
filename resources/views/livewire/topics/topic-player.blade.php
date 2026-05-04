@@ -2,7 +2,7 @@
     $isMentor = session('active_role') === 'disciples';
 @endphp
 
-<div class="space-y-6">
+<div class="space-y-6 lg:px-36">
     <section class="rounded-3xl bg-white border p-6 sm:p-8 space-y-4">
         <div class="flex items-start justify-between gap-4">
             <div>

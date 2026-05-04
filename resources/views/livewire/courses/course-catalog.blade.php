@@ -2,7 +2,7 @@
     $isMentor = session('active_role') === 'disciples';
 @endphp
 
-<div class="space-y-5">
+<div class="space-y-5 lg:px-36">
     <x-ui.page-header
         title="{{ $isMentor ? 'Courses (Mentor View)' : 'Course Catalog' }}"
         subtitle="{{ $isMentor ? 'Kelola course yang kamu ajar.' : 'Pencarian dan filter course.' }}"

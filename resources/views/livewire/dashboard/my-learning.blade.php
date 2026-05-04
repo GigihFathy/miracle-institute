@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6 lg:px-36">
     <x-ui.page-header
         title="My Learning"
         subtitle="Halaman khusus untuk progres kursus yang sedang kamu ikuti."

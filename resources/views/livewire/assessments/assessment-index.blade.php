@@ -1,4 +1,4 @@
-<div class="space-y-5">
+<div class="space-y-5 lg:px-36">
     <x-ui.page-header
         title="Assessment"
         subtitle="Lihat post-test yang tersedia untuk course kamu."

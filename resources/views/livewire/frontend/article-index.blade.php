@@ -1,4 +1,4 @@
-<div class="space-y-5">
+<div class="space-y-5 lg:px-36">
     <x-ui.page-header
         title="Articles"
         subtitle="News, updates, and learning notes."
