@@ -39,7 +39,7 @@
         <section class="rounded-2xl bg-white border p-5">
             <div class="flex items-end justify-between mb-4">
                 <div>
-                    <h2 class="font-semibold text-lg">Mentored Topics</h2>
+                    <h2 class="font-semibold text-lg">Mentored Courses</h2>
                     <p class="text-sm text-slate-500">Buka course untuk melihat topic yang bisa kamu kelola.</p>
                 </div>
             </div>
