@@ -92,12 +92,7 @@
                 @auth
                     @livewire('shared.role-switcher')
 
-                    <form method="POST" action="{{ route('logout') }}" class="hidden sm:block">
-                        @csrf
-                        <button class="px-3 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                            Logout
-                        </button>
-                    </form>
+                    @livewire('shared.profile-dropdown')
                 @endauth
 
                 @guest
