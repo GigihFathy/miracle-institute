@@ -3,9 +3,6 @@
         <div class="h-16 flex items-center justify-between gap-4">
             <div>
                 <h1 class="font-semibold text-lg">Administration</h1>
-                <p class="text-xs text-slate-500">
-                    {{ str(request()->route()?->getName())->replace('.', ' → ')->title() }}
-                </p>
             </div>
 
             <div class="flex items-center gap-3">
