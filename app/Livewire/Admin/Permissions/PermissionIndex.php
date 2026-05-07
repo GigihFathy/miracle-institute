@@ -11,12 +11,17 @@ class PermissionIndex extends Component
 {
     use WithAdminTableState;
 
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+    public ?string $deleteId = null;
+
     public ?string $editingId = null;
     public string $name = '';
 
     public function create(): void
     {
         $this->resetForm();
+        $this->showModal = true;
     }
 
     public function edit(string $id): void
@@ -24,6 +29,18 @@ class PermissionIndex extends Component
         $row = Permission::findOrFail($id);
         $this->editingId = $row->id;
         $this->name = $row->name;
+        $this->showModal = true;
+    }
+
+    public function confirmDelete(string $id): void
+    {
+        $this->deleteId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    private function toast(string $type, string $message): void
+    {
+        $this->dispatch('toast', type: $type, message: $message);
     }
 
     public function save(): void
@@ -39,19 +56,34 @@ class PermissionIndex extends Component
         );
 
         $this->resetForm();
+        $this->showModal = false;
+        $this->toast('success', 'Permission berhasil disimpan.');
     }
 
-    public function delete(string $id): void
+    public function delete(): void
     {
-        Permission::findOrFail($id)->delete();
+        if (! $this->deleteId) {
+            $this->toast('warning', 'Pilih permission yang akan dihapus.');
+            return;
+        }
+
+        Permission::findOrFail($this->deleteId)->delete();
+
+        $this->deleteId = null;
+        $this->showDeleteModal = false;
+        $this->toast('success', 'Permission berhasil dihapus.');
     }
 
     public function render()
     {
+        $query = Permission::query();
+
+        if ($this->search !== '') {
+            $query->where('name', 'like', "%{$this->search}%");
+        }
+
         return view('livewire.admin.permissions.index', [
-            'rows' => Permission::when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
-                ->latest()
-                ->paginate($this->perPage),
+            'rows' => $query->latest()->paginate($this->perPage),
         ])->layout('layouts.admin');
     }
 

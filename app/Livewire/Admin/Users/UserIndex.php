@@ -44,7 +44,7 @@ class UserIndex extends Component
 
         return view('livewire.admin.users.index', [
             'rows' => $query->paginate($this->perPage),
-            'roles' => Role::orderBy('name')->get(),
+            'roles' => Role::all()->sortBy('name')->values(),
         ])->layout('layouts.admin');
     }
 }

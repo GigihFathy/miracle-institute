@@ -20,13 +20,13 @@ class UserRoleManager extends Component
     public function save(): void
     {
         $this->user->roles()->sync($this->selectedRoles);
-        session()->flash('success', 'Roles updated.');
+        $this->dispatch('toast', type: 'success', message: 'Roles updated.');
     }
 
     public function render()
     {
         return view('livewire.admin.users.user-role-manager', [
-            'roles' => Role::orderBy('name')->get(),
+            'roles' => Role::all()->sortBy('name')->values(),
         ])->layout('layouts.admin');
     }
 }
