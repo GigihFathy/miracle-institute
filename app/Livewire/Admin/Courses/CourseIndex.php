@@ -11,6 +11,7 @@ use App\Models\StudyProgram;
 use App\Models\Topic;
 use App\Models\VideoSession;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use Livewire\Component;
 
 class CourseIndex extends Component
@@ -18,6 +19,9 @@ class CourseIndex extends Component
     use WithAdminTableState;
 
     public bool $showModal = false;
+
+    /** @var array<string> */
+    public array $thumbnails = [];
 
     public ?string $editingId = null;
     public string $study_program_id = '';
@@ -102,13 +106,29 @@ class CourseIndex extends Component
         );
 
         $this->resetForm();
-        session()->flash('success', 'Course berhasil disimpan.');
+        $this->showModal = false;
+        $this->dispatch('toast', type: 'success', message: 'Course berhasil disimpan.');
     }
 
     public function delete(string $id): void
     {
         Course::findOrFail($id)->delete();
-        session()->flash('success', 'Course berhasil dihapus.');
+        $this->dispatch('toast', type: 'success', message: 'Course berhasil dihapus.');
+    }
+
+    public function mount(): void
+    {
+        $dir = public_path('images/thumbnail');
+
+        if (File::exists($dir)) {
+            $files = File::files($dir);
+            $this->thumbnails = array_map(fn ($f) => 'images/thumbnail/' . $f->getFilename(), $files);
+        }
+    }
+
+    public function selectThumbnail(string $path): void
+    {
+        $this->poster = $path;
     }
 
     public function render()

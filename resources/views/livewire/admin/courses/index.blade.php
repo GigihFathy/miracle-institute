@@ -13,7 +13,7 @@
     </x-ui.page-header>
 
     {{-- STATS --}}
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+    {{-- <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         @foreach([
             ['Courses', $stats['courses']],
             ['Topics', $stats['topics']],
@@ -29,7 +29,7 @@
                 </div>
             </div>
         @endforeach
-    </div>
+    </div> --}}
 
     {{-- TABLE --}}
     <section class="space-y-4">
@@ -90,8 +90,9 @@
                         <td class="px-4 py-3 whitespace-nowrap">{{ $row->certificates_count }}</td>
 
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 py-1 rounded-full text-xs bg-slate-100">
-                                {{ $row->status }}
+                            @php $s = $row->status; @endphp
+                            <span class="px-2 py-1 rounded-full text-xs {{ $s === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700' }}">
+                                {{ ucfirst($s) }}
                             </span>
                         </td>
 
@@ -125,14 +126,18 @@
 
                                 <div class="w-full border-t my-1"></div>
 
-                                <button wire:click="edit('{{ $row->id }}')"
-                                        class="px-3 py-1.5 rounded-lg text-xs bg-blue-100 text-blue-700 hover:bg-blue-200">
-                                    Edit
+                                <button wire:click="edit('{{ $row->id }}')" title="Edit"
+                                        class="p-2 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M4 13.5V20h6.5L20.5 9.999l-6.5-6.5L4 13.5z" />
+                                    </svg>
                                 </button>
 
-                                <button wire:click="delete('{{ $row->id }}')"
-                                        class="px-3 py-1.5 rounded-lg text-xs bg-red-100 text-red-700 hover:bg-red-200">
-                                    Delete
+                                <button wire:click="delete('{{ $row->id }}')" title="Delete" onclick="confirm('Delete this course?') || event.stopImmediatePropagation()"
+                                        class="p-2 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
+                                    </svg>
                                 </button>
                             </div>
                         </td>
@@ -152,10 +157,10 @@
 
     {{-- MODAL --}}
     <template x-teleport="body">
-        <div x-show="open"
-             x-cloak
-             x-transition
-             class="fixed inset-0 z-[9999] flex items-center justify-center">
+           <div x-show="open"
+               x-cloak
+               x-transition
+               class="fixed inset-0 z-50 flex items-center justify-center">
 
             <!-- overlay -->
             <div class="absolute inset-0 bg-black/50"
@@ -188,9 +193,29 @@
                        class="w-full border rounded-xl px-4 py-2"
                        placeholder="Title">
 
-                <input wire:model="poster"
-                       class="w-full border rounded-xl px-4 py-2"
-                       placeholder="Poster path/url">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Poster preview</label>
+                        <div class="h-40 w-full bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border">
+                            @if($poster)
+                                <img src="{{ asset($poster) }}" alt="poster" class="object-contain h-full w-full">
+                            @else
+                                <div class="text-xs text-slate-400">No poster selected</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs text-slate-500 mb-1 block">Choose from thumbnails</label>
+                        <div id="file:thumbnail" class="grid grid-cols-4 gap-2 max-h-40 overflow-auto p-1 border rounded-lg">
+                            @foreach($thumbnails as $t)
+                                <button type="button" wire:click="selectThumbnail('{{ $t }}')" class="overflow-hidden rounded-md p-0 border {{ $poster === $t ? 'ring-2 ring-slate-900' : '' }}">
+                                    <img src="{{ asset($t) }}" class="h-16 w-full object-cover" alt="thumb">
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <input wire:model="credit" type="number"
