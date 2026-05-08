@@ -3,11 +3,6 @@
         
         $learningMenus = [
             ['label' => 'Courses', 'route' => 'mentor.courses.index'],
-            ['label' => 'Topics', 'route' => 'mentor.topics.index'],
-            ['label' => 'Materials', 'route' => 'mentor.materials.index'],
-            ['label' => 'Sessions', 'route' => 'mentor.sessions.index'], 
-            ['label' => 'Attendances', 'route' => 'mentor.attendances.index'],
-            ['label' => 'Assessments', 'route' => 'mentor.assessments.index'],
         ];
 
         $activeRole = session('active_role');

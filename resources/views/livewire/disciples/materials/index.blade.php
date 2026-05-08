@@ -1,28 +1,20 @@
-<div class="space-y-6 lg:px-5 2xl:px-8 pb-10 scale-[0.90] origin-top">
+<div class="space-y-6 lg:px-36 pb-10">
 
     {{-- HERO --}}
-    <section class="rounded-[28px] border bg-white shadow-sm overflow-hidden">
-        <div class="p-7 lg:p-10 space-y-6">
+    <section class="rounded-3xl bg-white border px-6 py-6 sm:py-8 sm:px-8 shadow-sm">
+        <div class="space-y-6">
 
             <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
                 <div class="space-y-3 max-w-4xl min-w-0">
-                    <div class="text-[11px] uppercase tracking-[0.35em] text-slate-400">
-                        Disciples Studio
-                    </div>
 
                     <div class="space-y-3 min-w-0">
                         <div class="flex flex-wrap items-center gap-3 min-w-0">
-                            <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
+                            <h1 class="text-2xl sm:text-3xl font-bold leading-tight text-slate-900">
                                 Material Studio
                             </h1>
-
-                            <a href="{{ route('mentor.topics.index') }}"
-                               class="h-11 px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition inline-flex items-center">
-                                Kembali
-                            </a>
                         </div>
 
-                        <p class="text-sm lg:text-[15px] leading-7 text-slate-600 max-w-3xl">
+                        <p class="text-slate-600 max-w-3xl">
                             Pengelolaan material yang visual, dengan ringkasan topic, tipe file, ukuran data, estimasi waktu baca, dan shortcut penginputan cepat.
                         </p>
                     </div>
@@ -30,75 +22,31 @@
 
                 <div class="flex gap-3 shrink-0">
                     <button wire:click="create"
-                            class="h-11 px-5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition">
+                            class="px-4 py-2 rounded-xl border text-sm hover:bg-slate-50 transition">
                         + New Material
                     </button>
                 </div>
-            </div>
-
-            {{-- STATS --}}
-            @php
-                $statRows = collect($statsCards)->chunk(3);
-            @endphp
-
-            <div class="space-y-3">
-                @foreach($statRows as $row)
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 {{ $row->count() === 3 ? 'xl:grid-cols-3' : ($row->count() === 2 ? 'xl:grid-cols-2' : 'xl:grid-cols-1') }}">
-                        @foreach($row as $card)
-                            <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 min-w-0">
-                                <div class="text-xs text-slate-500">
-                                    {{ $card['label'] }}
-                                </div>
-
-                                <div class="mt-2 text-3xl font-bold tracking-tight text-slate-900 break-words">
-                                    {{ $card['value'] }}
-                                </div>
-
-                                <div class="mt-1 text-xs leading-5 text-slate-500 break-words">
-                                    {{ $card['note'] }}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endforeach
             </div>
         </div>
     </section>
 
     {{-- FILTER --}}
-    <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
-            <input wire:model.live.debounce.300ms="search"
-                   class="w-full border rounded-xl px-4 py-3"
-                   placeholder="Search material...">
-
-            <select wire:model.live="courseFilter" class="border rounded-xl px-4 py-3">
-                <option value="">All courses</option>
-                @foreach($courses as $course)
-                    <option value="{{ $course->id }}">{{ $course->title }}</option>
-                @endforeach
-            </select>
-
-            <select wire:model.live="topicFilter" class="border rounded-xl px-4 py-3">
-                <option value="">All topics</option>
-                @foreach($topics as $topic)
-                    <option value="{{ $topic->id }}">{{ $topic->course?->title }} · {{ $topic->name }}</option>
-                @endforeach
-            </select>
-
-            <select wire:model.live="typeFilter" class="border rounded-xl px-4 py-3">
-                <option value="">All type</option>
-                <option value="pdf">PDF</option>
-                <option value="ppt">PPT</option>
-                <option value="video">VIDEO</option>
-            </select>
-
-            <select wire:model.live="statusFilter" class="border rounded-xl px-4 py-3">
-                <option value="">All status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="draft">Draft</option>
-            </select>
+    <div class="rounded-2xl bg-white border p-4 space-y-4">
+        <div class="border-b border-slate-200">
+            <div class="-mb-px flex gap-1 overflow-x-auto">
+                <button type="button" wire:click="setTypeTab('pdf')"
+                    class="shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition {{ $typeFilter === 'pdf' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}">
+                    PDF
+                </button>
+                <button type="button" wire:click="setTypeTab('ppt')"
+                    class="shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition {{ $typeFilter === 'ppt' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}">
+                    PPT
+                </button>
+                <button type="button" wire:click="setTypeTab('video')"
+                    class="shrink-0 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition {{ $typeFilter === 'video' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300' }}">
+                    Video
+                </button>
+            </div>
         </div>
     </div>
 
@@ -117,10 +65,7 @@
                     @foreach($topics as $topic)
                         <div wire:key="material-topic-{{ $topic->id }}"
                              class="rounded-[26px] border bg-white shadow-sm overflow-hidden">
-
-                            <button type="button"
-                                    wire:click="toggleTopic('{{ $topic->id }}')"
-                                    class="w-full text-left p-5 flex flex-wrap items-center justify-between gap-3">
+                            <div class="p-5 flex flex-wrap items-center justify-between gap-3 border-b bg-slate-50/50">
                                 <div class="min-w-0">
                                     <div class="text-[11px] uppercase tracking-[0.2em] text-slate-400 truncate">
                                         {{ $topic->course?->title }}
@@ -144,120 +89,74 @@
                                         {{ ucfirst($topic->status) }}
                                     </span>
                                 </div>
-                            </button>
+                            </div>
 
-                            @if(in_array($topic->id, $openTopics, true))
-                                <div class="border-t p-5 bg-slate-50">
-                                    @if($topic->materials->isEmpty())
-                                        <x-ui.empty-state
-                                            title="No materials yet"
-                                            description="Topic ini belum memiliki material."
-                                        />
-                                    @else
-                                        <div class="grid md:grid-cols-2 2xl:grid-cols-3 gap-4">
-                                            @foreach($topic->materials as $material)
-                                                @php
-                                                    $openUrl = $material->external_url ?: ($material->path ? Storage::disk('public')->url($material->path) : null);
-                                                    $size = $this->resolveStoredSize($material->path);
-                                                    $sizeText = $size ? $this->formatBytes($size) : 'N/A';
-                                                    $readTime = $size ? $this->formatMinutes($this->estimateReadTimeMinutes($size, $material->type)) : 'N/A';
-                                                    $typeBadge = match ($material->type) {
-                                                        'pdf' => 'bg-red-50 text-red-700 border-red-200',
-                                                        'ppt' => 'bg-orange-50 text-orange-700 border-orange-200',
-                                                        'video' => 'bg-blue-50 text-blue-700 border-blue-200',
-                                                        default => 'bg-slate-100 text-slate-600 border-slate-200',
-                                                    };
-                                                @endphp
+                            <div class="p-5 bg-white">
+                                @if($topic->materials->isEmpty())
+                                    <x-ui.empty-state
+                                        title="No materials yet"
+                                        description="Topic ini belum memiliki material."
+                                    />
+                                @else
+                                    <div class="space-y-4">
+                                        @foreach($topic->materials as $material)
+                                            @php
+                                                $openUrl = $this->resolveOpenUrl($material->external_url, $material->path);
+                                                $typeBadge = match ($material->type) {
+                                                    'pdf' => 'bg-red-50 text-red-700 border-red-200',
+                                                    'ppt' => 'bg-orange-50 text-orange-700 border-orange-200',
+                                                    'video' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                                    default => 'bg-slate-100 text-slate-600 border-slate-200',
+                                                };
+                                            @endphp
 
-                                                <div wire:key="material-{{ $material->id }}"
-                                                     class="rounded-2xl border bg-white p-4 min-w-0">
-                                                    <div class="flex items-start justify-between gap-3 min-w-0">
-                                                        <div class="min-w-0">
-                                                            <div class="font-semibold break-words">
-                                                                {{ $material->name }}
-                                                            </div>
-                                                            <div class="text-xs text-slate-500 mt-1">
-                                                                {{ $material->visibility }}
-                                                            </div>
-                                                        </div>
-
-                                                        <span class="shrink-0 text-xs px-2 py-1 rounded-full border {{ $typeBadge }}">
-                                                            {{ strtoupper($material->type) }}
-                                                        </span>
+                                            <div wire:key="material-{{ $material->id }}" class="rounded-2xl border bg-white p-4 min-w-0">
+                                                <div class="flex items-start justify-between gap-3 min-w-0">
+                                                    <div class="min-w-0">
+                                                        <div class="font-semibold break-words">{{ $material->name }}</div>
+                                                        <div class="text-xs text-slate-500 mt-1">{{ $material->visibility }} - {{ ucfirst($material->status) }}</div>
                                                     </div>
+                                                    <span class="shrink-0 text-xs px-2 py-1 rounded-full border {{ $typeBadge }}">
+                                                        {{ strtoupper($material->type) }}
+                                                    </span>
+                                                </div>
 
-                                                    <div class="mt-4 grid grid-cols-2 gap-2 text-xs">
-                                                        <div class="rounded-xl border bg-slate-50 p-3">
-                                                            <div class="text-slate-500">Size</div>
-                                                            <div class="mt-1 font-semibold text-slate-900">
-                                                                {{ $sizeText }}
-                                                            </div>
+                                                <div class="mt-3">
+                                                    @if($material->type === 'video' && $openUrl)
+                                                        <div class="aspect-video rounded-xl overflow-hidden bg-slate-100 border">
+                                                            <iframe src="{{ $openUrl }}" class="w-full h-full" allowfullscreen></iframe>
                                                         </div>
-
-                                                        <div class="rounded-xl border bg-slate-50 p-3">
-                                                            <div class="text-slate-500">Read time</div>
-                                                            <div class="mt-1 font-semibold text-slate-900">
-                                                                {{ $readTime }}
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="rounded-xl border bg-slate-50 p-3">
-                                                            <div class="text-slate-500">Sort</div>
-                                                            <div class="mt-1 font-semibold text-slate-900">
-                                                                {{ $material->sort_order }}
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="rounded-xl border bg-slate-50 p-3">
-                                                            <div class="text-slate-500">Status</div>
-                                                            <div class="mt-1 font-semibold text-slate-900">
-                                                                {{ ucfirst($material->status) }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="mt-4 text-xs text-slate-500 space-y-1 break-words">
-                                                        <div>
-                                                            Topic: {{ $topic->course?->title }} · {{ $topic->name }}
-                                                        </div>
-
-                                                        <div>
-                                                            Source:
+                                                    @else
+                                                        <div class="text-xs text-slate-500 break-all">
                                                             {{ $material->external_url ?: $material->path ?: 'No file attached' }}
                                                         </div>
-                                                    </div>
-
-                                                    <div class="mt-4 flex flex-wrap gap-2">
-                                                        @if($openUrl)
-                                                            <a href="{{ $openUrl }}" target="_blank"
-                                                               class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs">
-                                                                Open
-                                                            </a>
-                                                        @endif
-
-                                                        <button wire:click="edit('{{ $material->id }}')"
-                                                                class="px-3 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs">
-                                                            Edit
-                                                        </button>
-
-                                                        <button wire:click="delete('{{ $material->id }}')"
-                                                                class="px-3 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs">
-                                                            Delete
-                                                        </button>
-                                                    </div>
+                                                    @endif
                                                 </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
 
-                                    <div class="mt-4">
-                                        <button wire:click="create('{{ $topic->id }}')"
-                                                class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                                            + Add material to this topic
-                                        </button>
+                                                <div class="mt-4 flex flex-wrap gap-2">
+                                                    @if($openUrl)
+                                                        <a href="{{ $openUrl }}" target="_blank" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs">
+                                                            Lihat Material
+                                                        </a>
+                                                    @endif
+                                                    <button wire:click="edit('{{ $material->id }}')" class="px-3 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs">
+                                                        Edit
+                                                    </button>
+                                                    <button wire:click="delete('{{ $material->id }}')" class="px-3 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
+                                @endif
+
+                                <div class="mt-4">
+                                    <button wire:click="create('{{ $topic->id }}')" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
+                                        + Add material to this topic
+                                    </button>
                                 </div>
-                            @endif
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -267,111 +166,6 @@
                 </div>
             @endif
         </div>
-
-        {{-- SIDEBAR --}}
-        <aside class="space-y-4 sticky top-24 h-fit min-w-0">
-            <div class="rounded-[28px] bg-white border shadow-sm overflow-hidden">
-                @if($selectedTopic)
-                    <div class="p-6 space-y-5 min-w-0">
-                        <div class="space-y-2">
-                            <div class="text-[11px] uppercase tracking-[0.25em] text-slate-400">
-                                Selected Topic
-                            </div>
-
-                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 leading-tight break-words">
-                                {{ $selectedTopic->name }}
-                            </h2>
-
-                            <div class="flex flex-wrap gap-2">
-                                <span class="px-3 py-1 rounded-full text-xs bg-slate-100">
-                                    {{ $selectedTopic->course?->title }}
-                                </span>
-                                <span class="px-3 py-1 rounded-full text-xs bg-slate-100">
-                                    {{ $selectedTopic->teacher?->full_name }}
-                                </span>
-                                <span class="px-3 py-1 rounded-full text-xs bg-slate-100">
-                                    {{ ucfirst($selectedTopic->status) }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div class="rounded-2xl border bg-slate-50 p-4 min-w-0">
-                                <div class="text-xs text-slate-500">Materials</div>
-                                <div class="mt-1 text-xl font-bold text-slate-900">
-                                    {{ $selectedTopic->materials_count }}
-                                </div>
-                            </div>
-
-                            <div class="rounded-2xl border bg-slate-50 p-4 min-w-0">
-                                <div class="text-xs text-slate-500">Sessions</div>
-                                <div class="mt-1 text-xl font-bold text-slate-900">
-                                    {{ $selectedTopic->video_sessions_count }}
-                                </div>
-                            </div>
-
-                            <div class="rounded-2xl border bg-slate-50 p-4 min-w-0">
-                                <div class="text-xs text-slate-500">Total size</div>
-                                <div class="mt-1 text-xl font-bold text-slate-900">
-                                    {{ $selectedTopic->total_material_size ?? 'N/A' }}
-                                </div>
-                            </div>
-
-                            <div class="rounded-2xl border bg-slate-50 p-4 min-w-0">
-                                <div class="text-xs text-slate-500">Read time</div>
-                                <div class="mt-1 text-xl font-bold text-slate-900">
-                                    {{ $selectedTopic->estimated_read_time ?? 'N/A' }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="rounded-2xl border bg-slate-50 p-4 space-y-3">
-                            <div class="text-sm font-semibold">Assessment status</div>
-
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] border {{ $selectedTopic->assessment_badge_class }}">
-                                    {{ $selectedTopic->assessment_label }}
-                                </span>
-
-                                <span class="text-xs text-slate-500">
-                                    Assessment melekat ke course utama.
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="rounded-2xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">Description</div>
-                            <p class="mt-2 text-sm leading-7 text-slate-600 break-words">
-                                {{ $selectedTopic->description }}
-                            </p>
-                        </div>
-
-                        <div class="rounded-2xl border bg-slate-50 p-4 space-y-3">
-                            <div class="text-sm font-semibold">Quick actions</div>
-
-                            <div class="grid grid-cols-2 gap-2">
-                                <a href="{{ route('mentor.sessions.index', ['topicFilter' => $selectedTopic->id]) }}"
-                                   class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs text-center">
-                                    Sessions
-                                </a>
-
-                                <a href="{{ route('mentor.assessments.index', ['courseFilter' => $selectedTopic->course_id]) }}"
-                                   class="px-3 py-2 rounded-xl border text-xs text-center">
-                                    Course assessment
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="p-10">
-                        <x-ui.empty-state
-                            title="Select a topic"
-                            description="Klik topic untuk melihat detail dan daftar material."
-                        />
-                    </div>
-                @endif
-            </div>
-        </aside>
     </section>
 
     {{-- MODAL --}}

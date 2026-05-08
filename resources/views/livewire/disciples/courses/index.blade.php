@@ -1,114 +1,73 @@
-<div class="space-y-6 lg:px-5 2xl:px-8 pb-10 scale-[0.90] origin-top">
+<div class="space-y-8 px-4 sm:px-6 lg:px-36">
 
     {{-- HERO --}}
-    <section class="rounded-[28px] border bg-white shadow-sm overflow-hidden">
+    <section class="rounded-2xl border bg-white shadow-sm overflow-hidden">
         <div>
 
-            <div class="p-7 lg:p-10 space-y-6">
+            <div class="p-6 lg:p-8 space-y-6">
 
                 <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
-                    <div class="space-y-3 max-w-3xl">
-                        <div class="text-[11px] uppercase tracking-[0.35em] text-slate-400">
+                    <div class="space-y-2 max-w-3xl">
+                        <div class="text-[11px] uppercase tracking-[0.3em] text-slate-400">
                             Disciples Studio
                         </div>
 
-                        <div class="space-y-2">
-                            <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900">
-                                Learning Management Studio
+                        <div class="space-y-1">
+                            <h1 class="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900">
+                                Course Management
                             </h1>
 
-                            <p class="text-sm lg:text-[15px] leading-7 text-slate-600">
-                                Workspace operasional untuk mengelola course, memantau performa pembelajaran,
-                                dan mengontrol distribusi materi secara terstruktur.
+                            <p class="text-sm text-slate-600">
+                                Kelola daftar course dan buka detail saat dibutuhkan.
                             </p>
                         </div>
                     </div>
-
-                    <div class="flex gap-3">
-                        <button
-                            wire:click="create"
-                            class="h-11 px-5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition">
-                            + New Course
-                        </button>
-                    </div>
                 </div>
-
-                {{-- STATS --}}
-                <div class="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-4">
-
-                    @foreach($statsCards as $card)
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
-                            <div class="text-xs text-slate-500">
-                                {{ $card['label'] }}
-                            </div>
-
-                            <div class="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-                                {{ $card['value'] }}
-                            </div>
-
-                            <div class="mt-1 text-xs leading-5 text-slate-500">
-                                {{ $card['note'] }}
-                            </div>
-                        </div>
-                    @endforeach
-
-                </div>
-
                 
             </div>
         </div>
     </section>
     
     {{-- FILTER --}}
-    <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+    <div class="rounded-2xl border bg-white p-4">
+        <div class="flex flex-col lg:flex-row lg:items-center gap-3">
+            <div class="relative flex-1">
+                <div class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m1.85-5.4a7.25 7.25 0 1 1-14.5 0 7.25 7.25 0 0 1 14.5 0Z" />
+                    </svg>
+                </div>
+                <input
+                    wire:model.live.debounce.300ms="search"
+                    type="text"
+                    placeholder="Search course..."
+                    class="h-10 w-full rounded-xl border-slate-200 pl-9 pr-3 text-sm focus:border-slate-900 focus:ring-slate-900"
+                >
+            </div>
 
-            <input
-                wire:model.live.debounce.300ms="search"
-                type="text"
-                placeholder="Search course..."
-                class="h-11 rounded-xl border-slate-200 text-sm focus:border-slate-900 focus:ring-slate-900"
-            >
+            <div class="flex flex-col sm:flex-row gap-3 lg:w-auto">
+                <select
+                    wire:model.live="statusFilter"
+                    class="h-10 rounded-xl border-slate-200 text-sm focus:border-slate-900 focus:ring-slate-900">
+                    <option value="">All status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
 
-            <select
-                wire:model.live="studyProgramFilter"
-                class="h-11 rounded-xl border-slate-200 text-sm focus:border-slate-900 focus:ring-slate-900">
-
-                <option value="">All programs</option>
-
-                @foreach($studyPrograms as $sp)
-                    <option value="{{ $sp->id }}">
-                        {{ $sp->title }}
-                    </option>
-                @endforeach
-            </select>
-
-            <select
-                wire:model.live="statusFilter"
-                class="h-11 rounded-xl border-slate-200 text-sm focus:border-slate-900 focus:ring-slate-900">
-
-                <option value="">All status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-
-            <select
-                wire:model.live="perPage"
-                class="h-11 rounded-xl border-slate-200 text-sm focus:border-slate-900 focus:ring-slate-900">
-
-                <option value="12">12 / page</option>
-                <option value="24">24 / page</option>
-                <option value="48">48 / page</option>
-            </select>
-
+                <select
+                    wire:model.live="perPage"
+                    class="h-10 rounded-xl border-slate-200 text-sm focus:border-slate-900 focus:ring-slate-900">
+                    <option value="12">12 / page</option>
+                    <option value="24">24 / page</option>
+                    <option value="48">48 / page</option>
+                </select>
+            </div>
         </div>
     </div>
 
     {{-- CONTENT --}}
-    <section class="grid xl:grid-cols-[minmax(0,1fr)_360px] gap-6 items-start">
-
-        {{-- COURSE GRID --}}
-        <div class="space-y-5 min-w-0">
+    <section>
+        <div class="min-w-0">
 
             @if($rows->isEmpty())
 
@@ -119,290 +78,95 @@
 
             @else
 
-                <div class="grid md:grid-cols-2 2xl:grid-cols-3 gap-5">
+                <div class="rounded-2xl bg-white border overflow-hidden divide-y divide-slate-100">
 
                     @foreach($rows as $row)
 
                         <div
                             wire:key="course-{{ $row->id }}"
-                            class="group rounded-[26px] border bg-white shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                            x-data="{ open: false }"
+                            class="group">
 
                             <button
                                 type="button"
-                                wire:click="selectCourse('{{ $row->id }}')"
-                                class="w-full text-left">
-
-                                {{-- IMAGE --}}
-                                <div class="relative h-48 overflow-hidden bg-slate-100">
-
+                                @click="open = !open"
+                                class="w-full text-left px-4 py-4 hover:bg-slate-50/70 transition">
+                                <div class="flex items-start gap-4">
                                     <img
                                         src="{{ $row->poster ? asset($row->poster) : asset('images/test.png') }}"
                                         alt="{{ $row->title }}"
-                                        class="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500">
+                                        class="h-16 w-24 rounded-lg object-cover border border-slate-200 shrink-0">
 
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-
-                                    <div class="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4">
-
-                                        <div class="min-w-0">
-                                            <div class="text-[11px] uppercase tracking-[0.25em] text-slate-200 truncate">
-                                                {{ $row->studyProgram?->title }}
-                                            </div>
-
-                                            <h3 class="mt-1 text-xl font-semibold text-white leading-tight line-clamp-2">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-semibold text-slate-900">
                                                 {{ $row->title }}
                                             </h3>
+                                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium {{ $row->status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700' }}">
+                                                {{ ucfirst($row->status) }}
+                                            </span>
                                         </div>
-
-                                        <span class="shrink-0 rounded-full bg-white/15 backdrop-blur px-3 py-1 text-[11px] text-white border border-white/15">
-                                            {{ ucfirst($row->status) }}
-                                        </span>
-
-                                    </div>
-                                </div>
-
-                                {{-- BODY --}}
-                                <div class="p-5 space-y-5">
-
-                                    <div class="min-h-[4.5rem]"> 
-                                        <p class="text-sm text-slate-600 leading-6 line-clamp-3">
+                                        <div class="mt-1 text-xs text-slate-500">
+                                            {{ $row->studyProgram?->title }} - {{ $row->assessment_label }}
+                                        </div>
+                                        <p class="mt-2 text-sm text-slate-600 line-clamp-2">
                                             {{ $row->description }}
                                         </p>
                                     </div>
 
-                                    {{-- METRICS --}}
-                                    <div class="grid grid-cols-4 gap-2">
-
-                                        <div class="rounded-xl bg-slate-50 border p-3">
-                                            <div class="text-[11px] text-slate-500">
-                                                Topics
-                                            </div>
-
-                                            <div class="mt-1 text-lg font-bold text-slate-900">
-                                                {{ $row->topics_count }}
-                                            </div>
-                                        </div>
-
-                                        <div class="rounded-xl bg-slate-50 border p-3">
-                                            <div class="text-[11px] text-slate-500">
-                                                Enroll
-                                            </div>
-
-                                            <div class="mt-1 text-lg font-bold text-slate-900">
-                                                {{ $row->enrollments_count }}
-                                            </div>
-                                        </div>
-
-                                        <div class="rounded-xl bg-slate-50 border p-3">
-                                            <div class="text-[11px] text-slate-500">
-                                                Cert
-                                            </div>
-
-                                            <div class="mt-1 text-lg font-bold text-slate-900">
-                                                {{ $row->certificates_count }}
-                                            </div>
-                                        </div>
-
-                                        <div class="rounded-xl bg-slate-50 border p-3">
-                                            <div class="text-[11px] text-slate-500">
-                                                Complete
-                                            </div>
-
-                                            <div class="mt-1 text-lg font-bold text-slate-900">
-                                                {{ $row->completion_rate }}%
-                                            </div>
-                                        </div>
-
+                                    <div class="shrink-0 text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                        </svg>
                                     </div>
-
                                 </div>
                             </button>
 
-                            {{-- FOOTER --}}
-                            <div class="border-t bg-slate-50/70 px-5 py-4 space-y-3">
+                            <div x-show="open" x-collapse class="px-4 pb-4">
+                                <div class="ml-0 md:ml-28 border-t border-slate-200 pt-4 space-y-4">
+                                    <div class="space-y-2">
+                                        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                            Topics in this course
+                                        </div>
 
-                                <div class="flex flex-wrap gap-2">
+                                        @forelse($row->topics as $topic)
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2.5">
+                                                <div class="min-w-0">
+                                                    <div class="text-sm font-medium text-slate-900 truncate">
+                                                        {{ $topic->name }}
+                                                    </div>
+                                                    <div class="text-xs text-slate-500">
+                                                        {{ ucfirst($topic->status) }} - {{ $topic->materials_count }} materials
+                                                    </div>
+                                                </div>
 
-                                    <a
-                                        href="{{ route('mentor.topics.index', ['courseFilter' => $row->id]) }}"
-                                        class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-medium">
-                                        Topics
-                                    </a>
-
-                                    <a
-                                        href="{{ route('mentor.materials.index', ['courseFilter' => $row->id]) }}"
-                                        class="px-3 py-2 rounded-xl border text-xs">
-                                        Materials
-                                    </a>
-
-                                    <a
-                                        href="{{ route('mentor.sessions.index', ['courseFilter' => $row->id]) }}"
-                                        class="px-3 py-2 rounded-xl border text-xs">
-                                        Sessions
-                                    </a>
-
-                                </div>
-
-                                <div class="flex items-center justify-between">
-
-                                    <div class="text-xs text-slate-500">
-                                        {{ $row->assessment_label }}
+                                                <a
+                                                    href="{{ route('mentor.materials.index', ['topicFilter' => $topic->id]) }}"
+                                                    class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium whitespace-nowrap">
+                                                    Materials
+                                                </a>
+                                            </div>
+                                        @empty
+                                            <div class="rounded-lg border border-dashed border-slate-300 px-3 py-3 text-xs text-slate-500">
+                                                No topics in this course yet.
+                                            </div>
+                                        @endforelse
                                     </div>
-
-                                    <div class="flex gap-2">
-
-                                        <button
-                                            wire:click.stop="edit('{{ $row->id }}')"
-                                            class="px-3 py-2 rounded-xl bg-blue-50 text-blue-700 text-xs font-medium">
-                                            Edit
-                                        </button>
-
-                                        <button
-                                            wire:click.stop="delete('{{ $row->id }}')"
-                                            class="px-3 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs font-medium">
-                                            Delete
-                                        </button>
-
-                                    </div>
-
                                 </div>
-
                             </div>
-
                         </div>
 
                     @endforeach
 
                 </div>
 
-                <div class="pt-2">
+                <div class="pt-4">
                     {{ $rows->links() }}
                 </div>
 
             @endif
 
         </div>
-
-        {{-- SIDEBAR --}}
-        <aside class="sticky top-24 space-y-4">
-
-            <div class="rounded-[28px] border bg-white shadow-sm overflow-hidden">
-
-                @if($selectedCourse)
-
-                    <div class="p-6 space-y-5">
-
-                        <div class="space-y-2">
-                            <div class="text-[11px] uppercase tracking-[0.25em] text-slate-400">
-                                Selected Course
-                            </div>
-
-                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 leading-tight">
-                                {{ $selectedCourse->title }}
-                            </h2>
-                        </div>
-
-                        <div class="aspect-video rounded-2xl overflow-hidden border bg-slate-100">
-                            <img
-                                src="{{ $selectedCourse->poster ? asset($selectedCourse->poster) : asset('images/test.png') }}"
-                                alt="{{ $selectedCourse->title }}"
-                                class="w-full h-full object-cover">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-
-                            <div class="rounded-2xl border bg-slate-50 p-4">
-                                <div class="text-xs text-slate-500">
-                                    Topics
-                                </div>
-
-                                <div class="mt-1 text-xl font-bold text-slate-900">
-                                    {{ $selectedCourse->topics_count }}
-                                </div>
-                            </div>
-
-                            <div class="rounded-2xl border bg-slate-50 p-4">
-                                <div class="text-xs text-slate-500">
-                                    Completion
-                                </div>
-
-                                <div class="mt-1 text-xl font-bold text-slate-900">
-                                    {{ $selectedCourse->completion_rate }}%
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="space-y-3">
-
-                            <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
-                                <div
-                                    class="h-2 rounded-full bg-slate-900"
-                                    style="width: {{ $selectedCourse->completion_rate }}%">
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-between text-xs text-slate-500">
-                                <span>Learning completion</span>
-                                <span>{{ $selectedCourse->completion_rate }}%</span>
-                            </div>
-
-                        </div>
-
-                        <div class="rounded-2xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">
-                                Description
-                            </div>
-
-                            <p class="mt-2 text-sm leading-7 text-slate-600">
-                                {{ $selectedCourse->description }}
-                            </p>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2">
-
-                            <a
-                                href="{{ route('mentor.topics.index', ['courseFilter' => $selectedCourse->id]) }}"
-                                class="h-11 rounded-xl bg-slate-900 text-white text-xs font-medium flex items-center justify-center">
-                                Manage Topics
-                            </a>
-
-                            <a
-                                href="{{ route('mentor.materials.index', ['courseFilter' => $selectedCourse->id]) }}"
-                                class="h-11 rounded-xl border text-xs font-medium flex items-center justify-center">
-                                Materials
-                            </a>
-
-                            <a
-                                href="{{ route('mentor.sessions.index', ['courseFilter' => $selectedCourse->id]) }}"
-                                class="h-11 rounded-xl border text-xs font-medium flex items-center justify-center">
-                                Sessions
-                            </a>
-
-                            <a
-                                href="{{ route('mentor.assessments.index', ['courseFilter' => $selectedCourse->id]) }}"
-                                class="h-11 rounded-xl border text-xs font-medium flex items-center justify-center">
-                                Assessments
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                @else
-
-                    <div class="p-10">
-                        <x-ui.empty-state
-                            title="Select a course"
-                            description="Klik salah satu course untuk membuka detail operasional."
-                        />
-                    </div>
-
-                @endif
-
-            </div>
-
-        </aside>
 
     </section>
 

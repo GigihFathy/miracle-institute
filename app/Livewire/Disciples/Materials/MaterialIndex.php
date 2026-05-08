@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\WithFileUploads;
 use Livewire\Component;
+use Throwable;
 
 class MaterialIndex extends Component
 {
@@ -99,6 +100,13 @@ class MaterialIndex extends Component
         $this->syncSelectedTopicToFirstAvailable();
     }
 
+    public function setTypeTab(string $type = ''): void
+    {
+        $this->typeFilter = $type;
+        $this->resetPage();
+        $this->syncSelectedTopicToFirstAvailable();
+    }
+
     public function updatedVisibilityFilter(): void
     {
         $this->resetPage();
@@ -161,6 +169,24 @@ class MaterialIndex extends Component
         $this->selectedTopicId = $id;
     }
 
+    public function resolveOpenUrl(?string $externalUrl, ?string $path): ?string
+    {
+        if (! empty($externalUrl)) {
+            return $externalUrl;
+        }
+
+        if (empty($path)) {
+            return null;
+        }
+
+        try {
+            return Storage::disk('public')->url($path);
+        } catch (Throwable $e) {
+            report($e);
+            return null;
+        }
+    }
+
     public function save(): void
     {
         if ($this->isSaving) {
@@ -192,7 +218,7 @@ class MaterialIndex extends Component
             $storedPath = $this->currentPath;
 
             if ($this->uploadFile) {
-                if ($storedPath && Storage::disk('public')->exists($storedPath)) {
+                if ($storedPath && $this->safeFileExists($storedPath)) {
                     Storage::disk('public')->delete($storedPath);
                 }
 
@@ -426,11 +452,26 @@ class MaterialIndex extends Component
             return null;
         }
 
-        if (! Storage::disk('public')->exists($path)) {
+        if (! $this->safeFileExists($path)) {
             return null;
         }
 
-        return Storage::disk('public')->size($path);
+        try {
+            return Storage::disk('public')->size($path);
+        } catch (Throwable $e) {
+            report($e);
+            return null;
+        }
+    }
+
+    private function safeFileExists(string $path): bool
+    {
+        try {
+            return Storage::disk('public')->exists($path);
+        } catch (Throwable $e) {
+            report($e);
+            return false;
+        }
     }
 
     private function estimateReadTimeMinutes(int $bytes, string $type): int

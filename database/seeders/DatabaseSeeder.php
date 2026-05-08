@@ -120,13 +120,6 @@ class DatabaseSeeder extends Seeder
             ['name' => 'System Administrator', 'email' => 'admin@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0001', 'dob' => '1990-01-01', 'roles' => ['admin']],
             ['name' => 'Testing Disciple', 'email' => 'disciple@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0002', 'dob' => '1992-02-02', 'roles' => ['disciples', 'student']],
             ['name' => 'Testing Student', 'email' => 'student@example.test', 'gender' => 'female', 'phone' => '+62-811-0000-0003', 'dob' => '2001-03-03', 'roles' => ['student']],
-            ['name' => 'Nabila Rahman', 'email' => 'nabila.rahman@edunusa.test', 'gender' => 'female', 'phone' => '+62-811-2000-1001', 'dob' => '1990-02-11', 'roles' => ['admin']],
-            ['name' => 'Fikri Maulana', 'email' => 'fikri.maulana@edunusa.test', 'gender' => 'male', 'phone' => '+62-811-2000-1002', 'dob' => '1988-08-19', 'roles' => ['admin']],
-            ['name' => 'Maya Sari', 'email' => 'maya.sari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2001', 'dob' => '1992-04-07', 'roles' => ['disciples']],
-            ['name' => 'Bagas Wiratama', 'email' => 'bagas.wiratama@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2002', 'dob' => '1991-06-14', 'roles' => ['disciples']],
-            ['name' => 'Nadia Prameswari', 'email' => 'nadia.prameswari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2003', 'dob' => '1993-01-23', 'roles' => ['disciples']],
-            ['name' => 'Citra Lestari', 'email' => 'citra.lestari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2005', 'dob' => '1994-09-16', 'roles' => ['disciples', 'student']],
-            ['name' => 'Fajar Hidayat', 'email' => 'fajar.hidayat@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2006', 'dob' => '1990-12-01', 'roles' => ['disciples', 'student']],
             ['name' => 'Alya Nabila', 'email' => 'alya.nabila@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4001', 'dob' => '2002-05-12', 'roles' => ['student']],
             ['name' => 'Rizal Fadlan', 'email' => 'rizal.fadlan@edunusa.test', 'gender' => 'male', 'phone' => '+62-814-5000-4002', 'dob' => '2001-07-08', 'roles' => ['student']],
             ['name' => 'Sinta Rahma', 'email' => 'sinta.rahma@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4003', 'dob' => '2002-09-21', 'roles' => ['student']],
@@ -261,7 +254,9 @@ class DatabaseSeeder extends Seeder
         if ($cache === null) {
             $cache = DB::table('users')->pluck('id', 'email')->all();
         }
-        return $cache[$teacherEmail] ?? array_values($cache)[0];
+        return $cache['disciple@example.test']
+            ?? $cache[$teacherEmail]
+            ?? array_values($cache)[0];
     }
 
     private function seedMaterials(array $topicsByCourse, string $asset, $now): array
@@ -389,10 +384,21 @@ class DatabaseSeeder extends Seeder
         $rows = [];
         $byCourse = ['discipleship-foundations' => [], 'discipleship-growth-track' => [], 'sermon-foundations' => [], 'sermon-outreach-lab' => []];
         $completed = [];
+        $seenCourseUser = [];
 
         foreach ($plan as $courseSlug => $items) {
             foreach ($items as $index => $item) {
-                $user = $users['byEmail'][$item['email']];
+                $user = $users['byEmail'][$item['email']] ?? null;
+                if (! $user) {
+                    continue;
+                }
+
+                $pairKey = $courseSlug . '|' . $user['id'];
+                if (isset($seenCourseUser[$pairKey])) {
+                    continue;
+                }
+                $seenCourseUser[$pairKey] = true;
+
                 $enrolledAt = $now->copy()->subDays(50 + ($index * 5));
                 $completedAt = $item['status'] === 'completed' ? $enrolledAt->copy()->addDays(18 + $index) : null;
 
@@ -415,7 +421,9 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        DB::table('course_enrollments')->insert($rows);
+        if (! empty($rows)) {
+            DB::table('course_enrollments')->insert($rows);
+        }
 
         return ['all' => $rows, 'byCourse' => $byCourse, 'completed' => $completed];
     }

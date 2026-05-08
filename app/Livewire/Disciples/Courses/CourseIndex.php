@@ -121,7 +121,11 @@ class CourseIndex extends Component
 
     public function render()
     {
-        $rows = Course::with(['studyProgram', 'assessment'])
+        $rows = Course::with([
+                'studyProgram',
+                'assessment',
+                'topics' => fn ($q) => $q->withCount(['materials'])->orderBy('sort_order')->orderBy('name'),
+            ])
             ->withCount(['topics', 'enrollments', 'certificates'])
             ->when($this->search, fn ($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->studyProgramFilter, fn ($q) => $q->where('study_program_id', $this->studyProgramFilter))

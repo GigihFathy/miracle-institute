@@ -6,9 +6,6 @@
             <div class="p-6 sm:p-8 xl:p-10 space-y-6">
                 <div class="flex flex-wrap items-start justify-between gap-4">
                     <div class="space-y-3">
-                        <div class="text-xs uppercase tracking-[0.3em] text-slate-400">
-                            Disciples Studio
-                        </div>
                         <div class="space-y-2">
                             <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
                                 Mentor Dashboard
@@ -22,11 +19,7 @@
                     <div class="flex flex-wrap gap-2">
                         <a href="{{ route('mentor.courses.index') }}"
                            class="inline-flex h-10 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm text-white transition hover:bg-slate-800">
-                            Open Studio
-                        </a>
-                        <a href="{{ route('courses.index') }}"
-                           class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 transition hover:bg-slate-50">
-                            Public Site
+                            Lihat courses
                         </a>
                     </div>
                 </div>

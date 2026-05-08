@@ -119,6 +119,10 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
             Route::get('/topics', \App\Livewire\Disciples\Topics\TopicIndex::class)
                 ->name('topics.index');
 
+            Route::get('/topics-mentor', MentorTopicIndex::class)
+                ->middleware('permission:manage_topics')
+                ->name('topics.mentor-index');
+
             Route::get('/materials', \App\Livewire\Disciples\Materials\MaterialIndex::class)
                 ->name('materials.index');
 
