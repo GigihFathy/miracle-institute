@@ -23,7 +23,7 @@
                     wire:click="checkIn"
                     wire:loading.attr="disabled"
                     @disabled(!$canCheckIn)
-                    class="px-4 py-2 rounded-lg bg-black text-white text-sm disabled:opacity-50">
+                    class="px-4 py-2 rounded-lg bg-primary text-white text-sm disabled:opacity-50 disabled:bg-slate-300">
                 Check In
             </button>
         @endcan

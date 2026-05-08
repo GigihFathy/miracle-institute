@@ -166,7 +166,7 @@
                 {{-- SUBMIT --}}
                 <section class="flex justify-end">
                     <button wire:click="$set('openSubmit', true)"
-                            class="px-6 py-3 rounded-xl bg-black text-white text-sm font-medium">
+                            class="px-6 py-3 rounded-xl bg-primary text-white text-sm font-medium">
                         Submit Answers
                     </button>
                 </section>
@@ -196,7 +196,7 @@
                     </button>
 
                     <button wire:click="submit"
-                            class="px-4 py-2 bg-black text-white rounded-xl">
+                            class="px-4 py-2 bg-primary text-white rounded-xl">
                         Submit
                     </button>
                 </div>

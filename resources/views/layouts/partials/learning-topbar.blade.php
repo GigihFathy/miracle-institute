@@ -45,10 +45,7 @@
                 @endauth
 
                 @guest
-                    <a href="{{ route('login') }}"
-                       class="hidden sm:block px-3 py-2 rounded-xl border text-sm hover:bg-slate-50">
-                        Login
-                    </a>
+                    <x-ui.button href="{{ route('login') }}" variant="outline" size="md">Login</x-ui.button>
                 @endguest
             </div>
         </div>

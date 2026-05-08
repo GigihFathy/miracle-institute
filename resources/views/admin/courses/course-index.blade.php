@@ -47,8 +47,8 @@
                         <td>{{ $course->credit }}</td>
                         <td>{{ $course->quota }}</td>
                         <td class="flex gap-2 p-3">
-                            <button wire:click="edit('{{ $course->id }}')" class="text-blue-600">Edit</button>
-                            <button wire:click="delete('{{ $course->id }}')" class="text-red-600">Delete</button>
+                        <button wire:click="edit('{{ $course->id }}')" class="text-primary hover:text-primary-dark">Edit</button>
+                            <button wire:click="delete('{{ $course->id }}')" class="text-error hover:text-red-600">Delete</button>
                         </td>
                     </tr>
                 @endforeach

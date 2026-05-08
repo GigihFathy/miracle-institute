@@ -7,9 +7,7 @@
                 <h1 class="text-2xl font-bold">Study Programs</h1>
                 <p class="text-gray-500">Kelola kategori besar seperti Discipleship dan Sermon.</p>
             </div>
-            <button class="px-4 py-2 rounded-md bg-black text-white text-sm">
-                + New Study Program
-            </button>
+            <x-ui.button variant="primary" size="md">+ New Study Program</x-ui.button>
         </div>
 
         <div class="rounded-2xl bg-white border overflow-hidden">

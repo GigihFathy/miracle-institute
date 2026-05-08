@@ -6,6 +6,46 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-primary-dark: #00487C;
+    --color-primary: #027BCE;
+    --color-primary-light: #0496FF;
+    --color-primary-lighter: #4BB3FD;
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+    --color-info: #3B82F6;
+}
+
+@layer utilities {
+    /* Primary Colors */
+    .bg-primary-dark { background-color: var(--color-primary-dark); }
+    .bg-primary { background-color: var(--color-primary); }
+    .bg-primary-light { background-color: var(--color-primary-light); }
+    .bg-primary-lighter { background-color: var(--color-primary-lighter); }
+    
+    .text-primary { color: var(--color-primary); }
+    .text-primary-dark { color: var(--color-primary-dark); }
+    .text-primary-light { color: var(--color-primary-light); }
+    .text-primary-lighter { color: var(--color-primary-lighter); }
+    
+    .border-primary { border-color: var(--color-primary); }
+    .border-primary-dark { border-color: var(--color-primary-dark); }
+    
+    /* Status Colors */
+    .bg-success { background-color: var(--color-success); }
+    .text-success { color: var(--color-success); }
+    .border-success { border-color: var(--color-success); }
+    
+    .bg-error { background-color: var(--color-error); }
+    .text-error { color: var(--color-error); }
+    .border-error { border-color: var(--color-error); }
+    
+    .bg-warning { background-color: var(--color-warning); }
+    .text-warning { color: var(--color-warning); }
+    .border-warning { border-color: var(--color-warning); }
+    
+    .bg-info { background-color: var(--color-info); }
+    .text-info { color: var(--color-info); }
+    .border-info { border-color: var(--color-info); }
 }

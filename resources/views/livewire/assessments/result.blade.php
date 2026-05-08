@@ -25,7 +25,7 @@
 
         <div class="mt-8 flex flex-wrap justify-center gap-3">
             <a href="{{ route('learning.dashboard') }}"
-               class="px-5 py-3 rounded-xl bg-slate-900 text-white text-sm">
+               class="px-5 py-3 rounded-xl bg-primary text-white text-sm">
                 Back to Dashboard
             </a>
 

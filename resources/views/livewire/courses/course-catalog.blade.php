@@ -64,33 +64,26 @@
                     </div>
 
                     <div class="mt-auto flex justify-between items-center">
-                        <a href="{{ route('courses.show', $course->slug) }}"
-                           class="inline-flex px-3 py-1 bg-slate-900 text-white rounded-xl text-sm">
+                        <x-ui.button href="{{ route('courses.show', $course->slug) }}" variant="primary" size="sm">
                             Open
-                        </a>
+                        </x-ui.button>
 
                         @if($isMentor)
-                            <a href="{{ route('mentor.topics.index') }}"
-                               class="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm">
+                            <x-ui.button href="{{ route('mentor.topics.index') }}" variant="primary" size="sm">
                                 Manage
-                            </a>
+                            </x-ui.button>
                         @else
                             @if(auth()->check())
                                 @if($enrolled)
-                                    <span class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs">
-                                        Enrolled
-                                    </span>
+                                    <x-ui.badge variant="success" size="sm">Enrolled</x-ui.badge>
                                 @else
                                     <button wire:click="enroll('{{ $course->id }}')"
-                                            class="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm">
+                                            class="px-4 py-2 bg-primary text-white rounded-xl text-sm">
                                         Enroll
                                     </button>
                                 @endif
                             @else
-                                <a href="{{ route('login') }}"
-                                class="px-4 py-2 border rounded-xl text-sm">
-                                    Login to enroll
-                                </a>
+                                <x-ui.button href="{{ route('login') }}" variant="outline" size="sm">Login to enroll</x-ui.button>
                             @endif
                         @endif
                     </div>

@@ -47,7 +47,7 @@
                 </div>
 
                 <a href="{{ route('assessments.take', $assessment->id) }}"
-                   class="inline-flex px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
+                   class="inline-flex px-4 py-2 rounded-xl bg-primary text-white text-sm">
                     Start
                 </a>
             </div>

@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <button wire:click="resend" class="w-full bg-black text-white rounded-lg py-2">
+    <button wire:click="resend" class="w-full bg-primary text-white rounded-lg py-2 font-medium">
         Resend verification email
     </button>
 </div>

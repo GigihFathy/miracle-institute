@@ -38,7 +38,7 @@
 
             <button
                 wire:click="save"
-                class="px-5 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800"
+                class="px-5 py-3 rounded-xl bg-primary text-white hover:bg-primary-dark"
             >
                 Save Roles
             </button>

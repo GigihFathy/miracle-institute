@@ -4,7 +4,7 @@
     }"
     class="space-y-6">
     <x-ui.page-header title="Study Programs" subtitle="Kelola jalur pembelajaran utama.">
-        <button wire:click="create" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm hover:bg-slate-800 transition">
+        <button wire:click="create" class="px-4 py-2 rounded-xl bg-primary text-white text-sm hover:bg-primary-dark transition">
             + New Program
         </button>
     </x-ui.page-header>
@@ -158,7 +158,7 @@
                         Cancel
                     </button>
 
-                    <button wire:click="save" class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800">
+                    <button wire:click="save" class="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-dark">
                         Save
                     </button>
                 </div>

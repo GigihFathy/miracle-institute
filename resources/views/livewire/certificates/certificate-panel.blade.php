@@ -43,10 +43,7 @@
                 </p>
 
                 @if($certificate->file_path)
-                    <a href="{{ route('certificates.download', $certificate->id) }}"
-                       class="inline-flex px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                        Download
-                    </a>
+                    <x-ui.button href="{{ route('certificates.download', $certificate->id) }}" variant="primary" size="md">Download</x-ui.button>
                 @endif
             </div>
         @empty

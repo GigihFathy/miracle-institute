@@ -25,7 +25,7 @@
             @error('password_confirmation') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
         </div>
 
-        <button type="submit" class="w-full bg-black text-white rounded-lg py-2">
+        <button type="submit" class="w-full bg-primary text-white rounded-lg py-2 font-medium">
             Reset password
         </button>
     </form>

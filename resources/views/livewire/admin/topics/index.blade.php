@@ -5,7 +5,7 @@
         subtitle="Halaman utama topic. Semua detail content berada di bawah course yang relevan."
     >
         <button wire:click="create"
-            class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
+            class="px-4 py-2 rounded-xl bg-primary text-white text-sm">
             + New Topic
         </button>
     </x-ui.page-header>
@@ -238,7 +238,7 @@
 
                         <button 
                             wire:click="save"
-                            class="px-4 py-2 bg-slate-900 text-white rounded-xl"
+                            class="px-4 py-2 bg-primary text-white rounded-xl"
                         >
                             Save
                         </button>

@@ -15,7 +15,7 @@
 
     @if($buttonLabel && $buttonHref)
         <a href="{{ $buttonHref }}"
-           class="mt-5 inline-flex px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
+           class="mt-5 inline-flex px-4 py-2 rounded-xl bg-primary text-white text-sm">
             {{ $buttonLabel }}
         </a>
     @endif

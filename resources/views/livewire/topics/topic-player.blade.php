@@ -13,23 +13,20 @@
                 <p class="text-slate-600 mt-3 max-w-3xl">{{ $topic->description }}</p>
 
                 @if(session('active_role') === 'disciples' && auth()->user()->can('manage_topics'))
-                    <a href="{{ route('mentor.topics.show', $topic->slug) }}"
-                    class="inline-flex px-4 py-2 rounded-xl border text-sm">
+                    <x-ui.button href="{{ route('mentor.topics.show', $topic->slug) }}" variant="outline" size="md">
                         Open Mentor Workspace
-                    </a>
+                    </x-ui.button>
                 @endif
             </div>
 
             @if($topicCertificate)
-                <a href="{{ route('certificates.download', $topicCertificate->id) }}"
-                   class="inline-flex px-4 py-2 rounded-xl bg-emerald-50 text-emerald-700 text-sm font-medium">
+                <x-ui.button href="{{ route('certificates.download', $topicCertificate->id) }}" variant="success" size="md">
                     View Certificate
-                </a>
+                </x-ui.button>
             @elseif($topicStatus === 'completed')
-                <a href="{{ route('certificates.topic.claim', $topic->id) }}"
-                   class="inline-flex px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-sm font-medium">
+                <x-ui.button href="{{ route('certificates.topic.claim', $topic->id) }}" variant="outline" size="md">
                     Claim Certificate
-                </a>
+                </x-ui.button>
             @else
                 <span class="inline-flex px-4 py-2 rounded-xl border border-slate-200 text-slate-400 text-sm">
                     Certificate Pending
@@ -39,15 +36,15 @@
 
         <div class="flex flex-wrap gap-2">
             <button wire:click="setTab('materials')"
-                    class="px-4 py-2 rounded-xl border {{ $activeTab === 'materials' ? 'bg-slate-900 text-white' : 'bg-white' }}">
+                    class="px-4 py-2 rounded-xl border {{ $activeTab === 'materials' ? 'bg-primary text-white' : 'bg-white' }}">
                 Materials
             </button>
             <button wire:click="setTab('sessions')"
-                    class="px-4 py-2 rounded-xl border {{ $activeTab === 'sessions' ? 'bg-slate-900 text-white' : 'bg-white' }}">
+                    class="px-4 py-2 rounded-xl border {{ $activeTab === 'sessions' ? 'bg-primary text-white' : 'bg-white' }}">
                 Sessions
             </button>
             <button wire:click="setTab('assessment')"
-                    class="px-4 py-2 rounded-xl border {{ $activeTab === 'assessment' ? 'bg-slate-900 text-white' : 'bg-white' }}">
+                    class="px-4 py-2 rounded-xl border {{ $activeTab === 'assessment' ? 'bg-primary text-white' : 'bg-white' }}">
                 Assessment
             </button>
         </div>
@@ -67,7 +64,7 @@
                     @foreach($topic->materials as $material)
                         <button wire:click="selectMaterial('{{ $material->id }}')"
                                 class="shrink-0 w-[280px] text-left rounded-2xl border p-5 transition snap-start
-                                {{ $activeMaterial?->id === $material->id ? 'bg-slate-900 text-white border-slate-900' : 'bg-white hover:border-slate-400' }}">
+                                {{ $activeMaterial?->id === $material->id ? 'bg-primary text-white border-primary' : 'bg-white hover:border-primary' }}">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="font-semibold">{{ $material->name }}</div>
                                 <span class="text-xs px-2 py-1 rounded-full {{ $activeMaterial?->id === $material->id ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-600' }}">
@@ -91,10 +88,7 @@
                     </div>
 
                     @if($activeMaterial)
-                        <button wire:click="markViewed"
-                                class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                            Mark viewed
-                        </button>
+                        <x-ui.button wire:click="markViewed" variant="primary" size="md">Mark viewed</x-ui.button>
                     @endif
                 </div>
 
@@ -163,15 +157,13 @@
 
                     @if($activeAssessment)
                         @if($this->activeAttempt)
-                            <a href="{{ route('assessments.take', $activeAssessment->id) }}"
-                            class="px-4 py-2 bg-yellow-500 text-white rounded-xl">
+                            <x-ui.button href="{{ route('assessments.take', $activeAssessment->id) }}" variant="warning" size="md">
                                 Resume Test
-                            </a>
+                            </x-ui.button>
                         @else
-                            <a href="{{ route('assessments.take', $activeAssessment->id) }}"
-                            class="px-4 py-2 bg-black text-white rounded-xl">
+                            <x-ui.button href="{{ route('assessments.take', $activeAssessment->id) }}" variant="primary" size="md">
                                 Start Test
-                            </a>
+                            </x-ui.button>
                         @endif
                     @endif
                 </div>

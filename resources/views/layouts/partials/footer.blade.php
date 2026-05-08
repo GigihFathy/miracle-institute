@@ -1,4 +1,4 @@
-<footer class="bg-slate-900 text-slate-300 mt-16">
+<footer class="bg-primary-dark text-slate-300 mt-16">
     <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 
         <!-- BRAND -->

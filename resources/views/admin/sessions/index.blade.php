@@ -7,9 +7,7 @@
                 <h1 class="text-2xl font-bold">Sessions</h1>
                 <p class="text-gray-500">Kelola jadwal Zoom, recording, dan reminder.</p>
             </div>
-            <button class="px-4 py-2 rounded-md bg-black text-white text-sm">
-                + New Session
-            </button>
+            <x-ui.button variant="primary" size="md">+ New Session</x-ui.button>
         </div>
 
         <div class="rounded-2xl bg-white border overflow-hidden">

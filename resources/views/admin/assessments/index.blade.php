@@ -3,9 +3,7 @@
         title="Assessments"
         subtitle="Kelola post-test, passing grade, dan randomisasi soal."
     >
-        <button class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-            + New Assessment
-        </button>
+        <x-ui.button variant="primary" size="md">+ New Assessment</x-ui.button>
     </x-ui.page-header>
 
     <div class="rounded-2xl bg-white border p-4">

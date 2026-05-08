@@ -8,9 +8,7 @@
             <div class="flex items-center gap-3">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="px-3 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                        Logout
-                    </button>
+                    <x-ui.button type="submit" variant="primary" size="md">Logout</x-ui.button>
                 </form>
             </div>
         </div>

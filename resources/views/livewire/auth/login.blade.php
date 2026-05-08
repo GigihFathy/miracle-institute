@@ -47,7 +47,7 @@
             Remember me
         </label>
 
-        <button type="submit" class="w-full bg-black text-white rounded-lg py-2">
+        <button type="submit" class="w-full bg-primary text-white rounded-lg py-2 font-medium">
             Login
         </button>
     </form>

@@ -54,7 +54,7 @@
                             </td>
 
                             <td class="px-4 py-3 text-right">
-                                <a href="{{ route('admin.users.roles', $row->id) }}" class="inline-flex items-center rounded-lg bg-slate-900 px-3 py-2 text-xs font-medium text-white hover:bg-slate-800 transition">
+                                <a href="{{ route('admin.users.roles', $row->id) }}" class="inline-flex items-center rounded-lg bg-primary px-3 py-2 text-xs font-medium text-white hover:bg-primary-dark transition">
                                     Manage roles
                                 </a>
                             </td>

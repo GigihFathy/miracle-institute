@@ -5,7 +5,7 @@
 @endphp
 
 <div class="space-y-8 px-4 sm:px-6 lg:px-36">
-    <section class="rounded-3xl overflow-hidden bg-slate-900 text-white">
+    <section class="rounded-3xl overflow-hidden bg-primary-dark text-white">
 
         @if($isGuest || $isMentor)
             <div x-data="slider()" x-init="init()" class="relative">
@@ -31,16 +31,14 @@
                             </p>
 
                             <div class="flex gap-3">
-                                <a href="{{ route('courses.index') }}"
-                                class="px-5 py-3 bg-white text-black rounded-xl text-sm">
+                                <x-ui.button href="{{ route('courses.index') }}" variant="secondary" size="md">
                                     Explore Journey
-                                </a>
+                                </x-ui.button>
                                 
                                 @guest
-                                    <a href="{{ route('login') }}"
-                                    class="px-5 py-3 border border-white/30 rounded-xl text-sm">
+                                    <x-ui.button href="{{ route('login') }}" variant="outline" size="md">
                                         Login
-                                    </a>
+                                    </x-ui.button>
                                 @endguest
                             </div>
                         </div>
@@ -93,15 +91,13 @@
 
                         <!-- ACTION -->
                         <div class="flex flex-wrap gap-3 pt-2">
-                            <a href="{{ route('courses.index') }}"
-                            class="px-5 py-3 bg-white text-black rounded-xl text-sm font-medium">
+                            <x-ui.button href="{{ route('courses.index') }}" variant="secondary" size="md">
                                 Explore Classes
-                            </a>
+                            </x-ui.button>
 
-                            <a href="{{ route('learning.dashboard') }}"
-                            class="px-5 py-3 border border-white/20 rounded-xl text-sm">
+                            <x-ui.button href="{{ route('learning.dashboard') }}" variant="outline" size="md">
                                 My Journey
-                            </a>
+                            </x-ui.button>
                         </div>
                     </div>
 
@@ -171,12 +167,12 @@
                                         <span class="font-semibold text-slate-700">{{ $progress }}%</span>
                                     </div>
                                     <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
-                                        <div class="h-2 bg-slate-900 rounded-full" style="width: {{ $progress }}%"></div>
+                                        <div class="h-2 bg-primary rounded-full" style="width: {{ $progress }}%"></div>
                                     </div>
                                 </div>
 
                                 <div class="mt-4">
-                                    <span class="inline-flex px-3 py-1 bg-slate-900 text-white rounded-xl text-sm">Open</span>
+                                    <x-ui.badge variant="primary" size="sm">Open</x-ui.badge>
                                 </div>
                             </div>
                         </div>
@@ -202,13 +198,13 @@
                     @if($studyProgramCarousel)
                         <div class="mb-3 flex items-center justify-end gap-2">
                             <button type="button" id="study-program-prev"
-                                    class="nav-btn h-9 w-9 rounded-full border border-slate-200 bg-white text-slate-900 transition hover:bg-slate-100"
+                                    class="nav-btn h-9 w-9 rounded-full border border-primary bg-white text-primary transition hover:bg-primary/5"
                                     aria-label="Scroll categories left">
                                 ←
                             </button>
 
                             <button type="button" id="study-program-next"
-                                    class="nav-btn h-9 w-9 rounded-full border border-slate-200 bg-white text-slate-900 transition hover:bg-slate-100"
+                                    class="nav-btn h-9 w-9 rounded-full border border-primary bg-white text-primary transition hover:bg-primary/5"
                                     aria-label="Scroll categories right">
                                 →
                             </button>
@@ -218,9 +214,9 @@
                             @foreach($studyPrograms as $sp)
                                 <a href="{{ route('courses.index', ['studyProgram' => $sp->slug]) }}"
                                    data-study-program-card
-                                   class="group shrink-0 w-[240px] sm:w-[260px] lg:w-[280px] snap-start rounded-2xl border border-slate-200 bg-slate-50 p-4 h-44 flex flex-col justify-center transition hover:-translate-y-0.5 hover:border-slate-400 hover:shadow-md">
+                                   class="group shrink-0 w-[240px] sm:w-[260px] lg:w-[280px] snap-start rounded-2xl border border-slate-200 bg-slate-50 p-4 h-44 flex flex-col justify-center transition hover:-translate-y-0.5 hover:border-primary hover:shadow-md">
                                     <div class="flex items-center gap-4">
-                                        <div class="h-14 w-14 rounded-full bg-slate-900/90 text-white flex items-center justify-center text-xl font-semibold shadow-md">
+                                        <div class="h-14 w-14 rounded-full bg-primary text-white flex items-center justify-center text-xl font-semibold shadow-md">
                                             {{ strtoupper(mb_substr($sp->title, 0, 1)) }}
                                         </div>
 
@@ -290,7 +286,7 @@
                             </div>
 
                             <div class="mt-4">
-                                <a href="{{ route('courses.show', $course->slug) }}" class="inline-flex px-3 py-1 bg-slate-900 text-white rounded-xl text-sm">Open</a>
+                                <x-ui.badge variant="primary" size="sm"><a href="{{ route('courses.show', $course->slug) }}">Open</a></x-ui.badge>
                             </div>
                         </div>
                     </div>
@@ -299,16 +295,16 @@
         </div>
     </section>
 
-    <section class="rounded-3xl overflow-hidden bg-slate-900 text-white py-8 px-16">
+    <section class="rounded-3xl overflow-hidden bg-primary-dark text-white py-8 px-16">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center">
-            <div class="lg:col-span-1">
-                <h2 class="text-xl sm:text-2xl font-semibold">Experience God’s Presence Through Authentic Discipleship</h2>
+            <div class="lg:col-span-1 space-y-4">
+                <h2 class="text-xl sm:text-2xl font-semibold">Grow in Faith Through Authentic Discipleship</h2>
                 <p class="mt-1 text-xs text-slate-300 max-w-xl">Miracle Institute hadir untuk membantu setiap orang bertumbuh dalam iman, mengenal Yesus lebih dalam, dan hidup dalam kuasa serta kasih Tuhan setiap hari.</p>
 
                 <div class="mt-3 grid grid-cols-2 gap-2">
                     <div class="flex items-start gap-2">
-                        <div class="h-7 w-7 rounded-full bg-slate-800/60 flex items-center justify-center">
-                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#a78bfa" stroke-width="1"/></svg>
+                        <div class="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#4BB3FD" stroke-width="1"/></svg>
                         </div>
                         <div class="text-xs">
                             <div class="font-semibold">Learn</div>
@@ -317,8 +313,8 @@
                     </div>
 
                     <div class="flex items-start gap-2">
-                        <div class="h-7 w-7 rounded-full bg-slate-800/60 flex items-center justify-center">
-                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5z" stroke="#fbbf24" stroke-width="1"/></svg>
+                        <div class="h-7 w-7 rounded-full bg-warning/20 flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5z" stroke="#F59E0B" stroke-width="1"/></svg>
                         </div>
                         <div class="text-xs">
                             <div class="font-semibold">Disciple</div>
@@ -327,8 +323,8 @@
                     </div>
 
                     <div class="flex items-start gap-2">
-                        <div class="h-7 w-7 rounded-full bg-slate-800/60 flex items-center justify-center">
-                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="9" rx="2" stroke="#60a5fa" stroke-width="1"/></svg>
+                        <div class="h-7 w-7 rounded-full bg-info/20 flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="9" rx="2" stroke="#3B82F6" stroke-width="1"/></svg>
                         </div>
                         <div class="text-xs">
                             <div class="font-semibold">Community</div>
@@ -337,8 +333,8 @@
                     </div>
 
                     <div class="flex items-start gap-2">
-                        <div class="h-7 w-7 rounded-full bg-slate-800/60 flex items-center justify-center">
-                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#34d399" stroke-width="1"/></svg>
+                        <div class="h-7 w-7 rounded-full bg-success/20 flex items-center justify-center">
+                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#10B981" stroke-width="1"/></svg>
                         </div>
                         <div class="text-xs">
                             <div class="font-semibold">Impact</div>
@@ -348,7 +344,7 @@
                 </div>
 
                 <div class="mt-3 flex items-center gap-3">
-                    <a href="{{ route('courses.index') }}" class="inline-flex px-3 py-1 bg-white text-slate-900 rounded-xl text-sm font-semibold">Start Your Journey</a>
+                    <x-ui.button href="{{ route('courses.index') }}" variant="secondary" size="md">Start Your Journey</x-ui.button>
                 </div>
             </div>
 
