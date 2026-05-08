@@ -9,27 +9,77 @@ use App\Models\MaterialProgress;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
 
 class ProgressService
 {
-    public function markMaterialViewed(string $userId, string $materialId): MaterialProgress
+    public function markMaterialViewed(string $userId, string $materialId): void
     {
-        $material = Material::with('topic')->findOrFail($materialId);
+        $material = Material::with('topic.videoSessions')->findOrFail($materialId);
 
-        $progress = MaterialProgress::updateOrCreate(
-            [
-                'user_id' => $userId,
-                'material_id' => $materialId,
-            ],
-            [
-                'status' => 'completed',
-                'completed_at' => now(),
-            ]
-        );
+        DB::transaction(function () use ($userId, $material) {
+            MaterialProgress::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'material_id' => $material->id,
+                ],
+                [
+                    'status' => 'completed',
+                    'started_at' => now(),
+                    'completed_at' => now(),
+                ]
+            );
 
-        $this->checkTopicCompletion($userId, $material->topic_id, $material->topic->course_id);
+            $this->recalculateTopicCompletion($userId, $material->topic_id);
+        });
+    }
 
-        return $progress;
+    public function recalculateTopicCompletion(string $userId, string $topicId): void
+    {
+        $topic = \App\Models\Topic::with(['materials', 'videoSessions'])->findOrFail($topicId);
+
+        $activeMaterials = $topic->materials()->where('status', 'active')->pluck('id');
+        $sessionIds = $topic->videoSessions()->whereIn('status', ['scheduled', 'ongoing', 'completed'])->pluck('id');
+
+        $materialsDone = $activeMaterials->isEmpty()
+            || MaterialProgress::query()
+                ->where('user_id', $userId)
+                ->whereIn('material_id', $activeMaterials)
+                ->where('status', 'completed')
+                ->count() >= $activeMaterials->count();
+
+        $sessionsDone = $sessionIds->isEmpty()
+            || \App\Models\Attendance::query()
+                ->where('user_id', $userId)
+                ->whereIn('video_session_id', $sessionIds)
+                ->whereIn('status', ['present', 'late'])
+                ->count() >= $sessionIds->count();
+
+        $enrollment = \App\Models\CourseEnrollment::query()
+            ->where('user_id', $userId)
+            ->where('course_id', $topic->course_id)
+            ->first();
+
+        if (! $enrollment) {
+            return;
+        }
+
+        $progress = TopicProgress::firstOrNew([
+            'course_enrollment_id' => $enrollment->id,
+            'topic_id' => $topicId,
+        ]);
+
+        if ($materialsDone && $sessionsDone) {
+            $progress->status = 'completed';
+            $progress->completed_at = now();
+            $progress->started_at ??= now();
+        } else {
+            $progress->status = $progress->exists ? ($progress->status ?: 'started') : 'started';
+            $progress->started_at ??= now();
+        }
+
+        $progress->save();
     }
 
     protected function checkTopicCompletion(string $userId, string $topicId, string $courseId): void

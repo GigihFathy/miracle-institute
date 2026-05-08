@@ -78,13 +78,6 @@
                             {{ $assessment ? 'Active' : 'None' }}
                         </div>
                     </div>
-
-                    <div class="rounded-2xl border bg-slate-50 p-4">
-                        <div class="text-xs text-slate-500">Certificate</div>
-                        <div class="text-2xl font-bold mt-1">
-                            {{ $courseCertificate ? 'Issued' : 'Pending' }}
-                        </div>
-                    </div>
                 </div>
 
                 <div class="flex flex-wrap gap-3">
@@ -270,10 +263,6 @@
                     <div class="px-4 py-3 rounded-xl bg-slate-900 text-white text-sm text-center">
                         {{ $filteredTopics->count() }} shown
                     </div>
-                </div>
-            @else
-                <div class="rounded-2xl border bg-slate-50 p-4 text-sm text-slate-600">
-                    Mentor view tidak menggunakan progress belajar. Konten tetap bisa dibaca, tetapi interaksi student seperti enrollment, claim certificate, dan assessment submission tidak ditampilkan di sini.
                 </div>
             @endif
         </section>

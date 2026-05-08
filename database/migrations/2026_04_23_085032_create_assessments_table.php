@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('randomize_questions')->default(false);
             $table->unsignedSmallInteger('question_limit')->nullable();
             $table->unsignedSmallInteger('time_limit_minutes')->nullable();
-            $table->enum('status', ['draft', 'active', 'archived'])->default('active');
+            $table->string('status')->default('active');
 
             $table->timestamps();
 
