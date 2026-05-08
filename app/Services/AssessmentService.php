@@ -150,7 +150,6 @@ class AssessmentService
             ?? ($question->options->isNotEmpty() ? 'mcq' : 'text');
 
         if ($type === 'mcq') {
-
             if (blank($value)) {
                 AssessmentAnswer::query()
                     ->where('attempt_id', $attempt->id)
@@ -168,7 +167,7 @@ class AssessmentService
                 [
                     'question_option_id' => $value,
                     'answer_text' => null,
-                    'is_correct' => null,
+                    'is_correct' => false,
                 ]
             );
 
@@ -178,7 +177,6 @@ class AssessmentService
         $value = trim((string) $value);
 
         if ($value === '') {
-
             AssessmentAnswer::query()
                 ->where('attempt_id', $attempt->id)
                 ->where('question_id', $question->id)
@@ -195,7 +193,7 @@ class AssessmentService
             [
                 'question_option_id' => null,
                 'answer_text' => $value,
-                'is_correct' => null,
+                'is_correct' => false,
             ]
         );
     }

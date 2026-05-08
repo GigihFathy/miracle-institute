@@ -11,6 +11,7 @@ use App\Services\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Illuminate\Support\Collection;
 
 class CourseShow extends Component
 {
@@ -20,7 +21,6 @@ class CourseShow extends Component
 
     public bool $enrolled = false;
     public bool $isGuest = true;
-    public bool $showAssessmentModal = false;
 
     public ?Certificate $courseCertificate = null;
     public array $topicStatusMap = [];
@@ -28,12 +28,53 @@ class CourseShow extends Component
     public ?Assessment $assessment = null;
     public ?array $assessmentMeta = null;
 
+    public bool $showAssessmentModal = false;
+
     public string $topicSearch = '';
     public string $topicSort = 'sort_asc';
     public string $topicStatusFilter = 'all';
+    public Collection $guestPreviewTopics;
+
+    private function loadGuestPreviewTopics(): void
+    {
+        $this->guestPreviewTopics = $this->course
+            ->topics()
+            ->with([
+                'materials' => fn ($query) => $query
+                    ->select('id', 'topic_id', 'name', 'type')
+                    ->orderBy('sort_order'),
+
+                'videoSessions',
+            ])
+            ->orderBy('sort_order')
+            ->limit(6)
+            ->get()
+            ->map(function ($topic) {
+
+                return [
+                    'name' => $topic->name,
+                    'description' => str($topic->description)
+                        ->limit(140),
+
+                    'materials_count' => $topic->materials->count(),
+
+                    'video_sessions_count' => $topic->videoSessions->count(),
+
+                    'preview_materials' => $topic->materials
+                        ->take(3)
+                        ->map(fn ($material) => [
+                            'name' => $material->title,
+                            'type' => $material->type,
+                        ])
+                        ->values(),
+                ];
+            });
+    }
 
     public function mount(string $slug): void
     {
+        
+
         $this->course = Course::with([
             'studyProgram',
             'topics' => fn ($q) => $q->withCount(['materials', 'videoSessions'])
@@ -42,122 +83,76 @@ class CourseShow extends Component
             'assessment.questions.options',
         ])->where('slug', $slug)->firstOrFail();
 
+        $this->guestPreviewTopics = collect();
+
+        if (!auth()->check()) {
+            $this->loadGuestPreviewTopics();
+        }
+
         $this->assessment = $this->course->assessment && $this->course->assessment->status === 'active'
             ? $this->course->assessment
             : null;
 
         $this->buildAssessmentMeta();
 
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $this->isGuest = true;
             $this->enrolled = false;
             $this->topicStatusMap = [];
             return;
         }
 
+        $user = auth()->user();
         $this->isGuest = false;
 
-        $user = auth()->user();
         $enrollment = $user->courseEnrollments()
             ->where('course_id', $this->course->id)
             ->first();
 
         $this->enrolled = (bool) $enrollment;
 
-        if ($this->enrolled) {
-            $this->courseCertificate = Certificate::where('user_id', $user->id)
-                ->where('type', 'course')
-                ->where('course_id', $this->course->id)
-                ->latest()
-                ->first();
-
-            $this->topicStatusMap = TopicProgress::where('course_enrollment_id', $enrollment->id)
-                ->pluck('status', 'topic_id')
-                ->toArray();
-        }
-    }
-
-    public function getIsMentorProperty(): bool
-    {
-        return auth()->check() && session('active_role') === 'disciples';
-    }
-
-    public function getIsStudentProperty(): bool
-    {
-        return auth()->check() && ! $this->isMentor;
-    }
-
-    public function getCanUseStudentFeaturesProperty(): bool
-    {
-        return $this->isStudent && $this->enrolled;
-    }
-
-    public function getCompletedTopicsCountProperty(): int
-    {
-        return collect($this->topicStatusMap)
-            ->filter(fn ($status) => $status === 'completed')
-            ->count();
-    }
-
-    public function getInProgressTopicsCountProperty(): int
-    {
-        return collect($this->topicStatusMap)
-            ->filter(fn ($status) => $status === 'in_progress')
-            ->count();
-    }
-
-    public function getNotStartedTopicsCountProperty(): int
-    {
-        return max(0, $this->course->topics->count() - $this->completedTopicsCount - $this->inProgressTopicsCount);
-    }
-
-    public function getOverallProgressProperty(): int
-    {
-        $total = $this->course->topics->count();
-
-        return $total > 0
-            ? (int) round(($this->completedTopicsCount / $total) * 100)
-            : 0;
-    }
-
-    public function getAssessmentUnlockedProperty(): bool
-    {
-        if (! $this->assessment || ! $this->enrolled) {
-            return false;
+        if (! $this->enrolled) {
+            $this->topicStatusMap = [];
+            return;
         }
 
-        if ($this->course->topics->isEmpty()) {
-            return false;
-        }
-
-        return $this->course->topics->every(function ($topic) {
-            return ($this->topicStatusMap[$topic->id] ?? null) === 'completed';
-        });
-    }
-
-    public function getActiveAttemptProperty()
-    {
-        if (! auth()->check() || ! $this->assessment) {
-            return null;
-        }
-
-        return AssessmentAttempt::where('assessment_id', $this->assessment->id)
-            ->where('user_id', auth()->id())
-            ->whereNull('submitted_at')
+        $this->courseCertificate = Certificate::where('user_id', $user->id)
+            ->where('type', 'course')
+            ->where('course_id', $this->course->id)
+            ->latest()
             ->first();
+
+        $this->topicStatusMap = TopicProgress::where('course_enrollment_id', $enrollment->id)
+            ->pluck('status', 'topic_id')
+            ->toArray();
     }
 
-    public function getHasPassedAssessmentProperty(): bool
+    private function buildAssessmentMeta(): void
     {
-        if (! auth()->check() || ! $this->assessment) {
-            return false;
+        if (! $this->assessment) {
+            $this->assessmentMeta = null;
+            return;
         }
 
-        return AssessmentAttempt::where('assessment_id', $this->assessment->id)
-            ->where('user_id', auth()->id())
-            ->whereNotNull('submitted_at')
-            ->where('passed', true)
-            ->exists();
+        $questionCount = $this->assessment->questions->count();
+        $estimatedMinutes = $this->assessment->time_limit_minutes
+            ?: max(5, $questionCount * 2);
+
+        $this->assessmentMeta = [
+            'title' => $this->assessment->title,
+            'passing_grade' => $this->assessment->passing_grade,
+            'time_limit_minutes' => $this->assessment->time_limit_minutes,
+            'estimated_minutes' => $estimatedMinutes,
+            'question_count' => $questionCount,
+            'start_date' => $this->assessment->created_at?->format('d M Y'),
+            'status' => $this->assessment->status,
+            'instructions' => [
+                'Baca setiap soal dengan teliti sebelum menjawab.',
+                'Gunakan waktu secara efisien karena timer berjalan otomatis.',
+                'Jawaban isian harus sesuai ejaan yang benar.',
+                'Klik Submit hanya setelah kamu yakin.',
+            ],
+        ];
     }
 
     public function getFilteredTopicsProperty()
@@ -202,47 +197,69 @@ class CourseShow extends Component
         return $topics->values();
     }
 
-    public function getGuestPreviewTopicsProperty()
+    public function getCompletedTopicsCountProperty(): int
     {
-        return $this->course->topics->take(3)->map(function ($topic) {
-            return [
-                'name' => $topic->name,
-                'slug' => $topic->slug,
-                'description' => $topic->description,
-                'materials_count' => $topic->materials_count,
-                'video_sessions_count' => $topic->video_sessions_count,
-                'preview_materials' => $topic->materials->take(2)->map(function ($material) {
-                    return [
-                        'name' => $material->name,
-                        'type' => $material->type,
-                    ];
-                })->values(),
-            ];
+        return collect($this->topicStatusMap)
+            ->filter(fn ($status) => $status === 'completed')
+            ->count();
+    }
+
+    public function getInProgressTopicsCountProperty(): int
+    {
+        return collect($this->topicStatusMap)
+            ->filter(fn ($status) => $status === 'in_progress')
+            ->count();
+    }
+
+    public function getNotStartedTopicsCountProperty(): int
+    {
+        return $this->course->topics->count() - $this->completedTopicsCount - $this->inProgressTopicsCount;
+    }
+
+    public function getAssessmentUnlockedProperty(): bool
+    {
+        if (! $this->assessment || ! $this->enrolled) {
+            return false;
+        }
+
+        if ($this->course->topics->isEmpty()) {
+            return false;
+        }
+
+        return $this->course->topics->every(function ($topic) {
+            return ($this->topicStatusMap[$topic->id] ?? null) === 'completed';
         });
+    }
+
+    public function getActiveAttemptProperty()
+    {
+        if (! auth()->check() || ! $this->assessment) {
+            return null;
+        }
+
+        return AssessmentAttempt::where('assessment_id', $this->assessment->id)
+            ->where('user_id', auth()->id())
+            ->whereNull('submitted_at')
+            ->first();
+    }
+
+    public function getHasPassedAssessmentProperty(): bool
+    {
+        if (! auth()->check() || ! $this->assessment) {
+            return false;
+        }
+
+        return AssessmentAttempt::where('assessment_id', $this->assessment->id)
+            ->where('user_id', auth()->id())
+            ->whereNotNull('submitted_at')
+            ->where('passed', true)
+            ->exists();
     }
 
     public function getCertificateEligibilityProperty(): array
     {
         $checks = [];
         $reasons = [];
-
-        if ($this->isGuest) {
-            return [
-                'eligible' => false,
-                'has_certificate' => false,
-                'checks' => [],
-                'reasons' => ['Login untuk memeriksa dan mengakses sertifikat.'],
-            ];
-        }
-
-        if ($this->isMentor) {
-            return [
-                'eligible' => false,
-                'has_certificate' => (bool) $this->courseCertificate,
-                'checks' => [],
-                'reasons' => ['Mentor mode bersifat manajerial dan tidak menggunakan claim certificate.'],
-            ];
-        }
 
         $checks[] = [
             'label' => 'Logged in',
@@ -269,7 +286,9 @@ class CourseShow extends Component
         $checks[] = [
             'label' => 'All topics completed',
             'done' => $allTopicsCompleted,
-            'note' => $allTopicsCompleted ? 'All topics completed' : 'Finish remaining topics',
+            'note' => $allTopicsCompleted
+                ? 'All topics completed'
+                : 'Finish remaining topics',
         ];
 
         $assessmentOk = true;
@@ -322,41 +341,6 @@ class CourseShow extends Component
         ];
     }
 
-    private function buildAssessmentMeta(): void
-    {
-        if (! $this->assessment) {
-            $this->assessmentMeta = null;
-            return;
-        }
-
-        $questionCount = $this->assessment->questions->count();
-        $estimatedMinutes = $this->assessment->time_limit_minutes
-            ?: max(5, $questionCount * 2);
-
-        $this->assessmentMeta = [
-            'title' => $this->assessment->title,
-            'passing_grade' => $this->assessment->passing_grade,
-            'time_limit_minutes' => $this->assessment->time_limit_minutes,
-            'estimated_minutes' => $estimatedMinutes,
-            'question_count' => $questionCount,
-            'start_date' => $this->assessment->created_at?->format('d M Y'),
-            'status' => $this->assessment->status,
-            'instructions' => [
-                'Baca setiap soal dengan teliti sebelum menjawab.',
-                'Gunakan waktu secara efisien karena timer berjalan otomatis.',
-                'Jawaban isian harus sesuai ejaan yang benar.',
-                'Klik Submit hanya setelah kamu yakin.',
-            ],
-        ];
-    }
-
-    public function clearTopicFilters(): void
-    {
-        $this->reset(['topicSearch', 'topicSort', 'topicStatusFilter']);
-        $this->topicSort = 'sort_asc';
-        $this->topicStatusFilter = 'all';
-    }
-
     public function openAssessmentModal(): void
     {
         if (! $this->assessment) {
@@ -371,15 +355,17 @@ class CourseShow extends Component
         $this->showAssessmentModal = false;
     }
 
+    public function clearTopicFilters(): void
+    {
+        $this->reset(['topicSearch', 'topicSort', 'topicStatusFilter']);
+        $this->topicSort = 'sort_asc';
+        $this->topicStatusFilter = 'all';
+    }
+
     public function enroll(CourseService $courseService)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect()->route('login');
-        }
-
-        if ($this->isMentor) {
-            session()->flash('error', 'Mentor tidak menggunakan fitur enroll.');
-            return null;
         }
 
         $this->authorize('enroll', $this->course);
@@ -406,9 +392,14 @@ class CourseShow extends Component
 
     public function render()
     {
+        $activeMaterial = null;
+        $materialUrl = null;
+
         return view('livewire.courses.course-show', [
+            'activeMaterial' => $activeMaterial,
+            'materialUrl' => $materialUrl,
             'filteredTopics' => $this->filteredTopics,
-            'guestPreviewTopics' => $this->guestPreviewTopics,
+            'assessment' => $this->assessment,
             'assessmentMeta' => $this->assessmentMeta,
             'certificateEligibility' => $this->certificateEligibility,
         ])->layout('layouts.learning');

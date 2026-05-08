@@ -46,6 +46,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/', function () {
+    return redirect()->route('explore.dashboard');
+})->name('home');
+
+Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');
+
+Route::get('/courses', CourseCatalog::class)->name('courses.index');
+Route::get('/courses/{slug}', CourseShow::class)->name('courses.show');
+
+Route::get('/articles', ArticleIndex::class)->name('articles.index');
+Route::get('/articles/{article}', ArticleShow::class)->name('articles.show');
+
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
+    ->middleware('guest')
+    ->name('auth.google.redirect');
+
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
+    ->middleware('guest')
+    ->name('auth.google.callback');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/register', Register::class)->name('register');
@@ -251,24 +272,3 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
                 ->name('permissions.index');
         });
 });
-
-
-Route::get('/', function () {
-    return redirect()->route('explore.dashboard');
-})->name('home');
-
-Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');
-
-Route::get('/courses', CourseCatalog::class)->name('courses.index');
-Route::get('/courses/{slug}', CourseShow::class)->name('courses.show');
-
-Route::get('/articles', ArticleIndex::class)->name('articles.index');
-Route::get('/articles/{article}', ArticleShow::class)->name('articles.show');
-
-Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
-    ->middleware('guest')
-    ->name('auth.google.redirect');
-
-Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
-    ->middleware('guest')
-    ->name('auth.google.callback');

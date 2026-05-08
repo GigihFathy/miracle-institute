@@ -131,13 +131,6 @@
                         <h2 class="text-xl font-semibold">{{ $activeMaterial?->name ?? 'Select a material' }}</h2>
                         <p class="text-sm text-slate-500">Type: {{ $activeMaterial?->type ?? '-' }}</p>
                     </div>
-
-                    @if($activeMaterial)
-                        <button wire:click="markViewed"
-                                class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                            Mark viewed
-                        </button>
-                    @endif
                 </div>
 
                 @if($activeMaterial && $materialUrl)

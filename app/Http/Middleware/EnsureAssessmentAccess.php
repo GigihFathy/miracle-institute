@@ -32,7 +32,7 @@ class EnsureAssessmentAccess
 
         $enrolled = $request->user()
             ->courseEnrollments()
-            ->where('course_id', $assessment->topic->course_id)
+            ->where('course_id', $assessment->course_id)
             ->exists();
 
         if (!$enrolled) {

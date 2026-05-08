@@ -16,7 +16,8 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->text('option_text');
-            $table->boolean('is_correct')->default(false);
+            $table->boolean('is_correct')
+                ->default(false);
             $table->unsignedSmallInteger('sort_order')->default(0);
 
             $table->timestamps();
