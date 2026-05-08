@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Events\TopicCompleted;
 use App\Models\Certificate;
 use App\Models\CourseEnrollment;
 use App\Models\Material;
@@ -73,16 +72,6 @@ class ProgressService
                 'completed_at' => now(),
             ]
         );
-
-        if ($existingStatus !== 'completed') {
-            event(new TopicCompleted(
-                $userId,
-                $topicId,
-                $courseId,
-                $enrollmentId,
-                $progress->id
-            ));
-        }
 
         return $progress;
     }

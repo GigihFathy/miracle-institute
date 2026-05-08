@@ -45,14 +45,14 @@
 
     $visibleLearning = collect($learningMenus)->filter(function ($item) use ($canMap) {
         $ability = $canMap[$item['route']] ?? null;
-        return ! $ability || (auth()->check() && auth()->user()->can($ability));
+        return !$ability || (auth()->check() && auth()->user()->can($ability));
     });
 
     $visibleMain = collect($mainMenus)->filter(function ($item) use ($canMap) {
         if (($item['type'] ?? null) === 'dropdown') return true;
 
         $ability = $canMap[$item['route']] ?? null;
-        return ! $ability || (auth()->check() && auth()->user()->can($ability));
+        return !$ability || (auth()->check() && auth()->user()->can($ability));
     });
 
     $activeClass = fn ($route) => request()->routeIs($route)
@@ -99,7 +99,6 @@
             @endif
 
 
-            {{-- LEARNING DROPDOWN --}}
             @if(($item['type'] ?? null) === 'dropdown' && $visibleLearning->count())
 
                 <div class="mt-2">

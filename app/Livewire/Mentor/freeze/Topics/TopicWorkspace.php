@@ -34,8 +34,8 @@ class TopicWorkspace extends Component
         $this->topic = Topic::with([
             'course',
             'materials.uploader',
-            'sessions',
-            'assessments.questions',
+            'videoSessions',
+            'course.assessment.questions',
         ])->where('slug', $slug)->firstOrFail();
 
         abort_unless(
@@ -71,7 +71,7 @@ class TopicWorkspace extends Component
             'materialFile' => ['nullable', 'file', 'max:51200'],
         ]);
 
-        if (! $this->materialFile && ! $this->materialExternalUrl) {
+        if (!$this->materialFile && !$this->materialExternalUrl) {
             $this->addError('materialFile', 'Upload file atau isi external URL.');
             return;
         }
@@ -166,7 +166,7 @@ class TopicWorkspace extends Component
                 ];
             });
 
-        $assessment = $this->topic->assessments->first();
+        $assessment = $this->topic->course->assessment->first();
 
         return view('livewire.mentor.topics.topic-workspace', [
             'materials' => $materials,

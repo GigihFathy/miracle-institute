@@ -7,19 +7,17 @@
             <p class="text-sm text-slate-500 mt-2">By {{ $article->author }}</p>
 
             <div class="prose max-w-none mt-6">
-                {!! $article->content !!}
+                {!!$article->content !!}
             </div>
         </div>
 
-        @if($article->images->count())
+        @if($article->image)
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                @foreach($article->images as $image)
-                    <div class="rounded-2xl bg-white border overflow-hidden">
-                        <img src="{{ asset('images/dummyPNG.png') }}"
-                             class="w-full h-64 object-cover"
-                             alt="">
-                    </div>
-                @endforeach
+                <div class="rounded-2xl bg-white border overflow-hidden">
+                    <img src="{{ asset('images/test.png') }}"
+                            class="w-full h-64 object-cover"
+                            alt="">
+                </div>
             </div>
         @endif
     </article>

@@ -732,7 +732,7 @@ class DatabaseSeeder extends Seeder
 
                 $rows[] = [
                     'id' => $this->uuid(),
-                    'session_id' => $session['id'],
+                    'video_session_id' => $session['id'],
                     'user_id' => $users[$userKey],
                     'status' => $status,
                     'check_in_at' => in_array($status, ['present', 'late'], true) ? $session['start_at']->copy()->addMinutes($status === 'late' ? 15 : 5) : null,

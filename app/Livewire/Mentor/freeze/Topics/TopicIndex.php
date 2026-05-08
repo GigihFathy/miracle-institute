@@ -13,7 +13,7 @@ class TopicIndex extends Component
 
     public function render()
     {
-        $topics = Topic::with(['course', 'materials', 'assessments'])
+        $topics = Topic::with(['course', 'materials', 'course.assessment'])
             ->where('teacher_id', auth()->id())
             ->when($this->search, fn ($q) => $q->where('name', 'like', '%' . $this->search . '%'))
             ->latest()

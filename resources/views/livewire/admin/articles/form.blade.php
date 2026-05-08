@@ -321,7 +321,7 @@
                         </div>
 
                         <article class="prose max-w-none prose-slate ql-editor !p-0">
-                            {!! $content ?: '<p style="color:#94a3b8">Article preview will appear here.</p>' !!}
+                            {!!$content ?: '<p style="color:#94a3b8">Article preview will appear here.</p>' !!}
                         </article>
                     </div>
 
