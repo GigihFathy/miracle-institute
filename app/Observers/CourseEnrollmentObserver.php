@@ -3,15 +3,32 @@
 namespace App\Observers;
 
 use App\Models\CourseEnrollment;
-use App\Services\LearningNotificationService;
+use App\Events\EnrollmentConfirmed;
+use App\Events\CourseCompleted;
+use Illuminate\Support\Facades\DB;
 
 class CourseEnrollmentObserver
 {
-    public function __construct(protected LearningNotificationService $notifier) {}
-
     public function created(CourseEnrollment $enrollment): void
     {
-        $enrollment->loadMissing(['user', 'course.studyProgram']);
-        $this->notifier->sendEnrollmentConfirmed($enrollment);
+        DB::afterCommit(function () use ($enrollment) {
+            app(AttendanceAutomationService::class)
+                ->backfillAbsentForLateEnrollment($enrollment);
+
+            event(new EnrollmentConfirmed($enrollment->id));
+        });
+    }
+
+
+    public function updated(CourseEnrollment $enrollment): void
+    {
+        if (
+            $enrollment->wasChanged('status') &&
+            $enrollment->status === 'completed'
+        ) {
+            DB::afterCommit(function () use ($enrollment) {
+                event(new CourseCompleted($enrollment->id));
+            });
+        }
     }
 }

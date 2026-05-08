@@ -1,0 +1,28 @@
+[
+    {
+        "id": "20acba63-fc81-4212-9e58-9d6cd2db1053",
+        "study_program_id": "183592f7-d1bf-41cd-91e1-9a774d1c66e2",
+        "title": "Foundational Discipleship",
+        "slug": "foundational-discipleship",
+        "poster": "images\/test.png",
+        "credit": 3,
+        "description": "Core discipleship topics for new members and mentors",
+        "quota": 50,
+        "status": "active",
+        "created_at": "2026-05-08T03:20:24.000000Z",
+        "updated_at": "2026-05-08T03:20:24.000000Z"
+    },
+    {
+        "id": "62534e4a-381e-4832-96f7-ce37d928a6aa",
+        "study_program_id": "d70aa2c9-1939-4759-85ce-bff14cf081a5",
+        "title": "Sermon Basics",
+        "slug": "sermon-basics",
+        "poster": "images\/test.png",
+        "credit": 4,
+        "description": "Basic structure and delivery of sermons",
+        "quota": 40,
+        "status": "active",
+        "created_at": "2026-05-08T03:20:24.000000Z",
+        "updated_at": "2026-05-08T03:20:24.000000Z"
+    }
+]

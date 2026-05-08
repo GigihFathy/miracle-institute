@@ -12,6 +12,7 @@ use App\Listeners\SendCertificateIssuedNotification;
 use App\Listeners\SendEnrollmentNotification;
 use Illuminate\Support\ServiceProvider;
 
+
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
@@ -26,12 +27,41 @@ class EventServiceProvider extends ServiceProvider
         CertificateGenerated::class => [
             SendCertificateIssuedNotification::class,
         ],
-        EnrollmentCreated::class => [
-            SendEnrollmentNotification::class,
+        
+        \App\Events\EnrollmentConfirmed::class => [
+            \App\Listeners\SendEnrollmentConfirmationEmail::class,
         ],
 
-        \App\Events\EnrollmentConfirmed::class => [
-            \App\Listeners\SendEnrollmentConfirmedMail::class,
+        \App\Events\TopicCompleted::class => [
+            \App\Listeners\SendTopicCompletedEmail::class,
+        ],
+
+        \App\Events\CourseCompleted::class => [
+            \App\Listeners\SendCourseCompletedEmail::class,
+        ],
+
+        \App\Events\AssessmentAvailable::class => [
+            \App\Listeners\SendAssessmentAvailableEmail::class,
+        ],
+
+        \App\Events\AssessmentSubmitted::class => [
+            \App\Listeners\SendAssessmentSubmissionReceiptEmail::class,
+        ],
+
+        \App\Events\AttendanceIssueDetected::class => [
+            \App\Listeners\SendAttendanceIssueEmail::class,
+        ],
+
+        \App\Events\CertificateIssued::class => [
+            \App\Listeners\SendCertificateReadyEmail::class,
+        ],
+
+        \App\Events\VideoSessionReminderTriggered::class => [
+            \App\Listeners\SendVideoSessionReminderEmail::class,
+        ],
+
+        \App\Events\VideoSessionCreated::class => [
+            \App\Listeners\SendVideoSessionCreatedEmail::class,
         ],
     ];
 

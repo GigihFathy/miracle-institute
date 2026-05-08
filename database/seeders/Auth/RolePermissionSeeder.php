@@ -19,11 +19,6 @@ class RolePermissionSeeder extends Seeder
                 'manage_certificates',
                 'view_reports',
             ],
-            'instructor' => [
-                'manage_topics',
-                'manage_assessments',
-                'view_reports',
-            ],
             'student' => [
                 'enroll_course',
                 'access_topic',

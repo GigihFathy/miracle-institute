@@ -22,7 +22,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['question_id', 'sort_order']);
-            $table->unique(['question_id', 'sort_order']);
         });
     }
 

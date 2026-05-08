@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Assessment;
+use App\Models\Attendance;
 use App\Models\Course;
 use App\Models\VideoSession;
 use App\Models\Material;
@@ -25,10 +26,14 @@ use App\Policies\AttendancePolicy;
 use App\Policies\CoursePolicy;
 use App\Policies\MaterialPolicy;
 use App\Policies\TopicPolicy;
-use App\Observers\AssessmentAttemptObserver;
-use App\Observers\CertificateObserver;
+
 use App\Observers\CourseEnrollmentObserver;
 use App\Observers\TopicProgressObserver;
+use App\Observers\AssessmentAttemptObserver;
+use App\Observers\AttendanceObserver;
+use App\Observers\CertificateObserver;
+use App\Observers\VideoSessionObserver;
+
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -51,10 +56,29 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(StudyProgram::class, StudyProgramPolicy::class);
 
 
-        CourseEnrollment::observe(CourseEnrollmentObserver::class);
-        TopicProgress::observe(TopicProgressObserver::class);
-        AssessmentAttempt::observe(AssessmentAttemptObserver::class);
-        Certificate::observe(CertificateObserver::class);
+        CourseEnrollment::observe(
+            CourseEnrollmentObserver::class
+        );
+
+        TopicProgress::observe(
+            TopicProgressObserver::class
+        );
+
+        AssessmentAttempt::observe(
+            AssessmentAttemptObserver::class
+        );
+
+        Attendance::observe(
+            AttendanceObserver::class
+        );
+
+        Certificate::observe(
+            CertificateObserver::class
+        );
+
+        VideoSession::observe(
+            VideoSessionObserver::class
+        );
 
         // Admin | Disciple
         Gate::define('manage_users', fn ($user) => $user->hasPermission('manage_users'));
