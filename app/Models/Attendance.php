@@ -19,6 +19,7 @@ class Attendance extends Model
 
     protected $casts = [
         'check_in_at' => 'datetime',
+        'clock_out_at' => 'datetime',
     ];
 
     public function videoSession()

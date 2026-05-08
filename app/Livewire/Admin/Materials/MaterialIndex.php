@@ -84,7 +84,7 @@ class MaterialIndex extends Component
 
         if ($topicId) {
             $this->topic_id = $topicId;
-            if (! in_array($topicId, $this->openTopics, true)) {
+            if (!in_array($topicId, $this->openTopics, true)) {
                 $this->openTopics[] = $topicId;
             }
         }
@@ -109,7 +109,7 @@ class MaterialIndex extends Component
         $this->status = $row->status;
         $this->sort_order = (int) ($row->sort_order ?? 0);
 
-        if (! in_array($row->topic_id, $this->openTopics, true)) {
+        if (!in_array($row->topic_id, $this->openTopics, true)) {
             $this->openTopics[] = $row->topic_id;
         }
     }
@@ -123,7 +123,7 @@ class MaterialIndex extends Component
             ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
             ->count();
 
-        if (! $this->editingId && $count >= 3) {
+        if (!$this->editingId && $count >= 3) {
             throw ValidationException::withMessages([
                 'topic_id' => 'Setiap topic hanya boleh memiliki 3 material.',
             ]);
@@ -146,7 +146,7 @@ class MaterialIndex extends Component
 
         $this->resetForm();
 
-        if ($this->topic_id && ! in_array($this->topic_id, $this->openTopics, true)) {
+        if ($this->topic_id && !in_array($this->topic_id, $this->openTopics, true)) {
             $this->openTopics[] = $this->topic_id;
         }
 
@@ -195,7 +195,7 @@ class MaterialIndex extends Component
 
     private function validateMaterialType(): void
     {
-        if (! $this->topic_id || ! $this->type) {
+        if (!$this->topic_id || !$this->type) {
             return;
         }
 

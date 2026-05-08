@@ -41,7 +41,7 @@ class Topic extends Model
             Attendance::class,
             VideoSession::class,
             'topic_id',
-            'session_id',
+            'video_session_id',
             'id',
             'id'
         );

@@ -12,8 +12,6 @@ class ArticleShow extends Component
     public function mount(Article $article)
     {
         abort_unless($article->status === 'active', 404);
-
-        $this->article = $article->load('images');
     }
 
     public function render()

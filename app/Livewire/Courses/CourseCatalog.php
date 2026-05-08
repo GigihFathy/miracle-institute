@@ -17,21 +17,19 @@ class CourseCatalog extends Component
     public string $studyProgram = '';
     public string $sort = 'latest';
 
-    // protected $queryString = [
-    //     'search' => ['except' => ''],
-    //     'studyProgram' => ['except' => ''],
-    //     'sort' => ['except' => 'latest'],
-    //     'perPage' => ['except' => 9],
-    // ];
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'studyProgram' => ['except' => ''],
+        'sort' => ['except' => 'latest'],
+        'perPage' => ['except' => 9],
+        'page' => ['except' => 1],
+    ];
 
-    public function updatedStudyProgram(): void
+    public function updated($property): void
     {
-        $this->resetPage();
-    }
-
-    public function updatedSort(): void
-    {
-        $this->resetPage();
+        if (in_array($property, ['search', 'studyProgram', 'sort', 'perPage'])) {
+            $this->resetPage();
+        }
     }
 
     public function enroll(CourseService $courseService, string $courseId)
@@ -41,11 +39,14 @@ class CourseCatalog extends Component
         }
 
         $course = Course::findOrFail($courseId);
+
         $this->authorize('enroll', $course);
 
         try {
             $courseService->enrollUser(auth()->id(), $courseId);
+
             session()->flash('success', 'Berhasil mendaftar course.');
+
             $this->dispatch('$refresh');
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
@@ -56,27 +57,37 @@ class CourseCatalog extends Component
     {
         $user = auth()->user();
 
-        $enrolledCourseIds = [];
+        $enrolledCourseIds = $user
+            ? CourseEnrollment::where('user_id', $user->id)->pluck('course_id')->all()
+            : [];
 
-        if ($user) {
-            $enrolledCourseIds = CourseEnrollment::where('user_id', $user->id)
-                ->pluck('course_id')
-                ->all();
+        $query = Course::query()
+            ->with('studyProgram')
+            ->withCount('topics')
+            ->where('status', 'active');
+
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('title', 'like', "%{$this->search}%")
+                    ->orWhereHas('studyProgram', function ($sp) {
+                        $sp->where('title', 'like', "%{$this->search}%");
+                    });
+            });
         }
 
-        $query = Course::with('studyProgram')
-            ->withCount('topics')
-            ->where('status', 'active')
-            ->when($this->search, fn ($q) => $q->where('title', 'like', '%' . $this->search . '%'))
-            ->when($this->studyProgram, fn ($q) =>
-                $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram))
-            );
+        if ($this->studyProgram) {
+            $query->whereHas('studyProgram', function ($sp) {
+                $sp->where('slug', $this->studyProgram);
+            });
+        }
 
-        match ($this->sort) {
-            'title' => $query->orderBy('title'),
-            'topics' => $query->orderByDesc('topics_count'),
-            default => $query->latest(),
-        };
+        if ($this->sort === 'title') {
+            $query->orderBy('title');
+        } elseif ($this->sort === 'topics') {
+            $query->orderByDesc('topics_count');
+        } else {
+            $query->latest();
+        }
 
         return view('livewire.courses.course-catalog', [
             'courses' => $query->paginate($this->perPage),

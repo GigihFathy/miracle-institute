@@ -11,7 +11,7 @@ class AttendanceRepository
         return Attendance::updateOrCreate(
             [
                 'user_id' => $userId,
-                'session_id' => $sessionId
+                'video_session_id' => $sessionId
             ],
             [
                 'status' => 'present',
