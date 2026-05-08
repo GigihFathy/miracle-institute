@@ -10,6 +10,9 @@ use App\Models\Topic;
 use App\Models\Certificate;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\AssessmentAttempt;
+use App\Models\CourseEnrollment;
+use App\Models\TopicProgress;
 use App\Models\Permission;
 use App\Models\StudyProgram;
 use App\Policies\StudyProgramPolicy;
@@ -22,7 +25,10 @@ use App\Policies\AttendancePolicy;
 use App\Policies\CoursePolicy;
 use App\Policies\MaterialPolicy;
 use App\Policies\TopicPolicy;
-
+use App\Observers\AssessmentAttemptObserver;
+use App\Observers\CertificateObserver;
+use App\Observers\CourseEnrollmentObserver;
+use App\Observers\TopicProgressObserver;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -45,11 +51,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(StudyProgram::class, StudyProgramPolicy::class);
 
 
-        // Gate::before(function ($user, $ability) {
-        //     if ($user->roles()->where('name', 'super_admin')->exists()) {
-        //         return true;
-        //     }
-        // });
+        CourseEnrollment::observe(CourseEnrollmentObserver::class);
+        TopicProgress::observe(TopicProgressObserver::class);
+        AssessmentAttempt::observe(AssessmentAttemptObserver::class);
+        Certificate::observe(CertificateObserver::class);
 
         // Admin | Disciple
         Gate::define('manage_users', fn ($user) => $user->hasPermission('manage_users'));

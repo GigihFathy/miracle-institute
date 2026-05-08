@@ -13,12 +13,12 @@ trait WithTableState
 
     protected $paginationTheme = 'tailwind';
 
-    public function updatedSearch(): void
+    public function updatingSearch()
     {
         $this->resetPage();
     }
 
-    public function updatedPerPage(): void
+    public function updatingPerPage()
     {
         $this->resetPage();
     }

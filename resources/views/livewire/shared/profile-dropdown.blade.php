@@ -1,5 +1,15 @@
 <div x-data="{ open: false }" class="relative">
     @php
+        
+        $learningMenus = [
+            ['label' => 'Courses', 'route' => 'mentor.courses.index'],
+            ['label' => 'Topics', 'route' => 'mentor.topics.index'],
+            ['label' => 'Materials', 'route' => 'mentor.materials.index'],
+            ['label' => 'Sessions', 'route' => 'mentor.sessions.index'], 
+            ['label' => 'Attendances', 'route' => 'mentor.attendances.index'],
+            ['label' => 'Assessments', 'route' => 'mentor.assessments.index'],
+        ];
+
         $activeRole = session('active_role');
     @endphp
 
@@ -49,6 +59,43 @@
                 </svg>
                 Mentor Dashboard
             </a>
+
+            <a href="{{ route('mentor.study-recap.index') }}" class="flex items-center px-4 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition">
+                <svg class="h-4 w-4 text-slate-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                Recap Study
+            </a>
+
+            <div x-data="{ openLearning: {{ request()->routeIs('disciples.*') ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="openLearning = !openLearning"
+                    class="w-full flex items-center justify-between px-4 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100">
+
+                    <span>Learning</span>
+
+                    <svg class="w-4 h-4 transition-transform"
+                        :class="openLearning ? 'rotate-180' : ''"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="openLearning"
+                    x-transition
+                    class="pl-3 space-y-1">
+
+                    @foreach($learningMenus as $menu)
+                        <a href="{{ route($menu['route']) }}"
+                        class="block px-4 py-2 rounded-xl text-sm {{ request()->routeIs($menu['route']) ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100' }}">
+                            {{ $menu['label'] }}
+                        </a>
+                    @endforeach
+
+                </div>
+            </div>
+
+            
         @endif
 
         <a href="{{ route('certificates.index') }}" class="flex items-center px-4 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition">

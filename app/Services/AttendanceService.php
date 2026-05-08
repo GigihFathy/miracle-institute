@@ -31,7 +31,7 @@ class AttendanceService
 
         return Attendance::updateOrCreate(
             [
-                'session_id' => $sessionId,
+                'video_session_id' => $sessionId,
                 'user_id' => $userId,
             ],
             [

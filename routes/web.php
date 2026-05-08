@@ -46,18 +46,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return redirect()->route('explore.dashboard');
-})->name('home');
-
-Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');
-
-Route::get('/courses', CourseCatalog::class)->name('courses.index');
-Route::get('/courses/{slug}', CourseShow::class)->name('courses.show');
-
-Route::get('/articles', ArticleIndex::class)->name('articles.index');
-Route::get('/articles/{article}', ArticleShow::class)->name('articles.show');
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/register', Register::class)->name('register');
@@ -113,17 +101,48 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
         ->name('mentor.')
         ->middleware(['role:disciples'])
         ->group(function () {
-            Route::get('/dashboard', MentorDashboard::class)
+            Route::get('/dashboard', \App\Livewire\Disciples\Dashboard\DashboardIndex::class)
                 ->middleware('permission:manage_topics')
                 ->name('dashboard');
 
-            Route::get('/topics', MentorTopicIndex::class)
-                ->middleware('permission:manage_topics')
+            // Route::get('/topics', MentorTopicIndex::class)
+            //     ->middleware('permission:manage_topics')
+            //     ->name('topics.index');
+
+            // Route::get('/topics/{slug}', TopicWorkspace::class)
+            //     ->middleware('permission:manage_topics')
+            //     ->name('topics.show');
+
+            Route::get('/courses', \App\Livewire\Disciples\Courses\CourseIndex::class)
+                ->name('courses.index');
+
+            Route::get('/topics', \App\Livewire\Disciples\Topics\TopicIndex::class)
                 ->name('topics.index');
 
-            Route::get('/topics/{slug}', TopicWorkspace::class)
-                ->middleware('permission:manage_topics')
-                ->name('topics.show');
+            Route::get('/materials', \App\Livewire\Disciples\Materials\MaterialIndex::class)
+                ->name('materials.index');
+
+            Route::get('/sessions', \App\Livewire\Disciples\Sessions\SessionIndex::class)
+                ->name('sessions.index');
+                
+            Route::get('/attendances', \App\Livewire\Disciples\Attendances\AttendanceIndex::class)
+                ->name('attendances.index');
+            
+            Route::get('/assessments', \App\Livewire\Disciples\Assessments\AssessmentIndex::class)
+                ->name('assessments.index');
+
+            Route::get('/assessments/{assessmentId}/questions', \App\Livewire\Disciples\Assessments\QuestionManager::class)
+                ->name('assessments.questions');
+
+            Route::get('/mentor/study-recap',  App\Livewire\Disciples\StudyRecap\StudyRecapIndex::class)
+                ->name('study-recap.index');
+
+            Route::get('/mentor/study-recap/{course}/topics', App\Livewire\Disciples\StudyRecap\TopicRecap::class)
+                ->name('study-recap.topics');
+                
+            Route::get('/mentor/study-recap/{course}/students', App\Livewire\Disciples\StudyRecap\StudentRecap::class)
+                ->name('study-recap.students');
+
         });
 
     Route::middleware(['role:student,disciples'])->group(function () {
@@ -232,6 +251,19 @@ Route::middleware(['auth', 'verified', 'set.active.role'])->group(function () {
                 ->name('permissions.index');
         });
 });
+
+
+Route::get('/', function () {
+    return redirect()->route('explore.dashboard');
+})->name('home');
+
+Route::get('/dashboard/explore', ExploreDashboard::class)->name('explore.dashboard');
+
+Route::get('/courses', CourseCatalog::class)->name('courses.index');
+Route::get('/courses/{slug}', CourseShow::class)->name('courses.show');
+
+Route::get('/articles', ArticleIndex::class)->name('articles.index');
+Route::get('/articles/{article}', ArticleShow::class)->name('articles.show');
 
 Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
     ->middleware('guest')

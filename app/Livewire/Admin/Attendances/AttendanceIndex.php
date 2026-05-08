@@ -15,7 +15,6 @@ class AttendanceIndex extends Component
 {
     use WithAdminTableState;
 
-    public bool $showModal = false;
     public ?string $editingId = null;
 
     public string $video_session_id = '';
@@ -72,7 +71,6 @@ class AttendanceIndex extends Component
     public function create(): void
     {
         $this->resetForm();
-        $this->showModal = true;
     }
 
     public function edit(string $id): void
@@ -85,8 +83,6 @@ class AttendanceIndex extends Component
         $this->status = $row->status;
         $this->check_in_at = optional($row->check_in_at)->format('Y-m-d\TH:i');
         $this->ip_address = $row->ip_address;
-
-        $this->showModal = true;
     }
 
     public function save(): void
@@ -106,8 +102,6 @@ class AttendanceIndex extends Component
         );
 
         $this->resetForm();
-        $this->showModal = false;
-        
         session()->flash('success', 'Attendance berhasil disimpan.');
     }
 
@@ -129,6 +123,48 @@ class AttendanceIndex extends Component
         session()->flash('success', 'Status attendance diperbarui.');
     }
 
+    public function sessionJoinCutoff(VideoSession $session): Carbon
+    {
+        $byStartWindow = $session->start_at->copy()->addMinutes(45);
+        $byEndWindow = $session->end_at->copy()->subMinutes(15);
+
+        return $byStartWindow->lt($byEndWindow) ? $byStartWindow : $byEndWindow;
+    }
+
+    public function attendanceTimingLabel(Attendance $attendance): string
+    {
+        if (!$attendance->check_in_at) {
+            return 'No clock-in';
+        }
+
+        $session = $attendance->videoSession;
+        if (!$session) {
+            return ucfirst($attendance->status);
+        }
+
+        $joinCutoff = $this->sessionJoinCutoff($session);
+
+        if ($attendance->check_in_at->gt($joinCutoff)) {
+            return 'Outside window';
+        }
+
+        $minutesAfterStart = $session->start_at->diffInMinutes($attendance->check_in_at, false);
+
+        return $minutesAfterStart <= 15 ? 'On time' : 'Late';
+    }
+
+    public function attendanceTimingTone(Attendance $attendance): string
+    {
+        $label = $this->attendanceTimingLabel($attendance);
+
+        return match ($label) {
+            'On time' => 'emerald',
+            'Late' => 'amber',
+            'Outside window' => 'rose',
+            default => 'slate',
+        };
+    }
+
     public function render()
     {
         $baseQuery = Attendance::with(['videoSession.topic.course', 'user'])
@@ -136,7 +172,7 @@ class AttendanceIndex extends Component
                 $q->where(function ($inner) {
                     $inner->whereHas('user', function ($u) {
                         $u->where('name', 'like', "%{$this->search}%")
-                            ->orWhere('name', 'like', "%{$this->search}%")
+                            ->orWhere('last_name', 'like', "%{$this->search}%")
                             ->orWhere('email', 'like', "%{$this->search}%");
                     })->orWhereHas('videoSession', function ($s) {
                         $s->where('title', 'like', "%{$this->search}%")

@@ -20,7 +20,7 @@ class TopicSeeder extends Seeder
                 'slug' => 'new-birth',
                 'category' => 'Discipleship',
                 'description' => 'Introduction to salvation and spiritual rebirth.',
-                'poster' => 'images/dummyPNG.png',
+                'poster' => 'images/test.png',
             ],
             [
                 'course_slug' => 'foundational-discipleship',
@@ -28,7 +28,7 @@ class TopicSeeder extends Seeder
                 'slug' => 'spiritual-disciplines',
                 'category' => 'Discipleship',
                 'description' => 'Prayer, Bible study, and daily devotion habits.',
-                'poster' => 'images/dummyPNG.png',
+                'poster' => 'images/test.png',
             ],
             [
                 'course_slug' => 'foundational-discipleship',
@@ -36,7 +36,7 @@ class TopicSeeder extends Seeder
                 'slug' => 'serving-the-church',
                 'category' => 'Discipleship',
                 'description' => 'Practical service and ministry involvement.',
-                'poster' => 'images/dummyPNG.png',
+                'poster' => 'images/test.png',
             ],
             [
                 'course_slug' => 'sermon-basics',
@@ -44,7 +44,7 @@ class TopicSeeder extends Seeder
                 'slug' => 'hermeneutics-basics',
                 'category' => 'Sermon',
                 'description' => 'How to interpret a biblical text responsibly.',
-                'poster' => 'images/dummyPNG.png',
+                'poster' => 'images/test.png',
             ],
             [
                 'course_slug' => 'sermon-basics',
@@ -52,7 +52,7 @@ class TopicSeeder extends Seeder
                 'slug' => 'sermon-structure',
                 'category' => 'Sermon',
                 'description' => 'Building a sermon outline from introduction to application.',
-                'poster' => 'images/dummyPNG.png',
+                'poster' => 'images/test.png',
             ],
             [
                 'course_slug' => 'sermon-basics',
@@ -60,7 +60,7 @@ class TopicSeeder extends Seeder
                 'slug' => 'public-speaking-for-ministry',
                 'category' => 'Sermon',
                 'description' => 'Communication and delivery skills in ministry settings.',
-                'poster' => 'images/dummyPNG.png',
+                'poster' => 'images/test.png',
             ],
         ];
 

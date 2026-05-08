@@ -42,13 +42,13 @@
                             <div class="text-xs text-slate-500">Students</div>
                         </div>
                         <div class="rounded-xl border p-3 text-center">
-                            <div class="font-semibold">{{ $topic->assessments->count() }}</div>
+                            <div class="font-semibold">{{ $topic->course->assessment->status }}</div>
                             <div class="text-xs text-slate-500">Tests</div>
                         </div>
                     </div>
 
                     <div class="mt-auto flex items-center justify-between gap-3">
-                        <a href="{{ route('mentor.topics.show', $topic->slug) }}"
+                        <a href="{{ route('mentor.materials.index', $topic->slug) }}"
                            class="inline-flex px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
                             Open Workspace
                         </a>
