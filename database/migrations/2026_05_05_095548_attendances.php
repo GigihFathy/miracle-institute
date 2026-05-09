@@ -24,6 +24,7 @@ return new class extends Migration
 
             $table->string('status')->default('present'); // present, late, absent
             $table->dateTime('check_in_at')->nullable();
+            $table->dateTime('clock_out_at')->nullable();
             $table->string('ip_address', 45)->nullable();
 
             $table->timestamps();

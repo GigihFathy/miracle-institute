@@ -2,9 +2,9 @@
 
 namespace App\Events;
 
-class TopicCompleted
+class VideoSessionCreated
 {
     public function __construct(
-        public string $topicProgressId
+        public string $videoSessionId
     ) {}
 }

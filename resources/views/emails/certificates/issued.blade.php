@@ -17,7 +17,7 @@
         @include('emails.partials.meta-row', ['label' => 'Issued At', 'value' => optional($certificate->issued_at)->format('d M Y')])
     </table>
 
-    @component('emails.components.button', ['url' => asset('storage/' . $certificate->file_path), 'color' => '#7c3aed'])
+    @component('emails.components.button', ['url' => {{ route('certificates.download') }}, 'color' => '#7c3aed'])
         Download Sertifikat
     @endcomponent
 @endcomponent

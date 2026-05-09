@@ -2,9 +2,9 @@
 
 namespace App\Events;
 
-class TopicCompleted
+class EnrollmentConfirmed
 {
     public function __construct(
-        public string $topicProgressId
+        public string $enrollmentId
     ) {}
 }

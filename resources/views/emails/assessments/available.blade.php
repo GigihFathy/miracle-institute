@@ -1,23 +1,23 @@
 @component('emails.layouts.learning', [
-    'title' => 'Topik Selesai',
-    'accent' => '#4f46e5',
-    'accentSoft' => '#eef2ff',
-    'badge' => 'PROGRESS',
-    'icon' => '📘',
-    'heroTitle' => 'Satu topik berhasil diselesaikan',
-    'heroText' => 'Progres Anda bertambah. Selesaikan topik berikutnya untuk membuka assessment dan sertifikat.'
+    'title' => 'Assessment Tersedia',
+    'accent' => '#b45309',
+    'accentSoft' => '#fffbeb',
+    'badge' => 'ASSESSMENT',
+    'icon' => '📝',
+    'heroTitle' => 'Assessment sudah dibuka',
+    'heroText' => 'Seluruh topik sudah selesai dan assessment kini tersedia untuk dikerjakan.'
 ])
     <p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#334155;">
-        Halo <strong>{{ $notifiable->name }}</strong>, topik berikut sudah selesai:
+        Halo <strong>{{ $notifiable->name }}</strong>, Anda sudah dapat mulai mengerjakan assessment berikut.
     </p>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;margin-bottom:22px;">
-        @include('emails.partials.meta-row', ['label' => 'Topik', 'value' => $progress->topic->name])
-        @include('emails.partials.meta-row', ['label' => 'Course', 'value' => $progress->courseEnrollment->course->title])
-        @include('emails.partials.meta-row', ['label' => 'Status', 'value' => ucfirst($progress->status)])
+        @include('emails.partials.meta-row', ['label' => 'Assessment', 'value' => $assessment->title])
+        @include('emails.partials.meta-row', ['label' => 'Passing Grade', 'value' => $assessment->passing_grade . '%'])
+        @include('emails.partials.meta-row', ['label' => 'Waktu', 'value' => $assessment->time_limit_minutes ? $assessment->time_limit_minutes . ' menit' : 'Tanpa batas waktu'])
     </table>
 
-    @component('emails.components.button', ['url' => url('/topics/' . $progress->topic->slug), 'color' => '#4f46e5'])
-        Lanjutkan Topik
+    @component('emails.components.button', ['url' => url('/assessments/' . $assessment->id), 'color' => '#b45309'])
+        Kerjakan Assessment
     @endcomponent
 @endcomponent

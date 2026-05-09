@@ -70,37 +70,39 @@
                 <button wire:click="setTab('sessions')" class="px-4 py-2 rounded-xl border transition {{ $activeTab === 'sessions' ? 'bg-slate-900 text-white' : 'bg-white' }}">Sessions</button>
             </div>
 
-            @if($activeMaterial)
-                @php
-                    $isLocked = !$hasSessionEnded; 
-                @endphp
+            @if (!$topicCompleted)
+                @if($activeMaterial)
+                    @php
+                        $isLocked = !$hasSessionEnded; 
+                    @endphp
 
-                <button wire:click="{{ $isLocked ? '' : 'markViewed' }}"
-                        {{ $isLocked ? 'disabled' : '' }}
-                        class="group relative px-6 py-2 rounded-xl font-semibold border transition-all duration-300 flex items-center gap-2
-                        {{ $isLocked 
-                            ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-80' 
-                            : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:shadow-emerald-200/50 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0' 
-                        }}">
-                    
-                    @if($isLocked)
-                        <svg xmlns="http://w3.org" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Attend session to complete</span>
-                    @else
-                        <svg xmlns="http://w3.org" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>Mark topic as completed</span>
-                    @endif
+                    <button wire:click="{{ $isLocked ? '' : 'markViewed' }}"
+                            {{ $isLocked ? 'disabled' : '' }}
+                            class="group relative px-6 py-2 rounded-xl font-semibold border transition-all duration-300 flex items-center gap-2
+                            {{ $isLocked 
+                                ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-80' 
+                                : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:shadow-emerald-200/50 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0' 
+                            }}">
+                        
+                        @if($isLocked)
+                            <svg xmlns="http://w3.org" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Attend session to complete</span>
+                        @else
+                            <svg xmlns="http://w3.org" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            <span>Mark topic as completed</span>
+                        @endif
 
-                    @if($isLocked)
-                        <span class="absolute -top-10 left-1/2 -translate-x-1/2 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 whitespace-nowrap">
-                            Tombol akan aktif setelah sesi berakhir
-                        </span>
-                    @endif
-                </button>
+                        @if($isLocked)
+                            <span class="absolute -top-10 left-1/2 -translate-x-1/2 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 whitespace-nowrap">
+                                Tombol akan aktif setelah sesi berakhir
+                            </span>
+                        @endif
+                    </button>
+                @endif
             @endif
         </div>
 
