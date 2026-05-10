@@ -14,6 +14,10 @@
             </div>
 
             <div class="flex gap-3">
+                <a href="{{ route('topics.show', $topic->slug) }}"
+                   class="rounded-xl border px-4 py-2 text-sm">
+                    Visit Topic
+                </a>
                 <a href="{{ route('mentor.topics.index') }}"
                    class="rounded-xl border px-4 py-2 text-sm">
                     Back

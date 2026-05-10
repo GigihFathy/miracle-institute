@@ -9,6 +9,6 @@
 
 <article {{ $attributes->merge(['class' => 'article-prose prose prose-slate max-w-none rounded-2xl bg-white p-5 sm:p-6']) }}>
     <div class="ql-editor !p-0">
-        {!! $content ?: $fallback !!}
+        {!!$content ?: $fallback !!}
     </div>
 </article>

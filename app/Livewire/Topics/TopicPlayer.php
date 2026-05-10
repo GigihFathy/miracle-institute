@@ -47,7 +47,7 @@ class TopicPlayer extends Component
             : false;
 
         $this->canOpenMentorWorkspace = $this->isMentor && $this->canOpenMentorWorkspaceForTopic();
-        $this->canStudentInteract = auth()->check() && ! $this->canOpenMentorWorkspace;
+        $this->canStudentInteract = auth()->check() && !$this->canOpenMentorWorkspace;
 
         $this->activeMaterialId = $this->topic->materials->first()?->id;
 
@@ -56,7 +56,7 @@ class TopicPlayer extends Component
 
     private function canOpenMentorWorkspaceForTopic(): bool
     {
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 
@@ -79,7 +79,7 @@ class TopicPlayer extends Component
             ->where('course_id', $this->topic->course_id)
             ->first();
 
-        if (! $enrollment) {
+        if (!$enrollment) {
             $this->topicCompleted = false;
             $this->topicStatus = null;
 
@@ -145,7 +145,7 @@ class TopicPlayer extends Component
     {
         abort_unless($this->canStudentInteract, 403);
 
-        if (! $this->activeMaterialId) {
+        if (!$this->activeMaterialId) {
             return;
         }
 

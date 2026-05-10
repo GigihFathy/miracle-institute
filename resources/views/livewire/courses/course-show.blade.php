@@ -79,8 +79,8 @@
                     </div>
         
                     <div class="flex flex-wrap gap-2">
-                        @if(! $isMentor)
-                            @if(! auth()->check())
+                        @if(!$isMentor)
+                            @if(!auth()->check())
                                 <a href="{{ route('login') }}"
                                    class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-xs sm:text-sm font-medium text-white hover:bg-slate-700 transition">
                                     Login to Track
@@ -460,7 +460,7 @@
                         </p>
                     </div>
         
-                    @if(! $isMentor)
+                    @if(!$isMentor)
                         <div class="hidden md:flex items-center gap-2 text-xs text-slate-500">
                             <span>{{ $course->topics->count() }} Topics</span>
                             <span>•</span>

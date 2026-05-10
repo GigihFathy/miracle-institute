@@ -86,7 +86,7 @@
 
             @if($canStudentInteract && !$topicCompleted && $activeMaterial && $isStudent)
                 @php
-                    $isLocked = ! $hasSessionEnded;
+                    $isLocked = !$hasSessionEnded;
                 @endphp
 
                 <button wire:click="{{ $isLocked ? '' : 'markViewed' }}"

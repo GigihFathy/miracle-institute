@@ -72,9 +72,9 @@ class CourseShow extends Component
 
         $this->buildAssessmentMeta();
 
-        $this->isGuest = ! auth()->check();
+        $this->isGuest = !auth()->check();
 
-        if (! $this->isGuest) {
+        if (!$this->isGuest) {
             $user = auth()->user();
 
             $enrollment = $user->courseEnrollments()
@@ -103,7 +103,7 @@ class CourseShow extends Component
 
     public function setTopicTab(string $tab): void
     {
-        if (! in_array($tab, ['general', 'mentored'], true)) {
+        if (!in_array($tab, ['general', 'mentored'], true)) {
             return;
         }
 
@@ -115,7 +115,7 @@ class CourseShow extends Component
         $this->mentoredTopics = collect();
         $this->hasMentoredTopics = false;
 
-        if (! auth()->check() || session('active_role') !== 'disciples') {
+        if (!auth()->check() || session('active_role') !== 'disciples') {
             return;
         }
 
@@ -156,7 +156,7 @@ class CourseShow extends Component
 
     private function buildAssessmentMeta(): void
     {
-        if (! $this->assessment) {
+        if (!$this->assessment) {
             $this->assessmentMeta = null;
 
             return;
@@ -245,7 +245,7 @@ class CourseShow extends Component
             });
         }
 
-        if (! $this->isGuest && $this->topicStatusFilter !== 'all') {
+        if (!$this->isGuest && $this->topicStatusFilter !== 'all') {
             $topics = $topics->filter(fn ($topic) => $topic->progress_status === $this->topicStatusFilter);
         }
 
@@ -284,7 +284,7 @@ class CourseShow extends Component
 
     public function getAssessmentUnlockedProperty(): bool
     {
-        if (! $this->assessment || ! $this->enrolled) {
+        if (!$this->assessment || !$this->enrolled) {
             return false;
         }
 
@@ -299,7 +299,7 @@ class CourseShow extends Component
 
     public function getActiveAttemptProperty()
     {
-        if (! auth()->check() || ! $this->assessment) {
+        if (!auth()->check() || !$this->assessment) {
             return null;
         }
 
@@ -312,7 +312,7 @@ class CourseShow extends Component
 
     public function getHasPassedAssessmentProperty(): bool
     {
-        if (! auth()->check() || ! $this->assessment) {
+        if (!auth()->check() || !$this->assessment) {
             return false;
         }
 
@@ -373,25 +373,25 @@ class CourseShow extends Component
             && $hasTopics
             && $allTopicsCompleted
             && $assessmentOk
-            && ! $this->courseCertificate;
+            && !$this->courseCertificate;
 
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             $reasons[] = 'Silakan login untuk memeriksa sertifikat.';
         }
 
-        if (auth()->check() && ! $this->enrolled) {
+        if (auth()->check() && !$this->enrolled) {
             $reasons[] = 'Sertifikat hanya tersedia untuk peserta yang sudah enroll.';
         }
 
-        if (! $hasTopics) {
+        if (!$hasTopics) {
             $reasons[] = 'Course ini belum memiliki topic.';
         }
 
-        if ($hasTopics && ! $allTopicsCompleted) {
+        if ($hasTopics && !$allTopicsCompleted) {
             $reasons[] = 'Selesaikan seluruh topic untuk membuka sertifikat.';
         }
 
-        if ($this->assessment && ! $assessmentOk) {
+        if ($this->assessment && !$assessmentOk) {
             $reasons[] = 'Lulus assessment course terlebih dahulu.';
         }
 
@@ -409,7 +409,7 @@ class CourseShow extends Component
 
     public function openAssessmentModal(): void
     {
-        if (! $this->assessment) {
+        if (!$this->assessment) {
             return;
         }
 
@@ -430,7 +430,7 @@ class CourseShow extends Component
 
     public function enroll(CourseService $courseService)
     {
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             return redirect()->route('login');
         }
 
@@ -461,7 +461,7 @@ class CourseShow extends Component
     {
         $activeTab = $this->activeTopicTab;
 
-        if ($activeTab === 'mentored' && (! auth()->check() || session('active_role') !== 'disciples')) {
+        if ($activeTab === 'mentored' && (!auth()->check() || session('active_role') !== 'disciples')) {
             $activeTab = 'general';
         }
 

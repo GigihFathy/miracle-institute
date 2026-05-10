@@ -118,16 +118,26 @@ class DatabaseSeeder extends Seeder
     private function seedUsers(array $roles, string $asset, $now): array
     {
         $profiles = [
+            // ADMIN
             ['name' => 'System Administrator', 'email' => 'admin@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0001', 'dob' => '1990-01-01', 'roles' => ['admin']],
-            ['name' => 'Testing Disciple', 'email' => 'disciple@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0002', 'dob' => '1992-02-02', 'roles' => ['disciples', 'student']],
-            ['name' => 'Testing Student', 'email' => 'student@example.test', 'gender' => 'female', 'phone' => '+62-811-0000-0003', 'dob' => '2001-03-03', 'roles' => ['student']],
             ['name' => 'Nabila Rahman', 'email' => 'nabila.rahman@edunusa.test', 'gender' => 'female', 'phone' => '+62-811-2000-1001', 'dob' => '1990-02-11', 'roles' => ['admin']],
             ['name' => 'Fikri Maulana', 'email' => 'fikri.maulana@edunusa.test', 'gender' => 'male', 'phone' => '+62-811-2000-1002', 'dob' => '1988-08-19', 'roles' => ['admin']],
+
+            
+            // DISCIPLES & STUDENT (MULTI ROLE)
+            ['name' => 'Citra Lestari', 'email' => 'citra.lestari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2005', 'dob' => '1994-09-16', 'roles' => ['disciples', 'student']],
+            ['name' => 'Fajar Hidayat', 'email' => 'fajar.hidayat@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2006', 'dob' => '1990-12-01', 'roles' => ['disciples', 'student']],
+            ['name' => 'Testing Disciple', 'email' => 'disciple@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0002', 'dob' => '1992-02-02', 'roles' => ['disciples', 'student']],
+          
+          
+            // DISCIPLES
             ['name' => 'Maya Sari', 'email' => 'maya.sari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2001', 'dob' => '1992-04-07', 'roles' => ['disciples']],
             ['name' => 'Bagas Wiratama', 'email' => 'bagas.wiratama@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2002', 'dob' => '1991-06-14', 'roles' => ['disciples']],
             ['name' => 'Nadia Prameswari', 'email' => 'nadia.prameswari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2003', 'dob' => '1993-01-23', 'roles' => ['disciples']],
-            ['name' => 'Citra Lestari', 'email' => 'citra.lestari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2005', 'dob' => '1994-09-16', 'roles' => ['disciples', 'student']],
-            ['name' => 'Fajar Hidayat', 'email' => 'fajar.hidayat@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2006', 'dob' => '1990-12-01', 'roles' => ['disciples', 'student']],
+            
+
+            // STUDENT
+            ['name' => 'Testing Student', 'email' => 'student@example.test', 'gender' => 'female', 'phone' => '+62-811-0000-0003', 'dob' => '2001-03-03', 'roles' => ['student']],
             ['name' => 'Alya Nabila', 'email' => 'alya.nabila@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4001', 'dob' => '2002-05-12', 'roles' => ['student']],
             ['name' => 'Rizal Fadlan', 'email' => 'rizal.fadlan@edunusa.test', 'gender' => 'male', 'phone' => '+62-814-5000-4002', 'dob' => '2001-07-08', 'roles' => ['student']],
             ['name' => 'Sinta Rahma', 'email' => 'sinta.rahma@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4003', 'dob' => '2002-09-21', 'roles' => ['student']],
@@ -147,7 +157,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $profile['name'],
                 'email' => $profile['email'],
                 'email_verified_at' => $now->copy()->subDays(rand(1, 30)),
-                'password' => Hash::make('Password123!'),
+                'password' => Hash::make('12345678'),
                 'phone' => $profile['phone'],
                 'gender' => $profile['gender'],
                 'dob' => $profile['dob'],
@@ -199,8 +209,8 @@ class DatabaseSeeder extends Seeder
     private function seedCourses(array $programs, string $asset, $now): array
     {
         $rows = [
-            'discipleship-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Foundations', 'slug' => 'discipleship-foundations', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur dasar pemuridan untuk peserta baru.', 'quota' => 30, 'status' => 'active', 'created_at' => $now->copy()->subMonths(6), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'maya.sari@edunusa.test', '_program_slug' => 'discipleship'],
-            'discipleship-growth-track' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Growth Track', 'slug' => 'discipleship-growth-track', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur pengembangan pemuridan yang sedang berjalan dengan 4 dari 8 topik selesai.', 'quota' => 30, 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'in_progress', '_teacher_email' => 'fajar.hidayat@edunusa.test', '_program_slug' => 'discipleship'],
+            'discipleship-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Foundations', 'slug' => 'discipleship-foundations', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur dasar pemuridan untuk peserta baru.', 'quota' => 30, 'status' => 'active', 'created_at' => $now->copy()->subMonths(6), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
+            'discipleship-growth-track' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Growth Track', 'slug' => 'discipleship-growth-track', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur pengembangan pemuridan yang sedang berjalan dengan 4 dari 8 topik selesai.', 'quota' => 30, 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'in_progress', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
             'sermon-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Foundations', 'slug' => 'sermon-foundations', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur dasar persiapan sermon dan interpretasi teks.', 'quota' => 24, 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'bagas.wiratama@edunusa.test', '_program_slug' => 'sermon'],
             'sermon-outreach-lab' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Outreach Lab', 'slug' => 'sermon-outreach-lab', 'poster' => $asset, 'credit' => 2, 'description' => 'Jalur internal yang belum dibuka untuk peserta; topik masih draft.', 'quota' => 20, 'status' => 'inactive', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now, '_phase' => 'pre_learning', '_teacher_email' => 'nadia.prameswari@edunusa.test', '_program_slug' => 'sermon'],
         ];
@@ -800,20 +810,20 @@ class DatabaseSeeder extends Seeder
                 'user' => 'citra.lestari@edunusa.test',
                 'role_type' => 'collaborator',
                 'permissions' => $collaboratorPermissions,
-                'invited_by' => 'maya.sari@edunusa.test',
+                'invited_by' => 'disciple@example.test',
             ],
 
             [
                 'topic' => 'spiritual-growth-principles',
-                'user' => 'disciple@example.test',
+                'user' => 'fajar.hidayat@edunusa.test',
                 'role_type' => 'assistant',
                 'permissions' => $limitedCollaboratorPermissions,
-                'invited_by' => 'fajar.hidayat@edunusa.test',
+                'invited_by' => 'disciple@example.test', 
             ],
 
             [
                 'topic' => 'sermon-preparation-basics',
-                'user' => 'nadia.prameswari@edunusa.test',
+                'user' => 'disciple@example.test',
                 'role_type' => 'collaborator',
                 'permissions' => [
                     'manage_materials',
