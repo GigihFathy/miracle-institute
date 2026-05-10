@@ -91,6 +91,8 @@ class ProgressService
 
         $this->requireEnrollment($userId, $topic->course_id);
 
+        $this->syncEndedSessionAbsences($userId, $topic);
+
         $materialIds = $topic->materials->pluck('id')->all();
 
         $materialProgresses = MaterialProgress::query()
@@ -113,24 +115,50 @@ class ProgressService
 
         $sessionIds = $qualifyingSessions->pluck('id')->all();
 
-        $attendedSessionIds = Attendance::query()
+        $attendances = Attendance::query()
             ->where('user_id', $userId)
             ->whereIn('video_session_id', $sessionIds)
-            ->whereIn('status', ['present', 'late'])
-            ->pluck('video_session_id')
-            ->all();
+            ->get()
+            ->keyBy('video_session_id');
 
-        $missingSessions = $qualifyingSessions->filter(function ($session) use ($attendedSessionIds) {
-            return ! in_array($session->id, $attendedSessionIds, true);
-        });
+        $satisfiedSessionIds = [];
+
+        foreach ($qualifyingSessions as $session) {
+            $attendance = $attendances->get($session->id);
+            $sessionEnded = $this->sessionHasEnded($session);
+
+            $isSatisfied = false;
+
+            if ($attendance && in_array($attendance->status, ['present', 'late'], true)) {
+                $isSatisfied = true;
+            } elseif ($sessionEnded && $attendance && $attendance->status === 'absent') {
+                $isSatisfied = true;
+            } elseif ($sessionEnded && ! $attendance) {
+                $isSatisfied = true;
+            }
+
+            if ($isSatisfied) {
+                $satisfiedSessionIds[] = $session->id;
+            }
+        }
+
+        $missingSessions = $qualifyingSessions
+            ->reject(fn ($session) => in_array($session->id, $satisfiedSessionIds, true))
+            ->pluck('title')
+            ->values()
+            ->all();
 
         $allMaterialsCompleted = $topic->materials->isEmpty()
             ? true
             : $completedMaterials->count() === $topic->materials->count();
 
-        $allSessionsAttended = $qualifyingSessions->isEmpty()
+        $allSessionsRequirementMet = $qualifyingSessions->isEmpty()
             ? true
-            : count($attendedSessionIds) === $qualifyingSessions->count();
+            : count($satisfiedSessionIds) === $qualifyingSessions->count();
+
+        $allSessionsClosed = $qualifyingSessions->isEmpty()
+            ? true
+            : $qualifyingSessions->every(fn ($session) => $this->sessionHasEnded($session));
 
         $reasons = [];
 
@@ -138,12 +166,12 @@ class ProgressService
             $reasons[] = 'Semua materi harus selesai terlebih dahulu.';
         }
 
-        if (! $allSessionsAttended) {
-            $reasons[] = 'Attendance sesi video belum lengkap.';
+        if (! $allSessionsClosed) {
+            $reasons[] = 'Masih ada sesi video yang belum berakhir.';
         }
 
-        if ($topic->videoSessions->whereIn('status', ['scheduled', 'ongoing'])->isNotEmpty()) {
-            $reasons[] = 'Masih ada sesi yang belum selesai.';
+        if (! $allSessionsRequirementMet) {
+            $reasons[] = 'Masih ada syarat sesi yang belum terpenuhi.';
         }
 
         return [
@@ -152,10 +180,11 @@ class ProgressService
             'incomplete_materials' => $incompleteMaterials->pluck('name')->values()->all(),
             'all_materials_completed' => $allMaterialsCompleted,
             'total_sessions' => $qualifyingSessions->count(),
-            'attended_sessions' => count($attendedSessionIds),
-            'missing_sessions' => $missingSessions->pluck('title')->values()->all(),
-            'all_sessions_attended' => $allSessionsAttended,
-            'can_complete' => $allMaterialsCompleted && $allSessionsAttended && $topic->videoSessions->whereIn('status', ['scheduled', 'ongoing'])->isEmpty(),
+            'attended_sessions' => count($satisfiedSessionIds),
+            'missing_sessions' => $missingSessions,
+            'all_sessions_attended' => $allSessionsRequirementMet,
+            'all_sessions_closed' => $allSessionsClosed,
+            'can_complete' => $allMaterialsCompleted && $allSessionsRequirementMet && $allSessionsClosed,
             'reasons' => $reasons,
         ];
     }
@@ -194,6 +223,44 @@ class ProgressService
     public function recalculateTopicCompletion(string $userId, string $topicId): TopicProgress
     {
         return $this->syncTopicCompletion($userId, $topicId);
+    }
+
+    private function syncEndedSessionAbsences(string $userId, Topic $topic): void
+    {
+        $endedSessions = $topic->videoSessions->filter(function ($session) {
+            return $session->status !== 'cancelled'
+                && $session->end_at
+                && $session->end_at->lte(now());
+        });
+
+        foreach ($endedSessions as $session) {
+            $attendance = Attendance::query()
+                ->where('user_id', $userId)
+                ->where('video_session_id', $session->id)
+                ->first();
+
+            if ($attendance) {
+                continue;
+            }
+
+            Attendance::query()->create([
+                'user_id' => $userId,
+                'video_session_id' => $session->id,
+                'status' => 'absent',
+                'check_in_at' => null,
+                'clock_out_at' => null,
+                'ip_address' => request()->ip(),
+            ]);
+        }
+    }
+
+    private function sessionHasEnded($session): bool
+    {
+        if (! $session->end_at) {
+            return false;
+        }
+
+        return $session->end_at->lte(now());
     }
 
     private function requireEnrollment(string $userId, string $courseId): CourseEnrollment

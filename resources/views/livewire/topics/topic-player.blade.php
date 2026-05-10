@@ -89,13 +89,14 @@
                     $isLocked = !$hasSessionEnded;
                 @endphp
 
-                <button wire:click="{{ $isLocked ? '' : 'markViewed' }}"
-                        {{ $isLocked ? 'disabled' : '' }}
-                        class="group relative px-6 py-2 rounded-xl font-semibold border transition-all duration-300 flex items-center gap-2
-                        {{ $isLocked
-                            ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-80'
-                            : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:shadow-emerald-200/50 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'
-                        }}">
+                <button
+                    wire:click="markViewed"
+                    @disabled($isLocked)
+                    class="group relative px-6 py-2 rounded-xl font-semibold border transition-all duration-300 flex items-center gap-2
+                    {{ $isLocked
+                        ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-80'
+                        : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:shadow-emerald-200/50 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'
+                    }}">
                     @if($isLocked)
                         <svg xmlns="http://www.w3.org" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -231,7 +232,7 @@
                         <div>
                             <h3 class="text-lg font-semibold text-slate-900">Mark Complete</h3>
                             <p class="mt-1 text-sm text-slate-500">
-                                Tandai material ini selesai. Topic akan selesai otomatis jika semua syarat terpenuhi.
+                                Tandai material ini selesai. Topik akan selesai otomatis jika seluruh material selesai dan syarat sesi sudah terpenuhi.
                             </p>
                         </div>
 
@@ -274,10 +275,18 @@
                                 </div>
 
                                 <div class="flex items-center justify-between gap-3">
-                                    <span>Attendance complete</span>
+                                    <span>Attendance complete / session requirement fulfilled</span>
                                     <span class="rounded-full px-2 py-1 text-xs border
                                         {{ data_get($completionSnapshot, 'all_sessions_attended') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200' }}">
                                         {{ data_get($completionSnapshot, 'all_sessions_attended') ? 'YES' : 'NO' }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-3">
+                                    <span>All sessions closed</span>
+                                    <span class="rounded-full px-2 py-1 text-xs border
+                                        {{ data_get($completionSnapshot, 'all_sessions_closed') ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-50 text-slate-700 border-slate-200' }}">
+                                        {{ data_get($completionSnapshot, 'all_sessions_closed') ? 'YES' : 'NO' }}
                                     </span>
                                 </div>
 
@@ -514,7 +523,7 @@
                                         type="button"
                                         wire:click="joinSession('{{ $session->id }}')"
                                         wire:loading.attr="disabled"
-                                        @disabled(! $phase === 'live')
+                                        @disabled($phase !== 'live')
                                         class="rounded-xl px-4 py-2 text-sm font-medium transition"
                                         :class="buttonClass"
                                     >
@@ -536,6 +545,7 @@
         </section>
     @endif
 </div>
+
 @once
     <script>
         document.addEventListener('alpine:init', () => {

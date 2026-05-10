@@ -3,12 +3,12 @@
 namespace App\Livewire\Topics;
 
 use App\Models\Attendance;
+use App\Models\MaterialProgress;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use App\Models\TopicUser;
-use App\Models\MaterialProgress;
-use App\Services\ProgressService;
 use App\Models\VideoSession;
+use App\Services\ProgressService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Cache;
@@ -50,7 +50,7 @@ class TopicPlayer extends Component
             'success',
             $result['snapshot']['can_complete']
                 ? 'Material selesai. Topik juga dinyatakan completed.'
-                : 'Material selesai. Topik akan completed setelah semua materi dan attendance terpenuhi.'
+                : 'Material selesai. Topik akan completed setelah semua materi dan syarat sesi terpenuhi.'
         );
     }
 
@@ -108,6 +108,10 @@ class TopicPlayer extends Component
             $this->topicStatus = null;
 
             return;
+        }
+
+        if ($this->canStudentInteract && auth()->check()) {
+            app(ProgressService::class)->recalculateTopicCompletion(auth()->id(), $this->topic->id);
         }
 
         $progress = TopicProgress::query()
@@ -262,35 +266,21 @@ class TopicPlayer extends Component
         });
     }
 
-    public function completeTopic(): void
+    public function completeTopic(ProgressService $progressService): void
     {
         abort_unless($this->canStudentInteract, 403);
 
-        $enrollment = auth()->user()
-            ?->courseEnrollments()
-            ->where('course_id', $this->topic->course_id)
-            ->first();
+        $snapshot = $progressService->topicCompletionSnapshot(auth()->id(), $this->topic->id);
 
-        abort_unless($enrollment, 403);
-
-        if ($this->topicCompleted) {
-            session()->flash('success', 'Topik sudah selesai.');
+        if (! $snapshot['can_complete']) {
+            session()->flash('error', implode(' ', $snapshot['reasons']));
 
             return;
         }
 
-        $progress = TopicProgress::firstOrNew([
-            'course_enrollment_id' => $enrollment->id,
-            'topic_id' => $this->topic->id,
-        ]);
+        $progressService->syncTopicCompletion(auth()->id(), $this->topic->id);
 
-        $progress->status = 'completed';
-        $progress->started_at ??= now();
-        $progress->completed_at = now();
-        $progress->save();
-
-        $this->topicStatus = 'completed';
-        $this->topicCompleted = true;
+        $this->hydrateTopicCompletion();
 
         session()->flash('success', 'Topik berhasil ditandai sebagai selesai.');
     }
@@ -329,7 +319,6 @@ class TopicPlayer extends Component
 
     public function render()
     {
-        
         $activeMaterial = $this->topic->materials->firstWhere('id', $this->activeMaterialId);
 
         $materialUrl = null;
@@ -375,12 +364,6 @@ class TopicPlayer extends Component
             'checked_in' => $sessionAttendances->whereIn('status', ['present', 'late'])->count(),
         ];
 
-        $hasSessionEnded = VideoSession::query()
-            ->where('topic_id', $this->topic->id)
-            ->where('end_at', '<=', now())
-            ->exists();
-
-                $activeMaterialProgress = null;
         $completionSnapshot = [
             'total_materials' => 0,
             'completed_materials' => 0,
@@ -390,11 +373,13 @@ class TopicPlayer extends Component
             'attended_sessions' => 0,
             'missing_sessions' => [],
             'all_sessions_attended' => false,
+            'all_sessions_closed' => false,
             'can_complete' => false,
             'reasons' => [],
         ];
 
         $canMarkComplete = false;
+        $activeMaterialProgress = null;
 
         if (auth()->check() && $this->canStudentInteract && $activeMaterial) {
             $enrolled = auth()->user()
@@ -415,7 +400,7 @@ class TopicPlayer extends Component
             }
         }
 
-
+        $hasSessionEnded = $completionSnapshot['all_sessions_closed'] ?? false;
 
         return view('livewire.topics.topic-player', [
             'activeMaterialProgress' => $activeMaterialProgress,
