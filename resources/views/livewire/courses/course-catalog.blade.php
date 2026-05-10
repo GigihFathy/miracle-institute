@@ -4,7 +4,7 @@
     $isMentor = session('active_role') === 'disciples';
 @endphp
 
-<div class="space-y-6 lg:px-20 2xl:px-28 scale-[0.85] origin-top">
+<div class="space-y-6 lg:px-20 2xl:px-28 scale-[0.90] origin-top">
 
     {{-- HEADER --}}
     <section class="rounded-[2rem] border border-slate-200 bg-white overflow-hidden">
