@@ -34,7 +34,7 @@ class LearningProgressService
             ->where('status', 'active')
             ->first();
 
-        if (! $assessment) {
+        if (!$assessment) {
             return;
         }
 

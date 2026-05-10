@@ -95,7 +95,7 @@ class CourseShow extends Component
 
         $this->buildAssessmentMeta();
 
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             $this->isGuest = true;
             $this->enrolled = false;
             $this->topicStatusMap = [];
@@ -111,7 +111,7 @@ class CourseShow extends Component
 
         $this->enrolled = (bool) $enrollment;
 
-        if (! $this->enrolled) {
+        if (!$this->enrolled) {
             $this->topicStatusMap = [];
             return;
         }
@@ -129,7 +129,7 @@ class CourseShow extends Component
 
     private function buildAssessmentMeta(): void
     {
-        if (! $this->assessment) {
+        if (!$this->assessment) {
             $this->assessmentMeta = null;
             return;
         }
@@ -218,7 +218,7 @@ class CourseShow extends Component
 
     public function getAssessmentUnlockedProperty(): bool
     {
-        if (! $this->assessment || ! $this->enrolled) {
+        if (!$this->assessment || !$this->enrolled) {
             return false;
         }
 
@@ -233,7 +233,7 @@ class CourseShow extends Component
 
     public function getActiveAttemptProperty()
     {
-        if (! auth()->check() || ! $this->assessment) {
+        if (!auth()->check() || !$this->assessment) {
             return null;
         }
 
@@ -245,7 +245,7 @@ class CourseShow extends Component
 
     public function getHasPassedAssessmentProperty(): bool
     {
-        if (! auth()->check() || ! $this->assessment) {
+        if (!auth()->check() || !$this->assessment) {
             return false;
         }
 
@@ -307,25 +307,25 @@ class CourseShow extends Component
             && $hasTopics
             && $allTopicsCompleted
             && $assessmentOk
-            && ! $this->courseCertificate;
+            && !$this->courseCertificate;
 
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             $reasons[] = 'Silakan login untuk memeriksa sertifikat.';
         }
 
-        if (auth()->check() && ! $this->enrolled) {
+        if (auth()->check() && !$this->enrolled) {
             $reasons[] = 'Sertifikat hanya tersedia untuk peserta yang sudah enroll.';
         }
 
-        if (! $hasTopics) {
+        if (!$hasTopics) {
             $reasons[] = 'Course ini belum memiliki topic.';
         }
 
-        if ($hasTopics && ! $allTopicsCompleted) {
+        if ($hasTopics && !$allTopicsCompleted) {
             $reasons[] = 'Selesaikan seluruh topic untuk membuka sertifikat.';
         }
 
-        if ($this->assessment && ! $assessmentOk) {
+        if ($this->assessment && !$assessmentOk) {
             $reasons[] = 'Lulus assessment course terlebih dahulu.';
         }
 
@@ -343,7 +343,7 @@ class CourseShow extends Component
 
     public function openAssessmentModal(): void
     {
-        if (! $this->assessment) {
+        if (!$this->assessment) {
             return;
         }
 
@@ -364,7 +364,7 @@ class CourseShow extends Component
 
     public function enroll(CourseService $courseService)
     {
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             return redirect()->route('login');
         }
 

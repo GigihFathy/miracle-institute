@@ -7,7 +7,7 @@
             <p class="text-sm text-slate-500 mt-2">By {{ $article->author }}</p>
 
             <div class="prose max-w-none mt-6">
-                {!! $article->content !!}
+                {!!$article->content !!}
             </div>
         </div>
 

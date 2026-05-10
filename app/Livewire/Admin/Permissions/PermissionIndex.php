@@ -62,7 +62,7 @@ class PermissionIndex extends Component
 
     public function delete(): void
     {
-        if (! $this->deleteId) {
+        if (!$this->deleteId) {
             $this->toast('warning', 'Pilih permission yang akan dihapus.');
             return;
         }

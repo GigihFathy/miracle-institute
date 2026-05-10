@@ -24,13 +24,13 @@ class DatabaseSeeder extends Seeder
 
             $programs = $this->seedStudyPrograms($now);
             $courses = $this->seedCourses($programs, $asset, $now);
-            $this->seedCourseCollaborators($courses, $users, $now);
             $topics = $this->seedTopics($courses, $asset, $now);
             $materials = $this->seedMaterials($topics, $asset, $now);
             $assessments = $this->seedAssessments($courses, $now);
             $questionBanks = $this->seedQuestionsAndOptions($assessments, $topics, $now);
-
+            
             $enrollments = $this->seedCourseEnrollments($courses, $users, $now);
+            $this->seedTopicCollaborators($topics, $users, $now);
             $this->seedTopicProgresses($enrollments, $topics, $now);
             $this->seedMaterialProgresses($enrollments, $materials, $topics, $now);
             $attempts = $this->seedAssessmentAttemptsAndAnswers($assessments, $questionBanks, $enrollments, $courses, $now);
@@ -765,27 +765,24 @@ class DatabaseSeeder extends Seeder
     }
 
 
-    private function seedCourseCollaborators(array $courses, array $users, $now): void
+    private function seedTopicCollaborators(array $topics, array $users, $now): void
     {
-        $courseUsers = [];
-        $coursePermissions = [];
+        $topicUsers = [];
+        $topicPermissions = [];
 
         $permissionMap = [
-            'manage_topics',
             'manage_materials',
             'manage_sessions',
             'manage_assessments',
             'manage_attendance',
             'manage_students',
-            'publish_topics',
+            'publish_topic',
             'view_reports',
-            'manage_certificates',
         ];
 
         $ownerPermissions = $permissionMap;
 
         $collaboratorPermissions = [
-            'manage_topics',
             'manage_materials',
             'manage_sessions',
             'manage_assessments',
@@ -799,14 +796,7 @@ class DatabaseSeeder extends Seeder
 
         $relations = [
             [
-                'course' => 'discipleship-foundations',
-                'user' => 'maya.sari@edunusa.test',
-                'role_type' => 'owner',
-                'permissions' => $ownerPermissions,
-                'invited_by' => null,
-            ],
-            [
-                'course' => 'discipleship-foundations',
+                'topic' => 'introduction-to-discipleship',
                 'user' => 'citra.lestari@edunusa.test',
                 'role_type' => 'collaborator',
                 'permissions' => $collaboratorPermissions,
@@ -814,59 +804,45 @@ class DatabaseSeeder extends Seeder
             ],
 
             [
-                'course' => 'discipleship-growth-track',
-                'user' => 'fajar.hidayat@edunusa.test',
-                'role_type' => 'owner',
-                'permissions' => $ownerPermissions,
-                'invited_by' => null,
-            ],
-            [
-                'course' => 'discipleship-growth-track',
+                'topic' => 'spiritual-growth-principles',
                 'user' => 'disciple@example.test',
-                'role_type' => 'collaborator',
+                'role_type' => 'assistant',
                 'permissions' => $limitedCollaboratorPermissions,
                 'invited_by' => 'fajar.hidayat@edunusa.test',
             ],
 
             [
-                'course' => 'sermon-foundations',
-                'user' => 'bagas.wiratama@edunusa.test',
-                'role_type' => 'owner',
-                'permissions' => $ownerPermissions,
-                'invited_by' => null,
-            ],
-            [
-                'course' => 'sermon-foundations',
+                'topic' => 'sermon-preparation-basics',
                 'user' => 'nadia.prameswari@edunusa.test',
                 'role_type' => 'collaborator',
                 'permissions' => [
-                    'manage_topics',
-                    'publish_topics',
+                    'manage_materials',
                     'manage_assessments',
+                    'publish_topic',
                     'view_reports',
                 ],
                 'invited_by' => 'bagas.wiratama@edunusa.test',
             ],
-
-            [
-                'course' => 'sermon-outreach-lab',
-                'user' => 'nadia.prameswari@edunusa.test',
-                'role_type' => 'owner',
-                'permissions' => $ownerPermissions,
-                'invited_by' => null,
-            ],
         ];
 
         foreach ($relations as $relation) {
-            $courseUserId = $this->uuid();
+            if (!isset($topics[$relation['topic']])) {
+                continue;
+            }
+
+            if (!isset($users['byEmail'][$relation['user']])) {
+                continue;
+            }
+
+            $topicUserId = $this->uuid();
 
             $invitedBy = $relation['invited_by']
-                ? $users['byEmail'][$relation['invited_by']]['id']
+                ? ($users['byEmail'][$relation['invited_by']]['id'] ?? null)
                 : null;
 
-            $courseUsers[] = [
-                'id' => $courseUserId,
-                'course_id' => $courses[$relation['course']]['id'],
+            $topicUsers[] = [
+                'id' => $topicUserId,
+                'topic_id' => $topics[$relation['topic']]['id'],
                 'user_id' => $users['byEmail'][$relation['user']]['id'],
                 'role_type' => $relation['role_type'],
                 'status' => 'active',
@@ -877,9 +853,9 @@ class DatabaseSeeder extends Seeder
             ];
 
             foreach ($relation['permissions'] as $permission) {
-                $coursePermissions[] = [
+                $topicPermissions[] = [
                     'id' => $this->uuid(),
-                    'course_user_id' => $courseUserId,
+                    'topic_user_id' => $topicUserId,
                     'permission' => $permission,
                     'granted_by' => $invitedBy,
                     'created_at' => $now,
@@ -888,8 +864,12 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        DB::table('course_user')->insert($courseUsers);
+        if (!empty($topicUsers)) {
+            DB::table('topic_user')->insert($topicUsers);
+        }
 
-        DB::table('course_user_permissions')->insert($coursePermissions);
+        if (!empty($topicPermissions)) {
+            DB::table('topic_user_permissions')->insert($topicPermissions);
+        }
     }
 }

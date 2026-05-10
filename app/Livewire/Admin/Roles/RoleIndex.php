@@ -83,7 +83,7 @@ class RoleIndex extends Component
 
     public function delete(): void
     {
-        if (! $this->deleteId) {
+        if (!$this->deleteId) {
             $this->toast('warning', 'Pilih role yang akan dihapus.');
             return;
         }

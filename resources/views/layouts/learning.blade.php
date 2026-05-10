@@ -28,6 +28,8 @@
             @endif
 
             {{ $slot }}
+
+            <x-ui.flash-toasts />
         </main>
 
         @include('layouts.partials.footer')

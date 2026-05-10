@@ -50,7 +50,7 @@ class TopicPlayer extends Component
             ->where('course_id', $this->topic->course_id)
             ->first();
 
-        if (! $enrollment) {
+        if (!$enrollment) {
             $this->topicCompleted = false;
             return;
         }
@@ -109,7 +109,7 @@ class TopicPlayer extends Component
 
     public function markViewed(ProgressService $progressService): void
     {
-        if (! $this->activeMaterialId) {
+        if (!$this->activeMaterialId) {
             return;
         }
 

@@ -27,7 +27,7 @@ class SendVideoSessionReminderEmail implements ShouldQueue
 
         foreach ($session->topic->course->enrollments as $enrollment) {
 
-            if (! $enrollment->user) {
+            if (!$enrollment->user) {
                 continue;
             }
 

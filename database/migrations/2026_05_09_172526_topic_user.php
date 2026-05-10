@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('course_user', function (Blueprint $table) {
+        Schema::create('topic_user', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->uuid('course_id');
+            $table->uuid('topic_id');
             $table->uuid('user_id');
 
             $table->enum('role_type', [
@@ -30,17 +30,17 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->unique([
-                'course_id',
+                'topic_id',
                 'user_id'
             ]);
 
-            $table->index('course_id');
+            $table->index('topic_id');
             $table->index('user_id');
             $table->index('role_type');
 
-            $table->foreign('course_id')
+            $table->foreign('topic_id')
                 ->references('id')
-                ->on('courses')
+                ->on('topics')
                 ->cascadeOnDelete();
 
             $table->foreign('user_id')
@@ -57,6 +57,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('course_user');
+        Schema::dropIfExists('topic_user');
     }
 };

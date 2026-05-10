@@ -29,6 +29,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'dob' => 'date',
     ];
 
+    public function hasRole(string $role): bool
+    {
+        return $this->roles()
+            ->where('name', $role)
+            ->exists();
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_user')
@@ -111,9 +118,4 @@ class User extends Authenticatable implements MustVerifyEmail
             })
             ->exists();
     }
-
-    public function collaboratedCourses()
-    {
-        return $this->hasMany(CourseUser::class);
-    }
-    }
+}

@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('course_user_permissions', function (Blueprint $table) {
+        Schema::create('topic_user_permissions', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->uuid('course_user_id');
+            $table->uuid('topic_user_id');
 
             $table->string('permission');
 
@@ -19,16 +19,16 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->unique([
-                'course_user_id',
+                'topic_user_id',
                 'permission'
             ]);
 
-            $table->index('course_user_id');
+            $table->index('topic_user_id');
             $table->index('permission');
 
-            $table->foreign('course_user_id')
+            $table->foreign('topic_user_id')
                 ->references('id')
-                ->on('course_user')
+                ->on('topic_user')
                 ->cascadeOnDelete();
 
             $table->foreign('granted_by')
@@ -40,6 +40,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('course_user_permissions');
+        Schema::dropIfExists('topic_user_permissions');
     }
 };

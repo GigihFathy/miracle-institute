@@ -52,7 +52,7 @@ class CertificateService
                     ->exists();
             });
 
-            if (! $allCompleted) {
+            if (!$allCompleted) {
                 throw new \RuntimeException('Course belum selesai, sertifikat belum bisa diterbitkan.');
             }
 
@@ -246,7 +246,7 @@ class CertificateService
 
     private function extractSequenceLabel(?string $certificateNumber): string
     {
-        if (! $certificateNumber) {
+        if (!$certificateNumber) {
             return '0000';
         }
 
@@ -296,7 +296,7 @@ class CertificateService
     {
         $path = public_path('images/logo.png');
 
-        if (! file_exists($path)) {
+        if (!file_exists($path)) {
             return '';
         }
 

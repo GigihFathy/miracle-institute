@@ -87,7 +87,7 @@
                         <td class="p-4">
                             <div class="font-medium text-slate-900">{{ $row->title }}</div>
                             <div class="text-xs text-slate-500 line-clamp-2">
-                                {!! \Illuminate\Support\Str::limit(strip_tags($row->content), 100) !!}
+                                {!!\Illuminate\Support\Str::limit(strip_tags($row->content), 100) !!}
                             </div>
                         </td>
 

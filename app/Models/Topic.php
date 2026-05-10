@@ -65,4 +65,14 @@ class Topic extends Model
     {
         return $this->hasMany(Certificate::class);
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function collaborators()
+    {
+        return $this->hasMany(\App\Models\TopicUser::class, 'topic_id');
+    }
 }

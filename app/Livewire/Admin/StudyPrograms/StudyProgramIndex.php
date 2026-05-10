@@ -79,7 +79,7 @@ class StudyProgramIndex extends Component
 
     public function delete(): void
     {
-        if (! $this->deleteId) {
+        if (!$this->deleteId) {
             $this->toast('warning', 'Pilih study program yang akan dihapus.');
             return;
         }

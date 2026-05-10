@@ -3,11 +3,10 @@
 namespace App\Livewire\Mentor\Dashboard;
 
 use App\Models\Assessment;
-use App\Models\Certificate;
-use App\Models\CourseEnrollment;
 use App\Models\Material;
 use App\Models\Topic;
 use App\Models\TopicProgress;
+use App\Models\TopicUser;
 use Livewire\Component;
 
 class MentorDashboard extends Component
@@ -17,58 +16,70 @@ class MentorDashboard extends Component
         $user = auth()->user();
         $userId = $user->id;
 
-        $hasStudentRole = $user->roles->contains('name', 'student');
+        $managedTopicIds = TopicUser::query()
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->where('role_type', 'owner')
+                    ->orWhereHas('permissions', function ($p) {
+                        $p->where('permission', 'manage_topics');
+                    });
+            })
+            ->pluck('topic_id');
 
-        $mentoredTopicsQuery = Topic::with('course')
-            ->where('teacher_id', $userId);
+        $topicsQuery = Topic::query()
+            ->with(['course.studyProgram'])
+            ->where(function ($q) use ($userId, $managedTopicIds) {
+                $q->where('teacher_id', $userId);
 
-        $mentoredTopics = $mentoredTopicsQuery->latest()->get();
-        $topicIds = $mentoredTopicsQuery->pluck('id');
-        $mentoredTopicsByCourse = $mentoredTopics
-            ->groupBy(fn (Topic $topic) => $topic->course_id ?? $topic->id)
-            ->values();
+                if ($managedTopicIds->isNotEmpty()) {
+                    $q->orWhereIn('id', $managedTopicIds);
+                }
+            });
 
-        $studentEnrollmentIds = TopicProgress::whereIn('topic_id', $topicIds)
-            ->distinct()
-            ->pluck('course_enrollment_id');
+        $topics = (clone $topicsQuery)->latest()->get();
+        $topicIds = $topics->pluck('id');
+        $courseIds = $topics->pluck('course_id')->filter()->unique()->values();
 
-        $myCoursesCount = 0;
-        $myTopicsCompleted = 0;
-        $myCertificatesCount = 0;
+        $mentorStudentsCount = $topicIds->isEmpty()
+            ? 0
+            : TopicProgress::query()
+                ->whereIn('topic_id', $topicIds)
+                ->distinct()
+                ->count('course_enrollment_id');
 
-        if ($hasStudentRole) {
-            $myEnrollmentIds = CourseEnrollment::where('user_id', $userId)->pluck('id');
+        $mentorMaterialsCount = Material::query()
+            ->where('uploader_id', $userId)
+            ->count();
 
-            $myCoursesCount = $myEnrollmentIds->count();
-
-            $myTopicsCompleted = TopicProgress::whereIn('course_enrollment_id', $myEnrollmentIds)
-                ->where('status', 'completed')
+        $mentorAssessmentsCount = $courseIds->isEmpty()
+            ? 0
+            : Assessment::query()
+                ->whereIn('course_id', $courseIds)
                 ->count();
 
-            $myCertificatesCount = Certificate::where('user_id', $userId)->count();
-        }
+        $latestTopics = (clone $topicsQuery)
+            ->latest()
+            ->take(6)
+            ->get();
+
+        $topicsByCourse = $topics->groupBy('course_id')->values();
+
+        $latestMaterials = Material::query()
+            ->with(['topic.course'])
+            ->where('uploader_id', $userId)
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view('livewire.mentor.dashboard.mentor-dashboard', [
-            // Mentor Metrics
-            'mentorTopicsCount' => $topicIds->count(),
-            'mentorMaterialsCount' => Material::where('uploader_id', $userId)->count(),
-            'mentorStudentsCount' => $studentEnrollmentIds->count(),
-            'mentorAssessmentsCount' => Assessment::whereHas('course.topics', fn ($q) => $q->where('teacher_id', $userId))->distinct()->count(),
-
-            // Student Metrics (Conditional)
-            'hasStudentRole' => $hasStudentRole,
-            'myCoursesCount' => $myCoursesCount,
-            'myTopicsCompleted' => $myTopicsCompleted,
-            'myCertificatesCount' => $myCertificatesCount,
-
-            // Lists
-            'latestTopics' => $mentoredTopics,
-            'mentoredTopicsByCourse' => $mentoredTopicsByCourse,
-            'latestMaterials' => Material::with('topic')
-                ->where('uploader_id', $userId)
-                ->latest()
-                ->take(6)
-                ->get(),
+            'mentorTopicsCount' => $topics->count(),
+            'mentorMaterialsCount' => $mentorMaterialsCount,
+            'mentorStudentsCount' => $mentorStudentsCount,
+            'mentorAssessmentsCount' => $mentorAssessmentsCount,
+            'latestTopics' => $latestTopics,
+            'topicsByCourse' => $topicsByCourse,
+            'latestMaterials' => $latestMaterials,
         ])->layout('layouts.learning');
     }
 }

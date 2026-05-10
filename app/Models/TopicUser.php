@@ -2,21 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
 
-class CourseUser extends Model
+class TopicUser extends Model
 {
     use HasUuids;
 
-    protected $table = 'course_user';
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
+    protected $table = 'topic_user';
 
     protected $fillable = [
-        'course_id',
+        'topic_id',
         'user_id',
         'role_type',
         'status',
@@ -28,9 +24,9 @@ class CourseUser extends Model
         'joined_at' => 'datetime',
     ];
 
-    public function course()
+    public function topic()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Topic::class);
     }
 
     public function user()
@@ -45,17 +41,11 @@ class CourseUser extends Model
 
     public function permissions()
     {
-        return $this->hasMany(CourseUserPermission::class);
+        return $this->hasMany(TopicUserPermission::class, 'topic_user_id');
     }
 
     public function hasPermission(string $permission): bool
     {
-        if ($this->role_type === 'owner') {
-            return true;
-        }
-
-        return $this->permissions()
-            ->where('permission', $permission)
-            ->exists();
+        return $this->permissions()->where('permission', $permission)->exists();
     }
 }

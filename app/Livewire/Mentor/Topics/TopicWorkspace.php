@@ -2,180 +2,93 @@
 
 namespace App\Livewire\Mentor\Topics;
 
-use App\Models\Assessment;
-use App\Models\CourseEnrollment;
-use App\Models\Material;
+use App\Livewire\Concerns\InteractsWithMentorTopic;;
 use App\Models\Topic;
-use App\Models\TopicProgress;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 class TopicWorkspace extends Component
 {
-    use WithFileUploads;
+    use InteractsWithMentorTopic;
 
     public Topic $topic;
 
     public string $tab = 'overview';
-    public ?string $selectedMaterialId = null;
-
-    public string $materialName = '';
-    public string $materialType = 'pdf';
-    public string $materialVisibility = 'Public';
-    public string $materialStatus = 'active';
-    public ?string $materialExternalUrl = null;
-    public int $materialSortOrder = 0;
-    public $materialFile;
 
     public function mount(string $slug): void
     {
-        $this->topic = Topic::with([
-            'course',
-            'materials.uploader',
-            'videoSessions',
-            'course.assessment.questions',
-        ])->where('slug', $slug)->firstOrFail();
+        $this->topic = Topic::query()
+            ->with([
+                'course.studyProgram',
+                'course.assessment',
+            ])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        abort_unless(
-            $this->topic->teacher_id === auth()->id() || auth()->user()->can('manage_topics'),
-            403
-        );
+        abort_unless($this->canAccessTopic($this->topic), 403);
 
-        $this->selectedMaterialId = $this->topic->materials->first()?->id;
+        $allowedTabs = array_keys($this->availableTabs());
 
-        $this->materialSortOrder = ($this->topic->materials->max('sort_order') ?? 0) + 1;
+        if (! in_array($this->tab, $allowedTabs, true)) {
+            $this->tab = $allowedTabs[0] ?? 'overview';
+        }
     }
 
     public function setTab(string $tab): void
     {
-        $this->tab = $tab;
+        if (array_key_exists($tab, $this->availableTabs())) {
+            $this->tab = $tab;
+        }
     }
 
-    public function selectMaterial(string $materialId): void
+    private function availableTabs(): array
     {
-        $this->selectedMaterialId = $materialId;
-        $this->tab = 'materials';
-    }
+        $tabs = [
+            'overview' => 'Overview',
+        ];
 
-    public function saveMaterial(): void
-    {
-        $this->validate([
-            'materialName' => ['required', 'string', 'max:255'],
-            'materialType' => ['required', Rule::in(['pdf', 'video', 'doc', 'ppt', 'audio', 'image', 'link'])],
-            'materialVisibility' => ['required', Rule::in(['Public', 'Private'])],
-            'materialStatus' => ['required', Rule::in(['active', 'inactive', 'draft'])],
-            'materialSortOrder' => ['required', 'integer', 'min:0'],
-            'materialExternalUrl' => ['nullable', 'url'],
-            'materialFile' => ['nullable', 'file', 'max:51200'],
-        ]);
-
-        if (! $this->materialFile && ! $this->materialExternalUrl) {
-            $this->addError('materialFile', 'Upload file atau isi external URL.');
-            return;
+        if ($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics'])) {
+            $tabs['materials'] = 'Materials';
         }
 
-        $path = null;
-
-        if ($this->materialFile) {
-            $path = $this->materialFile->store('materials/' . $this->topic->id, 'public');
+        if ($this->canAccessTopic($this->topic, ['manage_sessions', 'manage_topics'])) {
+            $tabs['sessions'] = 'Sessions';
         }
 
-        $material = Material::create([
-            'topic_id' => $this->topic->id,
-            'uploader_id' => auth()->id(),
-            'name' => $this->materialName,
-            'visibility' => $this->materialVisibility,
-            'path' => $path,
-            'external_url' => $this->materialExternalUrl,
-            'type' => $this->materialType,
-            'status' => $this->materialStatus,
-            'sort_order' => $this->materialSortOrder,
-        ]);
-
-        $this->resetMaterialForm();
-        $this->selectedMaterialId = $material->id;
-        session()->flash('success', 'Material berhasil ditambahkan.');
-    }
-
-    public function deleteMaterial(string $id): void
-    {
-        $material = Material::where('topic_id', $this->topic->id)->findOrFail($id);
-
-        if ($material->path) {
-            Storage::disk('public')->delete($material->path);
+        if ($this->canAccessTopic($this->topic, ['manage_attendance', 'view_reports', 'manage_topics'])) {
+            $tabs['attendances'] = 'Attendances';
         }
 
-        $material->delete();
-
-        if ($this->selectedMaterialId === $id) {
-            $this->selectedMaterialId = $this->topic->materials()->latest()->value('id');
+        
+        if ($this->canAccessTopic($this->topic, ['manage_students', 'view_reports', 'manage_topics'])) {
+            $tabs['students'] = 'Students';
+            }
+            
+        if ($this->canManageCollaborators($this->topic)) {
+            $tabs['collaborators'] = 'Collaborators';
         }
 
-        session()->flash('success', 'Material berhasil dihapus.');
-    }
+        // if ($this->canAccessTopic($this->topic, ['manage_assessments', 'manage_topics'])) {
+        //     $tabs['assessment'] = 'Assessment';
+        // }
 
-    private function resetMaterialForm(): void
-    {
-        $this->reset([
-            'materialName',
-            'materialType',
-            'materialVisibility',
-            'materialStatus',
-            'materialExternalUrl',
-            'materialSortOrder',
-            'materialFile',
-        ]);
-
-        $this->materialType = 'pdf';
-        $this->materialVisibility = 'Public';
-        $this->materialStatus = 'active';
-        $this->materialSortOrder = ($this->topic->materials()->max('sort_order') ?? 0) + 1;
+        return $tabs;
     }
 
     public function render()
     {
-        $materials = $this->topic->materials()->with('uploader')->latest()->get();
-
-        $selectedMaterial = $this->selectedMaterialId
-            ? $materials->firstWhere('id', $this->selectedMaterialId)
-            : $materials->first();
-
-        $students = CourseEnrollment::with('user')
-            ->where('course_id', $this->topic->course_id)
-            ->get()
-            ->map(function ($enrollment) {
-                $progress = TopicProgress::where('course_enrollment_id', $enrollment->id)
-                    ->where('topic_id', $this->topic->id)
-                    ->first();
-
-                $status = $progress->status ?? 'not_started';
-
-                $percent = match ($status) {
-                    'completed' => 100,
-                    'in_progress' => 50,
-                    default => 0,
-                };
-
-                return [
-                    'enrollment' => $enrollment,
-                    'progress' => $progress,
-                    'status' => $status,
-                    'percent' => $percent,
-                ];
-            });
-
-        $assessment = $this->topic->course->assessment;
+        $tabs = $this->availableTabs();
 
         return view('livewire.mentor.topics.topic-workspace', [
-            'materials' => $materials,
-            'selectedMaterial' => $selectedMaterial,
-            'students' => $students,
-            'assessment' => $assessment,
-            'materialPreviewUrl' => $selectedMaterial
-                ? ($selectedMaterial->external_url ?: ($selectedMaterial->path ? Storage::disk('public')->url($selectedMaterial->path) : null))
-                : null,
+            'tabs' => $tabs,
+            'activeComponent' => match ($this->tab) {
+                'materials' => \App\Livewire\Mentor\Topics\Tabs\MaterialsTab::class,
+                'sessions' => \App\Livewire\Mentor\Topics\Tabs\SessionsTab::class,
+                'attendances' => \App\Livewire\Mentor\Topics\Tabs\AttendancesTab::class,
+                'students' => \App\Livewire\Mentor\Topics\Tabs\StudentsTab::class,
+                'collaborators' => \App\Livewire\Mentor\Topics\Tabs\CollaboratorsTab::class,
+                // 'assessment' => \App\Livewire\Mentor\Topics\Tabs\AssessmentTab::class,
+                default => \App\Livewire\Mentor\Topics\Tabs\OverviewTab::class,
+            },
         ])->layout('layouts.learning');
     }
 }

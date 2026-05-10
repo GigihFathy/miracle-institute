@@ -38,7 +38,7 @@ class AttendanceButton extends Component
     {
         $this->session->loadMissing('topic.course');
 
-        if (! $this->session->start_at || ! $this->session->end_at) {
+        if (!$this->session->start_at || !$this->session->end_at) {
             $this->attendance = null;
             $this->canJoin = false;
             $this->canClockOut = false;
@@ -65,7 +65,7 @@ class AttendanceButton extends Component
     {
         abort_unless(auth()->check(), 403);
 
-        if (! $this->scheduleReady()) {
+        if (!$this->scheduleReady()) {
             session()->flash('error', 'Jadwal sesi belum lengkap.');
             return null;
         }
@@ -94,7 +94,7 @@ class AttendanceButton extends Component
     {
         abort_unless(auth()->check(), 403);
 
-        if (! $this->attendance) {
+        if (!$this->attendance) {
             session()->flash('error', 'Belum ada data presensi masuk.');
             return;
         }
@@ -107,7 +107,7 @@ class AttendanceButton extends Component
 
         $now = now();
 
-        if (! $this->canClockOut($now)) {
+        if (!$this->canClockOut($now)) {
             session()->flash('error', 'Clock-out hanya tersedia sampai 15 menit sebelum sesi berakhir.');
             return;
         }
@@ -124,14 +124,14 @@ class AttendanceButton extends Component
 
     public function syncState(): void
     {
-        if (! $this->scheduleReady()) {
+        if (!$this->scheduleReady()) {
             $this->canJoin = false;
             $this->canClockOut = false;
             $this->stateLabel = 'Schedule incomplete';
             return;
         }
 
-        if (! $this->attendance) {
+        if (!$this->attendance) {
             $this->canJoin = $this->canClockIn(now());
             $this->canClockOut = false;
 
@@ -145,7 +145,7 @@ class AttendanceButton extends Component
         }
 
         $this->canJoin = false;
-        $this->canClockOut = ! $this->attendance->clock_out_at && $this->canClockOut(now());
+        $this->canClockOut = !$this->attendance->clock_out_at && $this->canClockOut(now());
 
         $this->stateLabel = $this->attendance->clock_out_at
             ? 'Completed'
@@ -164,7 +164,7 @@ class AttendanceButton extends Component
 
     private function resolveClockInDeadline(): ?Carbon
     {
-        if (! $this->scheduleReady()) {
+        if (!$this->scheduleReady()) {
             return null;
         }
 
@@ -176,7 +176,7 @@ class AttendanceButton extends Component
 
     private function resolveClockOutDeadline(): ?Carbon
     {
-        if (! $this->scheduleReady()) {
+        if (!$this->scheduleReady()) {
             return null;
         }
 
@@ -185,7 +185,7 @@ class AttendanceButton extends Component
 
     private function canClockIn(Carbon $moment): bool
     {
-        if (! $this->clockInDeadline) {
+        if (!$this->clockInDeadline) {
             return false;
         }
 
@@ -194,7 +194,7 @@ class AttendanceButton extends Component
 
     private function canClockOut(Carbon $moment): bool
     {
-        if (! $this->clockOutDeadline) {
+        if (!$this->clockOutDeadline) {
             return false;
         }
 
