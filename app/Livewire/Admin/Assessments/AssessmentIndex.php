@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Assessments;
 
 use App\Livewire\Concerns\WithAdminTableState;
+use Illuminate\Validation\Rule;
 use App\Models\Assessment;
 use App\Models\Course;
 use Livewire\Component;
@@ -20,7 +21,6 @@ class AssessmentIndex extends Component
     public int $passing_grade = 70;
     public bool $randomize_questions = false;
     public ?int $question_limit = null;
-    public ?int $time_limit_minutes = null;
     public string $status = 'active';
 
     public string $courseFilter = '';
@@ -45,7 +45,6 @@ class AssessmentIndex extends Component
             'passing_grade' => 'required|integer|min:0|max:100',
             'randomize_questions' => 'boolean',
             'question_limit' => 'nullable|integer|min:1',
-            'time_limit_minutes' => 'nullable|integer|min:1',
             'status' => 'required|in:active,inactive,draft',
         ];
     }
@@ -76,7 +75,6 @@ class AssessmentIndex extends Component
         $this->passing_grade = (int) $row->passing_grade;
         $this->randomize_questions = (bool) $row->randomize_questions;
         $this->question_limit = $row->question_limit;
-        $this->time_limit_minutes = $row->time_limit_minutes;
         $this->status = $row->status;
 
         $this->showModal = true;
@@ -103,7 +101,6 @@ class AssessmentIndex extends Component
                 'passing_grade' => $this->passing_grade,
                 'randomize_questions' => $this->randomize_questions,
                 'question_limit' => $this->question_limit,
-                'time_limit_minutes' => $this->time_limit_minutes,
                 'status' => $this->status,
             ]
         );
@@ -150,7 +147,6 @@ class AssessmentIndex extends Component
             'passing_grade',
             'randomize_questions',
             'question_limit',
-            'time_limit_minutes',
             'status',
         ]);
 

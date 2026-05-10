@@ -37,7 +37,6 @@
                 <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Assessment</th>
                 <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Q</th>
                 <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Grade</th>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Timer</th>
                 <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Attempts</th>
                 <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Status</th>
                 <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Action</th>
@@ -58,7 +57,6 @@
 
                     <td class="px-4 py-3 whitespace-nowrap">{{ $row->questions_count }}</td>
                     <td class="px-4 py-3 whitespace-nowrap">{{ $row->passing_grade }}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">{{ $row->time_limit_minutes ?? '-' }}</td>
                     <td class="px-4 py-3 whitespace-nowrap">{{ $row->attempts_count }}</td>
 
                     <td class="px-4 py-3 whitespace-nowrap">
@@ -147,10 +145,6 @@
                             class="w-full border rounded-xl px-4 py-2"
                             placeholder="Question limit">
                     </div>
-
-                    <input wire:model="time_limit_minutes" type="number"
-                        class="w-full border rounded-xl px-4 py-2"
-                        placeholder="Time limit (minutes)">
 
                     <label class="flex items-center gap-2 text-sm">
                         <input type="checkbox" wire:model="randomize_questions">
