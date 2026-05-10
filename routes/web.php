@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\VideoSessionJoinController;
 
 use App\Livewire\Admin\Assessments\AssessmentIndex as AdminAssessmentIndex;
 use App\Livewire\Admin\Assessments\QuestionManager;
@@ -107,6 +108,9 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware('auth')->group(function () {
+    Route::get('/sessions/{videoSession}/join', [VideoSessionJoinController::class, 'join'])
+        ->middleware(['auth', 'verified', 'throttle:10,1'])
+        ->name('sessions.join');
 
     Route::post('/logout', function (Request $request) {
 

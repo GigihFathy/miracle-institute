@@ -56,9 +56,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Permission::class, PermissionPolicy::class);
         Gate::policy(StudyProgram::class, StudyProgramPolicy::class);
 
-        CourseEnrollment::observe(
-            CourseEnrollmentObserver::class
-        );
+        CourseEnrollment::observe(CourseEnrollmentObserver::class);
 
         TopicProgress::observe(
             TopicProgressObserver::class

@@ -3,6 +3,8 @@
 namespace App\Observers;
 
 use App\Models\CourseEnrollment;
+use App\Models\Attendance;
+use App\Models\VideoSession;
 use App\Events\EnrollmentConfirmed;
 use App\Events\CourseCompleted;
 use Illuminate\Support\Facades\DB;
@@ -11,13 +13,44 @@ use Illuminate\Support\Facades\DB;
 
 class CourseEnrollmentObserver
 {
+    /**
+     * Handle the CourseEnrollment "created" event.
+     */
     public function created(CourseEnrollment $enrollment): void
     {
-        DB::afterCommit(function () use ($enrollment) {
-            app(AttendanceAutomationService::class)
-                ->backfillAbsentForLateEnrollment($enrollment);
+        DB::transaction(function () use ($enrollment) {
 
-            event(new EnrollmentConfirmed($enrollment->id));
+            /**
+             * Handle late enrollment attendance
+             */
+            $sessions = VideoSession::query()
+                ->whereHas('topic', function ($q) use ($enrollment) {
+                    $q->where('course_id', $enrollment->course_id);
+                })
+                ->where('end_at', '<', $enrollment->enrolled_at ?? now())
+                ->get();
+
+            foreach ($sessions as $session) {
+                Attendance::firstOrCreate(
+                    [
+                        'video_session_id' => $session->id,
+                        'user_id' => $enrollment->user_id,
+                    ],
+                    [
+                        'status' => 'absent',
+                        'check_in_at' => null,
+                        'clock_out_at' => null,
+                        'ip_address' => null,
+                    ]
+                );
+            }
+
+            /**
+             * Dispatch event AFTER transaction committed
+             */
+            DB::afterCommit(function () use ($enrollment) {
+                event(new EnrollmentConfirmed($enrollment->id));
+            });
         });
     }
 
@@ -32,4 +65,5 @@ class CourseEnrollmentObserver
             });
         }
     }
+    
 }

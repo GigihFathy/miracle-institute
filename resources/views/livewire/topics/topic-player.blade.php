@@ -290,7 +290,10 @@
                         </div>
                     </div>
 
-                    @livewire('sessions.attendance-button', ['sessionId' => $session->id], key('attendance-'.$session->id))
+                    <livewire:sessions.join-session-button
+                        :video-session-id="$session->id"
+                        :key="'join-session-'.$session->id"
+                    />
                 </div>
             @empty
                 <div class="rounded-2xl border border-dashed bg-slate-50 p-6">

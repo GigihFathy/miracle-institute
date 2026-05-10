@@ -32,4 +32,15 @@ class VideoSession extends Model
     {
         return $this->hasMany(Attendance::class, 'video_session_id');
     }
+
+    public function isJoinable(): bool
+    {
+        return in_array($this->status, ['scheduled', 'ongoing'], true)
+            && now()->betweenIncluded($this->start_at, $this->end_at);
+    }
+
+    public function attendanceStatusForNow(): string
+    {
+        return now()->diffInMinutes($this->start_at, false) <= 45 ? 'present' : 'late';
+    }
 }
