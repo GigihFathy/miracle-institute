@@ -8,7 +8,10 @@ use App\Models\TopicProgress;
 use App\Models\TopicUser;
 use App\Models\VideoSession;
 use App\Services\ProgressService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
@@ -42,12 +45,9 @@ class TopicPlayer extends Component
 
         $user = auth()->user();
 
-        $this->isMentor = $user
-            ? $user->hasRole('disciples')
-            : false;
-
+        $this->isMentor = $user ? $user->hasRole('disciples') : false;
         $this->canOpenMentorWorkspace = $this->isMentor && $this->canOpenMentorWorkspaceForTopic();
-        $this->canStudentInteract = auth()->check() && !$this->canOpenMentorWorkspace;
+        $this->canStudentInteract = auth()->check() && ! $this->canOpenMentorWorkspace;
 
         $this->activeMaterialId = $this->topic->materials->first()?->id;
 
@@ -56,7 +56,7 @@ class TopicPlayer extends Component
 
     private function canOpenMentorWorkspaceForTopic(): bool
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
 
@@ -79,7 +79,7 @@ class TopicPlayer extends Component
             ->where('course_id', $this->topic->course_id)
             ->first();
 
-        if (!$enrollment) {
+        if (! $enrollment) {
             $this->topicCompleted = false;
             $this->topicStatus = null;
 
@@ -106,6 +106,136 @@ class TopicPlayer extends Component
     {
         $this->activeMaterialId = $materialId;
         $this->activeTab = 'materials';
+    }
+
+    public function sessionPhase(VideoSession $session): string
+    {
+        if (! $session->start_at || ! $session->end_at) {
+            return 'invalid';
+        }
+
+        $now = now();
+
+        if ($now->lt($session->start_at)) {
+            return 'upcoming';
+        }
+
+        if ($now->betweenIncluded($session->start_at, $session->end_at)) {
+            return 'live';
+        }
+
+        return 'ended';
+    }
+
+    public function sessionButtonText(VideoSession $session): string
+    {
+        return match ($this->sessionPhase($session)) {
+            'upcoming' => 'Not Started',
+            'live' => 'Join Session',
+            'ended' => 'Completed',
+            default => 'Unavailable',
+        };
+    }
+
+    public function sessionBadgeClass(VideoSession $session): string
+    {
+        return match ($this->sessionPhase($session)) {
+            'upcoming' => 'bg-amber-100 text-amber-700 border-amber-200',
+            'live' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+            'ended' => 'bg-slate-100 text-slate-700 border-slate-200',
+            default => 'bg-slate-100 text-slate-700 border-slate-200',
+        };
+    }
+
+    public function sessionButtonClass(VideoSession $session): string
+    {
+        return match ($this->sessionPhase($session)) {
+            'upcoming' => 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed',
+            'live' => 'bg-slate-900 text-white border-slate-900 hover:bg-slate-700',
+            'ended' => 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed',
+            default => 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed',
+        };
+    }
+
+    public function sessionCountdownLabel(VideoSession $session): string
+    {
+        if (! $session->start_at || ! $session->end_at) {
+            return 'Session schedule belum lengkap.';
+        }
+
+        $now = now();
+
+        if ($now->lt($session->start_at)) {
+            $diff = $now->diffInSeconds($session->start_at);
+            return 'Starts in ' . $this->formatDuration($diff);
+        }
+
+        if ($now->betweenIncluded($session->start_at, $session->end_at)) {
+            $diff = $now->diffInSeconds($session->end_at);
+            return 'Ends in ' . $this->formatDuration($diff);
+        }
+
+        return 'Session completed';
+    }
+
+    private function formatDuration(int $seconds): string
+    {
+        $hours = intdiv($seconds, 3600);
+        $minutes = intdiv($seconds % 3600, 60);
+        $secs = $seconds % 60;
+
+        $parts = [];
+
+        if ($hours > 0) {
+            $parts[] = $hours . 'h';
+        }
+
+        if ($minutes > 0 || $hours > 0) {
+            $parts[] = $minutes . 'm';
+        }
+
+        $parts[] = $secs . 's';
+
+        return implode(' ', $parts);
+    }
+
+    public function joinSession(string $sessionId)
+    {
+        abort_unless(auth()->check(), 403);
+
+        $session = VideoSession::query()
+            ->where('topic_id', $this->topic->id)
+            ->findOrFail($sessionId);
+
+        abort_unless($this->sessionPhase($session) === 'live', 403);
+
+        $user = auth()->user();
+        $now = now();
+
+        if (! $user->hasRole('student') && session('active_role') !== 'student') {
+            return redirect()->away($session->zoom_link);
+        }
+
+        $status = $now->diffInMinutes($session->start_at, false) <= 45 ? 'present' : 'late';
+
+        $lock = Cache::lock("attendance:join:{$session->id}:{$user->id}", 10);
+
+        return $lock->block(3, function () use ($session, $user, $now, $status) {
+            Attendance::firstOrCreate(
+                [
+                    'video_session_id' => $session->id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'status' => $status,
+                    'check_in_at' => $now,
+                    'clock_out_at' => null,
+                    'ip_address' => request()->ip(),
+                ]
+            );
+
+            return redirect()->away($session->zoom_link);
+        });
     }
 
     public function completeTopic(): void
@@ -145,7 +275,7 @@ class TopicPlayer extends Component
     {
         abort_unless($this->canStudentInteract, 403);
 
-        if (!$this->activeMaterialId) {
+        if (! $this->activeMaterialId) {
             return;
         }
 

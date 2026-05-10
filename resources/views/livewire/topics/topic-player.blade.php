@@ -205,104 +205,306 @@
 
     @if($activeTab === 'sessions')
         <section class="space-y-4">
-            <div class="rounded-2xl bg-white border p-5">
+            <div class="rounded-2xl bg-white border p-5 space-y-4">
                 <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                     <div>
-                        <h2 class="text-xl font-semibold">Sessions</h2>
+                        <h2 class="text-lg font-semibold">Sessions</h2>
                         <p class="text-sm text-slate-500">
-                            Pastikan kamu memeriksa status waktu di setiap sesi.
+                            Cek jadwal sesi dan join hanya saat window sesi aktif.
                         </p>
                     </div>
-
-                    @php
-                        $now = Carbon::now();
-                        $session = $topic->videoSessions->first();
-
-                        $open = null;
-                        $close = null;
-                        $isOpen = false;
-                        $isPast = false;
-
-                        if ($session) {
-                            $start = $session->start_at;
-                            $end = $session->end_at;
-
-                            $open = $start;
-                            $close = $start->copy()->addMinutes(45)->lt($end->copy()->subMinutes(15))
-                                ? $start->copy()->addMinutes(45)
-                                : $end->copy()->subMinutes(15);
-
-                            $isOpen = $now->between($open, $close);
-                            $isPast = $now->gt($close);
-                        }
-                    @endphp
-
-                    @if($session)
-                        <div class="rounded-xl border px-3 py-2 text-xs
-                            {{ $isOpen ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                            ($isPast ? 'bg-red-50 text-red-600 border-red-200' :
-                            'bg-slate-50 text-slate-600') }}">
-                            Clock-in: {{ $open->format('H:i') }} - {{ $close->format('H:i') }}
-                        </div>
-                    @endif
                 </div>
             </div>
 
             @forelse($topic->videoSessions as $session)
                 @php
                     $attendance = $sessionAttendances->get($session->id);
+                    $phase = $this->sessionPhase($session);
+                    $buttonText = $this->sessionButtonText($session);
+                    $buttonClass = $this->sessionButtonClass($session);
+                    $badgeClass = $this->sessionBadgeClass($session);
+                    $countdownText = $this->sessionCountdownLabel($session);
+                    $startIso = $session->start_at?->toIso8601String();
+                    $endIso = $session->end_at?->toIso8601String();
                 @endphp
 
-                <div class="rounded-2xl bg-white border p-5 space-y-4 shadow-sm">
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <h3 class="font-semibold text-lg">{{ $session->title }}</h3>
-                            <p class="text-sm text-slate-500 mt-1">
-                                {{ $session->start_at->format('d M Y, H:i') }} - {{ $session->end_at->format('H:i') }}
-                            </p>
+                <div
+                    x-data="sessionJoinCard({
+                        startAt: @js($startIso),
+                        endAt: @js($endIso),
+                        initialPhase: @js($phase),
+                        title: @js($session->title),
+                        startLabel: @js($session->start_at?->format('d M Y, H:i') ?? '-'),
+                        endLabel: @js($session->end_at?->format('H:i') ?? '-')
+                    })"
+                    class="rounded-2xl bg-white border p-5 space-y-4 shadow-sm"
+                >
+                    <div class="space-y-1">
+                        <div class="font-semibold">{{ $session->title }}</div>
+                        <div class="text-sm text-slate-500">
+                            {{ $session->topic?->course?->title }} · {{ $session->topic?->name }}
                         </div>
-
-                        <span class="text-xs px-2 py-1 rounded-full bg-slate-100">
-                            {{ ucfirst($session->status) }}
-                        </span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                        <div class="rounded-xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">Access Window</div>
-                            <div class="font-semibold mt-1">
-                                {{ $session->start_at->format('H:i') }} - {{ $session->start_at->copy()->addMinutes(45)->lt($session->end_at->copy()->subMinutes(15)) ? $session->start_at->copy()->addMinutes(45)->format('H:i') : $session->end_at->copy()->subMinutes(15)->format('H:i') }}
-                            </div>
-                        </div>
-
-                        <div class="rounded-xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">Attendance Status</div>
-                            <div class="font-semibold mt-1">
-                                {{ $attendance?->status ?? 'absent' }}
-                            </div>
-                        </div>
-
-                        <div class="rounded-xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">Check In</div>
-                            <div class="font-semibold mt-1">
-                                {{ $attendance?->check_in_at?->format('d M Y, H:i') ?? '-' }}
-                            </div>
+                        <div class="text-xs text-slate-500">
+                            {{ $session->start_at?->format('d M Y, H:i') ?? '-' }} - {{ $session->end_at?->format('H:i') ?? '-' }}
                         </div>
                     </div>
 
-                    <livewire:sessions.join-session-button
-                        :video-session-id="$session->id"
-                        :key="'join-session-'.$session->id"
-                    />
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="text-sm">
+                            Status: <span class="font-medium" x-text="stateLabel"></span>
+                        </div>
+
+                        @if($attendance)
+                            <span class="text-xs px-2 py-1 rounded-full {{ $attendanceBadgeClass ?? 'bg-slate-100' }}">
+                                {{ strtoupper($attendance->status) }}
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="text-xs text-slate-500" x-text="countdownLabel">
+                        {{ $countdownText }}
+                    </div>
+
+                    @if($attendance)
+                        <div class="space-y-1 text-sm">
+                            <div>Check in: {{ $attendance->check_in_at?->format('d M Y, H:i') ?? '-' }}</div>
+                            <div>Check out: {{ $attendance->clock_out_at?->format('d M Y, H:i') ?? '-' }}</div>
+                        </div>
+                    @endif
+
+                    <div class="flex flex-wrap gap-2">
+                        @if($isStudent)
+                            <button
+                                type="button"
+                                x-on:click="openModal()"
+                                :disabled="!canJoin"
+                                class="px-4 py-2 rounded-xl border text-sm font-medium transition"
+                                :class="buttonClass"
+                            >
+                                <span x-text="buttonText">{{ $buttonText }}</span>
+                            </button>
+                        @else
+                            <span class="px-4 py-2 rounded-xl border bg-slate-50 text-xs text-slate-500">
+                                Read-only review
+                            </span>
+                        @endif
+                    </div>
+
+                    <div
+                        x-cloak
+                        x-show="open"
+                        x-transition.opacity
+                        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+                        x-on:keydown.escape.window="closeModal()"
+                        x-on:click.self="closeModal()"
+                    >
+                        <div class="w-full max-w-2xl rounded-3xl bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
+                            <div class="flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6 sm:py-5">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-900">Join Session</h3>
+                                    <p class="mt-1 text-sm text-slate-500">
+                                        Student akan dicatat ke attendance sebelum diarahkan ke meeting.
+                                    </p>
+                                </div>
+
+                                <button type="button"
+                                        x-on:click="closeModal()"
+                                        class="rounded-xl border px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                                    Close
+                                </button>
+                            </div>
+
+                            <div class="px-5 py-5 sm:px-6 sm:py-6 space-y-4">
+                                <div class="grid gap-3 sm:grid-cols-2 text-sm">
+                                    <div class="rounded-xl border bg-slate-50 p-4">
+                                        <div class="text-xs text-slate-500">Title</div>
+                                        <div class="mt-1 font-semibold text-slate-900">{{ $session->title }}</div>
+                                    </div>
+
+                                    <div class="rounded-xl border bg-slate-50 p-4">
+                                        <div class="text-xs text-slate-500">Status</div>
+                                        <div class="mt-1">
+                                            <span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold border"
+                                                :class="badgeClass"
+                                                x-text="stateLabel"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-xl border bg-slate-50 p-4">
+                                        <div class="text-xs text-slate-500">Start</div>
+                                        <div class="mt-1 font-semibold text-slate-900">
+                                            {{ $session->start_at?->format('d M Y, H:i') ?? '-' }}
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-xl border bg-slate-50 p-4">
+                                        <div class="text-xs text-slate-500">End</div>
+                                        <div class="mt-1 font-semibold text-slate-900">
+                                            {{ $session->end_at?->format('d M Y, H:i') ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="rounded-xl border border-slate-200 bg-white p-4">
+                                    <div class="text-xs uppercase tracking-wide text-slate-500">Countdown</div>
+                                    <div class="mt-1 text-base font-semibold text-slate-900" x-text="countdownLabel"></div>
+                                </div>
+
+                                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                                    Clock-in deadline: {{ $session->start_at?->copy()->addMinutes(45)?->format('d M Y, H:i') ?? '-' }}
+                                </div>
+
+                                <div class="flex items-center justify-end gap-3 border-t pt-4">
+                                    <button
+                                        type="button"
+                                        x-on:click="closeModal()"
+                                        class="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        wire:click="joinSession('{{ $session->id }}')"
+                                        wire:loading.attr="disabled"
+                                        @disabled(! $phase === 'live')
+                                        class="rounded-xl px-4 py-2 text-sm font-medium transition"
+                                        :class="buttonClass"
+                                    >
+                                        Join &amp; Log Attendance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @empty
                 <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
                     <div class="font-semibold text-slate-900">Belum ada sesi terjadwal</div>
                     <p class="text-sm text-slate-600 mt-1 leading-6">
-                        Mentor belum menjadwalkan sesi untuk topik ini. Tab tetap tersedia agar mahasiswa bisa memantau jadwal begitu dipublikasikan.
+                        Mentor belum menjadwalkan sesi untuk topik ini.
                     </p>
                 </div>
             @endforelse
         </section>
     @endif
 </div>
+@once
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('sessionJoinCard', (cfg) => ({
+                open: false,
+                now: Date.now(),
+                timer: null,
+
+                startAt: cfg.startAt ? new Date(cfg.startAt).getTime() : null,
+                endAt: cfg.endAt ? new Date(cfg.endAt).getTime() : null,
+                initialPhase: cfg.initialPhase ?? 'invalid',
+
+                init() {
+                    this.timer = setInterval(() => {
+                        this.now = Date.now();
+                    }, 1000);
+                },
+
+                destroy() {
+                    if (this.timer) {
+                        clearInterval(this.timer);
+                    }
+                },
+
+                get phase() {
+                    if (!this.startAt || !this.endAt) {
+                        return 'invalid';
+                    }
+
+                    if (this.now < this.startAt) {
+                        return 'upcoming';
+                    }
+
+                    if (this.now <= this.endAt) {
+                        return 'live';
+                    }
+
+                    return 'ended';
+                },
+
+                get canJoin() {
+                    return this.phase === 'live';
+                },
+
+                get stateLabel() {
+                    if (this.phase === 'upcoming') return 'Scheduled';
+                    if (this.phase === 'live') return 'Live';
+                    if (this.phase === 'ended') return 'Completed';
+
+                    return 'Unavailable';
+                },
+
+                get badgeClass() {
+                    if (this.phase === 'upcoming') return 'bg-amber-100 text-amber-700 border-amber-200';
+                    if (this.phase === 'live') return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                    if (this.phase === 'ended') return 'bg-slate-100 text-slate-700 border-slate-200';
+
+                    return 'bg-slate-100 text-slate-700 border-slate-200';
+                },
+
+                get buttonClass() {
+                    if (this.phase === 'upcoming') {
+                        return 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed';
+                    }
+
+                    if (this.phase === 'live') {
+                        return 'bg-slate-900 text-white border-slate-900 hover:bg-slate-700';
+                    }
+
+                    return 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed';
+                },
+
+                get buttonText() {
+                    if (this.phase === 'upcoming') return 'Not Started';
+                    if (this.phase === 'live') return 'Join Session';
+                    if (this.phase === 'ended') return 'Completed';
+
+                    return 'Unavailable';
+                },
+
+                get countdownLabel() {
+                    if (!this.startAt || !this.endAt) {
+                        return 'Session schedule belum lengkap.';
+                    }
+
+                    let target = this.phase === 'upcoming' ? this.startAt : this.endAt;
+
+                    if (this.phase === 'ended') {
+                        return 'Session completed';
+                    }
+
+                    let diff = Math.max(0, Math.floor((target - this.now) / 1000));
+                    let h = Math.floor(diff / 3600);
+                    let m = Math.floor((diff % 3600) / 60);
+                    let s = diff % 60;
+
+                    let parts = [];
+                    if (h > 0) parts.push(`${h}h`);
+                    if (m > 0 || h > 0) parts.push(`${m}m`);
+                    parts.push(`${s}s`);
+
+                    return this.phase === 'upcoming'
+                        ? `Starts in ${parts.join(' ')}`
+                        : `Ends in ${parts.join(' ')}`;
+                },
+
+                openModal() {
+                    if (this.canJoin) {
+                        this.open = true;
+                    }
+                },
+
+                closeModal() {
+                    this.open = false;
+                },
+            }));
+        });
+    </script>
+@endonce
