@@ -13,19 +13,18 @@ class ArticleShow extends Component
     {
         abort_unless($article->status === 'active', 404);
 
-        $this->article = $article->load('images');
+        $this->article = $article;
     }
 
     public function render()
     {
-        $related = Article::where('status', 'active')
-            ->where('id', '!=', $this->article->id)
-            ->latest()
-            ->take(3)
-            ->get();
-
         return view('livewire.frontend.article-show', [
-            'related' => $related,
+            'related' => Article::query()
+                ->where('status', 'active')
+                ->where('id', '!=', $this->article->id)
+                ->latest()
+                ->take(4)
+                ->get(),
         ])->layout('layouts.learning');
     }
 }

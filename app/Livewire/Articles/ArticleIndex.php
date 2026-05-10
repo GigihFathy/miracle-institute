@@ -12,10 +12,11 @@ class ArticleIndex extends Component
 
     public function render()
     {
-        $articles = Article::where('status', 'active')
-            ->when($this->search, function ($q) {
-                $q->where(function ($query) {
-                    $query->where('title', 'like', '%' . $this->search . '%')
+        $articles = Article::query()
+            ->where('status', 'active')
+            ->when($this->search, function ($query) {
+                $query->where(function ($subQuery) {
+                    $subQuery->where('title', 'like', '%' . $this->search . '%')
                         ->orWhere('author', 'like', '%' . $this->search . '%');
                 });
             })
