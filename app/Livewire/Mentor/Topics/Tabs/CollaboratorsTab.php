@@ -63,7 +63,7 @@ class CollaboratorsTab extends Component
 
     private function isEligibleMentor(User $user): bool
     {
-        return $user->hasRole('disciples') && ! $user->hasRole('student');
+        return $user->hasRole('disciples') && !$user->hasRole('student');
     }
 
     public function saveCollaborator(): void
@@ -79,7 +79,7 @@ class CollaboratorsTab extends Component
 
         $user = User::query()->findOrFail($this->collaboratorUserId);
 
-        if (! $this->isEligibleMentor($user)) {
+        if (!$this->isEligibleMentor($user)) {
             throw ValidationException::withMessages([
                 'collaboratorUserId' => 'Hanya akun Mentor/Disciples yang dapat menjadi collaborator.',
             ]);
@@ -99,7 +99,7 @@ class CollaboratorsTab extends Component
                     ->where('user_id', $this->collaboratorUserId)
                     ->first();
 
-            if (! $topicUser) {
+            if (!$topicUser) {
                 $topicUser = TopicUser::create([
                     'topic_id' => $this->topic->id,
                     'user_id' => $this->collaboratorUserId,

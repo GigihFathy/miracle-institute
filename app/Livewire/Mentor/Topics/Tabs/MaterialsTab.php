@@ -121,7 +121,7 @@ class MaterialsTab extends Component
             ? Material::query()->where('topic_id', $this->topic->id)->findOrFail($this->editingMaterialId)
             : null;
 
-        if ($this->materialType === 'video' && ! $this->materialExternalUrl) {
+        if ($this->materialType === 'video' && !$this->materialExternalUrl) {
             throw ValidationException::withMessages([
                 'materialExternalUrl' => 'Video wajib memakai external path.',
             ]);
@@ -218,7 +218,7 @@ class MaterialsTab extends Component
             ? $materials->firstWhere('id', $this->selectedMaterialId)
             : $materials->first();
 
-        if (! $selectedMaterial && $materials->isNotEmpty()) {
+        if (!$selectedMaterial && $materials->isNotEmpty()) {
             $selectedMaterial = $materials->first();
             $this->selectedMaterialId = $selectedMaterial->id;
         }

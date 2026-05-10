@@ -29,7 +29,7 @@ trait InteractsWithMentorTopic
             ->where('status', 'active')
             ->first();
 
-        if (! $topicUser) {
+        if (!$topicUser) {
             return false;
         }
 
@@ -102,7 +102,7 @@ trait InteractsWithMentorTopic
 
         $membership = $this->topicMembership($topic);
 
-        if (! $membership) {
+        if (!$membership) {
             return false;
         }
 

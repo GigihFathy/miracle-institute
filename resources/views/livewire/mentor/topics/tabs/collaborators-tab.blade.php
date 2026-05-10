@@ -80,7 +80,7 @@
     >
         <form wire:submit.prevent="saveCollaborator" class="space-y-4">
             <div class="grid gap-4">
-                @if(! $editingCollaboratorId)
+                @if(!$editingCollaboratorId)
                     <div>
                         <label class="text-xs font-medium text-slate-500">Search User</label>
                         <input wire:model.live="collaboratorSearch" class="mt-1 w-full rounded-xl border px-4 py-2" placeholder="Name or email">

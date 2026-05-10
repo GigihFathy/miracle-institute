@@ -45,7 +45,7 @@ class TopicIndex extends Component
 
         $studentCounts = collect();
 
-        if (! empty($topicIds)) {
+        if (!empty($topicIds)) {
             $studentCounts = TopicProgress::query()
                 ->whereIn('topic_id', $topicIds)
                 ->selectRaw('topic_id, COUNT(DISTINCT course_enrollment_id) as student_count')

@@ -28,7 +28,7 @@ class TopicWorkspace extends Component
 
         $allowedTabs = array_keys($this->availableTabs());
 
-        if (! in_array($this->tab, $allowedTabs, true)) {
+        if (!in_array($this->tab, $allowedTabs, true)) {
             $this->tab = $allowedTabs[0] ?? 'overview';
         }
     }
