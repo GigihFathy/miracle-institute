@@ -17,7 +17,11 @@ class MyLearning extends Component
     public function render(ProgressService $progressService)
     {
         $user = auth()->user();
-        $summary = $progressService->getUserSummary($user);
+        $summary = array_merge([
+            'courses_enrolled' => 0,
+            'topics_completed' => 0,
+            'certificates' => 0,
+        ], (array) $progressService->getUserSummary($user));
 
         $enrollments = CourseEnrollment::with(['course.studyProgram', 'course.topics'])
             ->where('user_id', $user->id)

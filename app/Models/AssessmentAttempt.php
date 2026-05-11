@@ -16,9 +16,11 @@ class AssessmentAttempt extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'passed' => 'boolean',
+        'question_snapshot' => 'array',
         'started_at' => 'datetime',
         'submitted_at' => 'datetime',
+        'graded_at' => 'datetime',
+        'passed' => 'boolean',
     ];
 
     public function assessment()
@@ -35,4 +37,5 @@ class AssessmentAttempt extends Model
     {
         return $this->hasMany(AssessmentAnswer::class, 'attempt_id');
     }
+
 }

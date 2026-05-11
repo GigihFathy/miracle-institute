@@ -25,7 +25,6 @@ class AssessmentFactory extends Factory
 
             'question_limit' => $this->faker->randomElement([null, 5, 10]),
 
-            'time_limit_minutes' => $this->faker->randomElement([null, 10, 15]),
 
             'status' => 'active',
         ];

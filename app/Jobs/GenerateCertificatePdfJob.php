@@ -28,16 +28,13 @@ class GenerateCertificatePdfJob implements ShouldQueue
 
     public function handle(CertificateService $certificateService): void
     {
-        $certificate = Certificate::with(['user', 'course', 'topic'])->findOrFail($this->certificateId);
+        $certificate = Certificate::with(['user', 'course'])->findOrFail($this->certificateId);
 
         if ($certificate->status === 'issued' && !empty($certificate->file_path) && Storage::disk('public')->exists($certificate->file_path)) {
             return;
         }
 
         $path = $certificateService->pdfPathFor($certificate);
-        $absolutePath = Storage::disk('public')->path($path);
-
-        Storage::disk('public')->makeDirectory('certificates');
 
         $pdf = Pdf::loadView('pdf.certificate', [
             'certificate' => $certificate,

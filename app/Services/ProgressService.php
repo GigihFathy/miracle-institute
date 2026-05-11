@@ -2,13 +2,18 @@
 
 namespace App\Services;
 
+use App\Models\Assessment;
+use App\Models\AssessmentAttempt;
 use App\Models\Attendance;
+use App\Models\Certificate;
 use App\Models\CourseEnrollment;
 use App\Models\Material;
+use App\Models\User;
 use App\Models\MaterialProgress;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ProgressService
@@ -71,6 +76,8 @@ class ProgressService
             }
 
             $topicProgress->save();
+
+            $this->syncCertificateState($userId, $material->topic->course_id);
 
             return [
                 'material_progress' => $materialProgress,
@@ -198,7 +205,13 @@ class ProgressService
 
         $enrollment = $this->requireEnrollment($userId, $topic->course_id);
 
-        return DB::transaction(function () use ($snapshot, $enrollment, $topicId) {
+        return DB::transaction(function () use (
+            $snapshot,
+            $enrollment,
+            $topicId,
+            $topic,
+            $userId
+        ) {
             $topicProgress = TopicProgress::query()->firstOrNew([
                 'course_enrollment_id' => $enrollment->id,
                 'topic_id' => $topicId,
@@ -216,6 +229,8 @@ class ProgressService
 
             $topicProgress->save();
 
+            $this->syncCertificateState($userId, $topic->course_id);
+
             return $topicProgress;
         });
     }
@@ -223,6 +238,79 @@ class ProgressService
     public function recalculateTopicCompletion(string $userId, string $topicId): TopicProgress
     {
         return $this->syncTopicCompletion($userId, $topicId);
+    }
+
+    public function syncCertificateState(string $userId, string $courseId): ?Certificate
+    {
+        $assessment = Assessment::query()
+            ->where('course_id', $courseId)
+            ->first();
+
+        if (! $assessment) {
+            return null;
+        }
+
+        $enrollment = CourseEnrollment::query()
+            ->where('user_id', $userId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if (! $enrollment) {
+            return null;
+        }
+
+        $topicIds = Topic::query()
+            ->where('course_id', $courseId)
+            ->pluck('id')
+            ->all();
+
+        $allTopicsCompleted = empty($topicIds)
+            ? true
+            : TopicProgress::query()
+                ->where('course_enrollment_id', $enrollment->id)
+                ->whereIn('topic_id', $topicIds)
+                ->where('status', 'completed')
+                ->count() === count($topicIds);
+
+        $assessmentPassed = AssessmentAttempt::query()
+            ->where('assessment_id', $assessment->id)
+            ->where('user_id', $userId)
+            ->where('passed', true)
+            ->whereNotNull('submitted_at')
+            ->exists();
+
+        $eligible = $allTopicsCompleted && $assessmentPassed;
+
+        $certificate = Certificate::query()
+            ->where('user_id', $userId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if ($eligible) {
+            return DB::transaction(function () use ($userId, $courseId, $certificate) {
+                $certificate = Certificate::query()->firstOrNew([
+                    'user_id' => $userId,
+                    'course_id' => $courseId,
+                ]);
+
+                if (! $certificate->certificate_number) {
+                    $certificate->certificate_number = $this->generateCertificateNumber();
+                }
+
+                $certificate->status = 'issued';
+                $certificate->issued_at = now();
+                $certificate->save();
+
+                return $certificate;
+            });
+        }
+
+        if ($certificate && $certificate->status === 'issued') {
+            $certificate->status = 'revoked';
+            $certificate->save();
+        }
+
+        return $certificate;
     }
 
     private function syncEndedSessionAbsences(string $userId, Topic $topic): void
@@ -263,6 +351,11 @@ class ProgressService
         return $session->end_at->lte(now());
     }
 
+    private function generateCertificateNumber(): string
+    {
+        return 'CERT-' . now()->format('Ymd') . '-' . Str::upper(Str::random(8));
+    }
+
     private function requireEnrollment(string $userId, string $courseId): CourseEnrollment
     {
         $enrollment = CourseEnrollment::query()
@@ -277,5 +370,24 @@ class ProgressService
         }
 
         return $enrollment;
+    }
+
+    public function getUserSummary(?User $user): array
+    {
+        if (!$user) {
+            return [
+                'courses_enrolled' => 0,
+                'topics_completed' => 0,
+                'certificates' => 0,
+            ];
+        }
+
+        return [
+            'courses_enrolled' => CourseEnrollment::where('user_id', $user->id)->count(),
+            'topics_completed' => TopicProgress::whereHas('courseEnrollment', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->where('status', 'completed')->count(),
+            'certificates' => Certificate::where('user_id', $user->id)->count(),
+        ];
     }
 }

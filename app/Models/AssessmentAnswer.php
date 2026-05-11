@@ -33,4 +33,11 @@ class AssessmentAnswer extends Model
     {
         return $this->belongsTo(QuestionOption::class);
     }
+
+    public function option()
+    {
+        return $this->belongsTo(QuestionOption::class, 'question_option_id');
+    }
+
+    
 }

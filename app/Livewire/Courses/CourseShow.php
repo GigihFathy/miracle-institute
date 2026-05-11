@@ -86,7 +86,6 @@ class CourseShow extends Component
             if ($this->enrolled) {
                 $this->courseCertificate = Certificate::query()
                     ->where('user_id', $user->id)
-                    ->where('type', 'course')
                     ->where('course_id', $this->course->id)
                     ->latest()
                     ->first();
@@ -163,13 +162,10 @@ class CourseShow extends Component
         }
 
         $questionCount = $this->assessment->questions->count();
-        $estimatedMinutes = $this->assessment->time_limit_minutes ?: max(5, $questionCount * 2);
 
         $this->assessmentMeta = [
             'title' => $this->assessment->title,
             'passing_grade' => $this->assessment->passing_grade,
-            'time_limit_minutes' => $this->assessment->time_limit_minutes,
-            'estimated_minutes' => $estimatedMinutes,
             'question_count' => $questionCount,
             'status' => $this->assessment->status,
             'instructions' => [

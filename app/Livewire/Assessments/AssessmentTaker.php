@@ -3,253 +3,135 @@
 namespace App\Livewire\Assessments;
 
 use App\Models\Assessment;
-use App\Models\AssessmentAnswer;
 use App\Models\AssessmentAttempt;
+use App\Services\AssessmentFlowService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class AssessmentTaker extends Component
 {
+    use AuthorizesRequests;
+
     public Assessment $assessment;
     public AssessmentAttempt $attempt;
 
-    public $questions;
+    public array $questions = [];
     public array $answers = [];
 
     public int $currentIndex = 0;
 
-    public ?int $timeLeft = null;
-    public ?int $timeLimit = null;
-
     public bool $openSubmit = false;
 
-    protected $listeners = ['tick'];
-
-    public function mount(Assessment $assessment)
+    public function mount(Assessment $assessment, AssessmentFlowService $flowService): void
     {
-        $this->assessment = $assessment;
-        $this->attempt = $this->resolveAttempt();
+        abort_unless(Auth::check(), 403);
 
-        // redirect jika sudah submit
-        if ($this->attempt->submitted_at) {
-            return redirect()->route('assessments.result', $this->attempt->id);
-        }
+        $this->assessment = $assessment->loadMissing(['course']);
 
-        $this->questions = $assessment->questions()
-            ->with('options')
-            ->orderBy('sort_order')
-            ->get()
-            ->values();
-
-        $this->timeLimit = $assessment->time_limit_minutes;
-
-        $this->loadAnswers();
-        $this->initTimer();
-    }
-
-    private function resolveAttempt(): AssessmentAttempt
-    {
-        $last = AssessmentAttempt::where('assessment_id', $this->assessment->id)
-            ->where('user_id', Auth::id())
-            ->latest('attempt_no')
-            ->first();
-
-        if ($last && !$last->submitted_at) {
-            return $last;
-        }
-
-        $attemptNo = $last ? $last->attempt_no + 1 : 1;
-
-        return AssessmentAttempt::create([
-            'assessment_id' => $this->assessment->id,
-            'user_id' => Auth::id(),
-            'attempt_no' => $attemptNo,
-            'started_at' => now(),
-        ]);
-    }
-
-    private function loadAnswers()
-    {
-        $this->answers = $this->attempt->answers()
-            ->get()
-            ->mapWithKeys(fn ($a) => [
-                $a->question_id => $a->question_option_id ?? $a->answer_text
-            ])
-            ->toArray();
-    }
-
-    private function initTimer()
-    {
-        if (!$this->timeLimit || !$this->attempt->started_at) {
+        $passedAttempt = $flowService->latestPassedAttempt($this->assessment->id, Auth::id());
+        if ($passedAttempt) {
+            redirect()->route('assessments.result', $passedAttempt->id);
             return;
         }
 
-        $end = $this->attempt->started_at->addMinutes($this->timeLimit);
-        $this->timeLeft = now()->diffInSeconds($end, false);
+        $this->attempt = $flowService->startAttempt($this->assessment->id, Auth::id());
 
-        if ($this->timeLeft <= 0) {
-            $this->submit();
-        }
-    }
-
-    public function tick(): void
-    {
-        if ($this->timeLeft === null) return;
-
-        $this->timeLeft--;
-
-        if ($this->timeLeft <= 0) {
-            $this->submit();
-        }
-    }
-
-    public function getFormattedTimeProperty(): string
-    {
-        if ($this->timeLeft === null) return '';
-
-        $m = floor($this->timeLeft / 60);
-        $s = $this->timeLeft % 60;
-
-        return sprintf('%02d:%02d', $m, $s);
-    }
-
-    public function updateAnswer($questionId, $value)
-    {
-        if ($this->attempt->submitted_at) return;
-
-        $question = $this->questions->firstWhere('id', $questionId);
-        if (!$question) return;
-
-        if ($question->question_type === 'mcq') {
-            AssessmentAnswer::updateOrCreate(
-                [
-                    'attempt_id' => $this->attempt->id,
-                    'question_id' => $questionId,
-                ],
-                [
-                    'question_option_id' => $value,
-                    'answer_text' => null,
-                ]
-            );
-        } else {
-            AssessmentAnswer::updateOrCreate(
-                [
-                    'attempt_id' => $this->attempt->id,
-                    'question_id' => $questionId,
-                ],
-                [
-                    'question_option_id' => null,
-                    'answer_text' => $value,
-                ]
-            );
+        if ($this->attempt->submitted_at) {
+            redirect()->route('assessments.result', $this->attempt->id);
+            return;
         }
 
-        $this->answers[$questionId] = $value;
+        $this->questions = $flowService->loadAttemptQuestions($this->attempt)
+            ->map(function ($question) {
+                return [
+                    'id' => $question->id,
+                    'question' => $question->question,
+                    'question_type' => $question->question_type,
+                    'options' => $question->options->map(function ($option) {
+                        return [
+                            'id' => $option->id,
+                            'option_text' => $option->option_text,
+                        ];
+                    })->values()->all(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $this->loadAnswers();
     }
 
-    public function submit()
+    private function loadAnswers(): void
     {
-        if ($this->attempt->submitted_at) return;
+        $this->answers = $this->attempt->answers()
+            ->get()
+            ->mapWithKeys(fn ($answer) => [
+                $answer->question_id => $answer->question_option_id,
+            ])
+            ->all();
+    }
 
-        $answers = $this->attempt->answers()->with('question.options')->get();
-
-        $correct = 0;
-
-        foreach ($answers as $a) {
-            $q = $a->question;
-
-            if ($q->question_type === 'mcq') {
-                $correctOption = $q->options->firstWhere('is_correct', true);
-                $isCorrect = $correctOption && $a->question_option_id == $correctOption->id;
-            } else {
-                $isCorrect = strtolower(trim($a->answer_text)) === strtolower(trim($q->correct_text_answer));
-            }
-
-            $a->update(['is_correct' => $isCorrect]);
-
-            if ($isCorrect) $correct++;
+    public function selectOption(string $questionId, string $optionId, AssessmentFlowService $flowService): void
+    {
+        if ($this->attempt->submitted_at) {
+            return;
         }
 
-        $total = $this->questions->count();
-
-        $score = $total > 0
-            ? round(($correct / $total) * 100)
-            : 0;
-
-        $this->attempt->update([
-            'score' => $score,
-            'passed' => $score >= $this->assessment->passing_grade,
-            'submitted_at' => now(),
-        ]);
-
-        return redirect()->route('assessments.result', $this->attempt->id);
+        $flowService->saveAnswer($this->attempt, $questionId, $optionId);
+        $this->answers[$questionId] = $optionId;
     }
 
-    public function next()
+    public function clearOption(string $questionId, AssessmentFlowService $flowService): void
     {
-        if ($this->currentIndex < $this->questions->count() - 1) {
+        if ($this->attempt->submitted_at) {
+            return;
+        }
+
+        $flowService->clearAnswer($this->attempt, $questionId);
+        unset($this->answers[$questionId]);
+    }
+
+    public function next(): void
+    {
+        if ($this->currentIndex < count($this->questions) - 1) {
             $this->currentIndex++;
         }
     }
 
-    public function prev()
+    public function prev(): void
     {
         if ($this->currentIndex > 0) {
             $this->currentIndex--;
         }
     }
 
-    public function goTo($index)
+    public function goTo(int $index): void
     {
-        $this->currentIndex = $index;
+        if (isset($this->questions[$index])) {
+            $this->currentIndex = $index;
+        }
     }
 
-    public function saveTextAnswer(string $questionId, string $value): void
+    public function submit(AssessmentFlowService $flowService, bool $auto = false): void
     {
-        if ($this->attempt->submitted_at) return;
-
-        $value = trim($value);
-
-        if ($value === '') {
-            unset($this->answers[$questionId]);
-
-            AssessmentAnswer::where('attempt_id', $this->attempt->id)
-                ->where('question_id', $questionId)
-                ->delete();
-
+        if ($this->attempt->submitted_at) {
+            redirect()->route('assessments.result', $this->attempt->id);
             return;
         }
 
-        $this->answers[$questionId] = $value;
+        $submitted = $flowService->submitAttempt($this->attempt, $auto);
 
-        AssessmentAnswer::updateOrCreate(
-            [
-                'attempt_id' => $this->attempt->id,
-                'question_id' => $questionId,
-            ],
-            [
-                'answer_text' => $value,
-                'question_option_id' => null,
-            ]
+        $this->openSubmit = false;
+
+        session()->flash(
+            'success',
+            $submitted->passed
+                ? 'Selamat, langkah ini telah tuntas! Sertifikat dan catatan progresmu sudah sinkron. Teruslah bertumbuh dan jadilah berkat bagi sesama dengan ilmu yang baru ini.'
+                : 'Assessment belum lulus. Anda dapat mengulang attempt berikutnya sampai mencapai passing grade.'
         );
-    }
 
-    public function selectOption(string $questionId, string $optionId): void
-    {
-        if ($this->attempt->submitted_at) return;
-
-        $this->answers[$questionId] = $optionId;
-
-        AssessmentAnswer::updateOrCreate(
-            [
-                'attempt_id' => $this->attempt->id,
-                'question_id' => $questionId,
-            ],
-            [
-                'question_option_id' => $optionId,
-                'answer_text' => null,
-            ]
-        );
+        redirect()->route('assessments.result', $submitted->id);
     }
 
     public function render()

@@ -19,7 +19,7 @@ class EnsureAssessmentAccess
         if ($subject instanceof Assessment) {
             $assessment = $subject;
         } elseif (is_string($subject)) {
-            $assessment = Assessment::with('topic')->findOrFail($subject);
+            $assessment = Assessment::with('course')->findOrFail($subject);
         } else {
             abort(404);
         }
@@ -32,7 +32,7 @@ class EnsureAssessmentAccess
 
         $enrolled = $request->user()
             ->courseEnrollments()
-            ->where('course_id', $assessment->topic->course_id)
+            ->where('course_id', $assessment->course_id)
             ->exists();
 
         if (!$enrolled) {

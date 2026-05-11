@@ -37,11 +37,6 @@
             <div class="text-xs text-slate-500">Passing Grade</div>
             <div class="text-2xl font-bold mt-1">{{ $assessment->passing_grade }}</div>
         </div>
-
-        <div class="rounded-2xl bg-white border p-5">
-            <div class="text-xs text-slate-500">Timer</div>
-            <div class="text-2xl font-bold mt-1">{{ $assessment->time_limit_minutes ?? '-' }}</div>
-        </div>
     </div>
 
     <div class="rounded-2xl bg-white border overflow-hidden">

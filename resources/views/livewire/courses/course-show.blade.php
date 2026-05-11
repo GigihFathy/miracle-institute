@@ -216,7 +216,7 @@
         
                         @if($assessmentMeta)
         
-                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                            <div class="grid grid-cols-2 lg:grid-cols-2 gap-2">
                                 <div class="rounded-xl border border-white/10 bg-white/5 p-3">
                                     <div class="text-[11px] text-slate-400">Questions</div>
                                     <div class="text-lg font-bold mt-1">{{ $assessmentMeta['question_count'] }}</div>
@@ -227,19 +227,7 @@
                                     <div class="text-lg font-bold mt-1">{{ $assessmentMeta['passing_grade'] }}</div>
                                 </div>
         
-                                <div class="rounded-xl border border-white/10 bg-white/5 p-3">
-                                    <div class="text-[11px] text-slate-400">Time Limit</div>
-                                    <div class="text-lg font-bold mt-1">
-                                        {{ $assessmentMeta['time_limit_minutes'] ? $assessmentMeta['time_limit_minutes'].' min' : 'No limit' }}
-                                    </div>
-                                </div>
         
-                                <div class="rounded-xl border border-white/10 bg-white/5 p-3">
-                                    <div class="text-[11px] text-slate-400">Estimated</div>
-                                    <div class="text-lg font-bold mt-1">
-                                        {{ $assessmentMeta['estimated_minutes'] }} min
-                                    </div>
-                                </div>
                             </div>
         
                             <div class="rounded-xl border border-white/10 bg-white/5 p-4 space-y-2">
@@ -725,18 +713,6 @@
                             <div class="rounded-xl border p-4 bg-slate-50">
                                 <div class="text-xs text-slate-500">Passing Grade</div>
                                 <div class="font-semibold mt-1">{{ $assessmentMeta['passing_grade'] }}</div>
-                            </div>
-
-                            <div class="rounded-xl border p-4 bg-slate-50">
-                                <div class="text-xs text-slate-500">Time Limit</div>
-                                <div class="font-semibold mt-1">
-                                    {{ $assessmentMeta['time_limit_minutes'] ? $assessmentMeta['time_limit_minutes'].' minutes' : 'No limit' }}
-                                </div>
-                            </div>
-
-                            <div class="rounded-xl border p-4 bg-slate-50">
-                                <div class="text-xs text-slate-500">Estimated Completion</div>
-                                <div class="font-semibold mt-1">{{ $assessmentMeta['estimated_minutes'] }} minutes</div>
                             </div>
                         </div>
                     </div>

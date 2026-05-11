@@ -45,7 +45,6 @@ class AssessmentService
                 ];
             })->values()->all(),
             'question_ids' => $questions->pluck('id')->values()->all(),
-            'time_limit_minutes' => $assessment->time_limit_minutes,
         ];
     }
 

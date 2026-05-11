@@ -14,7 +14,6 @@
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;margin-bottom:22px;">
         @include('emails.partials.meta-row', ['label' => 'Assessment', 'value' => $assessment->title])
         @include('emails.partials.meta-row', ['label' => 'Passing Grade', 'value' => $assessment->passing_grade . '%'])
-        @include('emails.partials.meta-row', ['label' => 'Waktu', 'value' => $assessment->time_limit_minutes ? $assessment->time_limit_minutes . ' menit' : 'Tanpa batas waktu'])
     </table>
 
     @component('emails.components.button', ['url' => url('/assessments/' . $assessment->id), 'color' => '#b45309'])

@@ -15,7 +15,7 @@ return new class extends Migration
                 ->constrained('assessments')
                 ->cascadeOnDelete();
 
-            $table->enum('question_type', ['mcq', 'text'])->default('mcq');
+            $table->enum('question_type', ['mcq'])->default('mcq'); // Hanya fokus MCQ
             $table->text('question');
             $table->text('correct_text_answer')->nullable();
             $table->text('explanation')->nullable();

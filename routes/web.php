@@ -61,6 +61,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+if (auth()->check() && auth()->user()->Str::lower(role) === 'admin') {
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
+}
+
 Route::get('/', function () {
     return redirect()->route('explore.dashboard');
 })->name('home');
@@ -266,8 +272,8 @@ Route::middleware([
         Route::get('/assessments/{assessment}', AssessmentTaker::class)
             ->middleware('assessment.access:assessment')
             ->name('assessments.take');
-
-        Route::get('/assessments/{attempt}/result', AssessmentResult::class)
+            
+        Route::get('/assessment-attempts/{attempt}/result', AssessmentResult::class)
             ->name('assessments.result');
 
         Route::get('/certificates', CertificatePanel::class)

@@ -17,19 +17,13 @@ return new class extends Migration
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            $table->string('type'); // topic, course
 
             $table->foreignUuid('course_id')
                 ->nullable()
                 ->constrained('courses')
                 ->nullOnDelete();
 
-            $table->foreignUuid('topic_id')
-                ->nullable()
-                ->constrained('topics')
-                ->nullOnDelete();
 
-            $table->string('file_path')->nullable();
             $table->dateTime('issued_at')->nullable();
             $table->string('status')->default('draft'); // draft, issued, revoked
 

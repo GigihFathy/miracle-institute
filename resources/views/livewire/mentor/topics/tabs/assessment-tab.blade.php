@@ -13,10 +13,6 @@
                 <div class="mt-1 font-semibold">{{ $assessment->passing_grade }}</div>
             </div>
             <div class="rounded-xl border bg-slate-50 p-4">
-                <div class="text-xs text-slate-500">Time Limit</div>
-                <div class="mt-1 font-semibold">{{ $assessment->time_limit_minutes ?? 'No limit' }}</div>
-            </div>
-            <div class="rounded-xl border bg-slate-50 p-4">
                 <div class="text-xs text-slate-500">Questions</div>
                 <div class="mt-1 font-semibold">{{ $assessment->question_limit ?? 'All' }}</div>
             </div>

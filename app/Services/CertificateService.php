@@ -27,7 +27,6 @@ class CertificateService
             $existing = Certificate::query()
                 ->where('course_id', $course->id)
                 ->where('user_id', $user->id)
-                ->where('type', 'course')
                 ->lockForUpdate()
                 ->first();
 
@@ -58,7 +57,6 @@ class CertificateService
 
             $sequence = Certificate::query()
                 ->where('course_id', $course->id)
-                ->where('type', 'course')
                 ->lockForUpdate()
                 ->count() + 1;
 
@@ -87,9 +85,7 @@ class CertificateService
             $certificate->forceFill([
                 'certificate_number' => $certificateNumber,
                 'user_id' => $user->id,
-                'type' => 'course',
                 'course_id' => $course->id,
-                'topic_id' => null,
                 'issued_at' => $issuedAt,
                 'status' => 'issued',
             ])->save();

@@ -19,8 +19,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('passing_grade')->default(70);
             $table->boolean('randomize_questions')->default(false);
             $table->unsignedSmallInteger('question_limit')->nullable();
-            $table->unsignedSmallInteger('time_limit_minutes')->nullable();
-            $table->string('status')->default('active'); //'draft', 'active', 'archived'
+            $table->string('status')->default('active'); // Active, Inactive, Draft
 
             $table->timestamps();
 
