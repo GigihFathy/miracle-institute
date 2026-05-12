@@ -3,7 +3,6 @@
 namespace App\Livewire\Dashboard;
 
 use App\Livewire\Concerns\WithTableState;
-use App\Models\Certificate;
 use App\Models\CourseEnrollment;
 use App\Models\VideoSession;
 use App\Models\TopicProgress;
@@ -50,16 +49,10 @@ class MyLearning extends Component
             ->take(5)
             ->get();
 
-        $latestCertificates = Certificate::where('user_id', $user->id)
-            ->latest()
-            ->take(4)
-            ->get();
-
         return view('livewire.dashboard.my-learning', compact(
             'summary',
             'enrollments',
-            'upcomingSessions',
-            'latestCertificates'
+            'upcomingSessions'
         ))->layout('layouts.learning');
     }
 }

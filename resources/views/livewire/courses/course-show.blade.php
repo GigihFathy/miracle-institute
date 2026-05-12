@@ -267,10 +267,6 @@
                         <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
                             Course Topics
                         </h2>
-        
-                        <p class="mt-1 text-xs sm:text-sm text-slate-500">
-                            Explore all learning topics and materials.
-                        </p>
                     </div>
         
                     <div class="hidden md:flex items-center gap-2 text-xs text-slate-500">
