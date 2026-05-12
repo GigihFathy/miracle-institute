@@ -128,10 +128,10 @@
                 <p class="text-sm text-[#004777]/70">Continue where you left off in your discipleship journey.</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+            <div class="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-5 sm:px-5 lg:mx-0 lg:px-0">
                 @foreach($continueCourses as $item)
                     @php
-                        $progress = (int) ($item->progress_percentage ?? $item->progress ?? 50);
+                        $progress = (int) ($item->progress_percentage ?? 0);
                         $progress = max(0, min(100, $progress));
 
                         $courseImage = $item->course->poster ?? null;
@@ -152,7 +152,7 @@
                     @endphp
 
                     <a href="{{ route('courses.show', $item->course->slug) }}"
-                       class="group overflow-hidden rounded-2xl transition hover:bg-[#35A7FF]/10">
+                            class="group w-[220px] shrink-0 overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]">
                         <div class="p-2.5">
                             <div class="overflow-hidden rounded-lg thumb">
                                 @if($courseImageSrc)
@@ -185,12 +185,6 @@
                                     <div class="h-1.5 overflow-hidden rounded-full bg-[#35A7FF]/20">
                                         <div class="h-1.5 rounded-full bg-[#004777]" style="width: {{ $progress }}%"></div>
                                     </div>
-                                </div>
-
-                                <div class="mt-3">
-                                    <span class="inline-flex rounded-lg bg-[#004777] px-3 py-1 text-xs font-medium text-white">
-                                        Open
-                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -276,7 +270,7 @@
             <p class="text-sm text-[#004777]/70">Discover impactful teachings and discipleship classes prepared to strengthen your faith journey.</p>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+        <div class="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-5 sm:px-5 lg:mx-0 lg:px-0">
             @foreach($featured as $course)
                 @php
                     $courseImage = $course->poster ?? null;
@@ -295,7 +289,7 @@
                         }
                     }
                 @endphp
-                 <div class="cursor-pointer overflow-hidden rounded-2xl transition hover:bg-[#35A7FF]/10"
+                 <div class="w-[220px] shrink-0 cursor-pointer overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]"
                      role="link" tabindex="0"
                      onclick="window.location='{{ route('courses.show', $course->slug) }}'"
                      onkeydown="if(event.key==='Enter'){ window.location='{{ route('courses.show', $course->slug) }}' }">
@@ -351,8 +345,8 @@
         </div>
     </section>
 
-    <section class="!mt-16 overflow-hidden rounded-3xl bg-[#004777] px-12 py-6 text-white sm:px-8 lg:px-10">
-        <div class="grid grid-cols-1 items-center gap-6 lg:grid-cols-2">
+    <section class="!mt-8 overflow-hidden rounded-3xl bg-[#004777] px-4 py-6 text-white sm:px-6 lg:px-10">
+        <div class="grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-8">
             <div>
                 <h2 class="text-xl sm:text-2xl font-semibold leading-tight">
                     Experience God's Presence Through Authentic Discipleship
@@ -361,7 +355,7 @@
                     Miracle Institute hadir untuk membantu setiap orang bertumbuh dalam iman, mengenal Yesus lebih dalam, dan hidup dalam kuasa serta kasih Tuhan setiap hari.
                 </p>
 
-                <div class="mt-4 grid grid-cols-2 gap-3">
+                <div class="mt-4 grid grid-cols-1 gap-3">
                     <div class="flex items-start gap-3">
                         <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10">
                             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -419,9 +413,9 @@
                 </div>
             </div>
             
-            <div class="flex justify-end">
-                <div class="flex items-center justify-center rounded-2xl p-2.5">
-                    <img src="{{ asset('images/decor/church_1.jpeg') }}" alt="Church illustration" class="h-56 w-96 sm:h-80 sm:w-[32rem] rounded-lg object-cover">
+            <div class="flex justify-center lg:justify-end">
+                <div class="w-full max-w-xl rounded-2xl p-1.5 sm:p-2.5">
+                    <img src="{{ asset('images/decor/church_1.jpeg') }}" alt="Church illustration" class="h-48 w-full rounded-lg object-cover sm:h-64 lg:h-72">
                 </div>
             </div>
         </div>
