@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
+use App\Email\Events\AssessmentSubmissionProcessed;
 use App\Models\AssessmentAttempt;
-use App\Events\AssessmentSubmitted;
 use Illuminate\Support\Facades\DB;
 
 class AssessmentAttemptObserver
@@ -15,7 +15,10 @@ class AssessmentAttemptObserver
             filled($attempt->submitted_at)
         ) {
             DB::afterCommit(function () use ($attempt) {
-                event(new AssessmentSubmitted($attempt->id));
+                event(new AssessmentSubmissionProcessed(
+                    $attempt->id,
+                    $attempt->passed ?? false
+                ));
             });
         }
     }

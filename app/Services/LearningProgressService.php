@@ -4,13 +4,12 @@ namespace App\Services;
 
 use App\Models\Assessment;
 use App\Models\TopicProgress;
-use App\Events\AssessmentAvailable;
 
 class LearningProgressService
 {
-    public function checkAssessmentAvailability(
+    public function getAvailableAssessmentFor(
         TopicProgress $topicProgress
-    ): void {
+    ): ?Assessment {
 
         $enrollment = $topicProgress
             ->courseEnrollment()
@@ -26,21 +25,12 @@ class LearningProgressService
             ->count();
 
         if ($unfinished > 0) {
-            return;
+            return null;
         }
 
-        $assessment = Assessment::query()
+        return Assessment::query()
             ->where('course_id', $enrollment->course_id)
             ->where('status', 'active')
             ->first();
-
-        if (!$assessment) {
-            return;
-        }
-
-        event(new AssessmentAvailable(
-            $assessment->id,
-            $enrollment->user_id
-        ));
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Events\VideoSessionCreated;
+use App\Email\Events\VideoSessionScheduled;
 use App\Models\VideoSession;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +18,16 @@ class VideoSessionObserver
         // }
         
         DB::afterCommit(function () use ($videoSession) {
-            event(new VideoSessionCreated($videoSession->id));
+            event(new VideoSessionScheduled($videoSession->id));
         });
+    }
+
+    public function updated(VideoSession $videoSession): void
+    {
+        if ($videoSession->wasChanged(['start_at', 'status'])) {
+            DB::afterCommit(function () use ($videoSession) {
+                event(new VideoSessionScheduled($videoSession->id));
+            });
+        }
     }
 }

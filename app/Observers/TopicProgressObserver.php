@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
+use App\Email\Events\ContentCompleted;
 use App\Models\TopicProgress;
-use App\Events\TopicCompleted;
 use App\Services\LearningProgressService;
 use Illuminate\Support\Facades\DB;
 
@@ -18,11 +18,18 @@ class TopicProgressObserver
             $topicProgress->status === 'completed'
         ) {
             DB::afterCommit(function () use ($topicProgress) {
-                event(new TopicCompleted($topicProgress->id));
+                event(new ContentCompleted('topic_progress', $topicProgress->id));
             });
 
-            app(LearningProgressService::class)
-                ->checkAssessmentAvailability($topicProgress);
+            if ($assessment = app(LearningProgressService::class)
+                ->getAvailableAssessmentFor($topicProgress)) {
+                DB::afterCommit(function () use ($assessment, $topicProgress) {
+                    event(new \App\Events\AssessmentAvailable(
+                        $assessment->id,
+                        $topicProgress->courseEnrollment->user_id
+                    ));
+                });
+            }
         }
     }
 }

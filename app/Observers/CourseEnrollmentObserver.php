@@ -2,11 +2,11 @@
 
 namespace App\Observers;
 
+use App\Email\Events\ContentCompleted;
+use App\Email\Events\CourseEnrollmentCreated;
 use App\Models\CourseEnrollment;
 use App\Models\Attendance;
 use App\Models\VideoSession;
-use App\Events\EnrollmentConfirmed;
-use App\Events\CourseCompleted;
 use Illuminate\Support\Facades\DB;
 
 // Course Enrollment ['active', 'completed', 'dropped']
@@ -45,11 +45,8 @@ class CourseEnrollmentObserver
                 );
             }
 
-            /**
-             * Dispatch event AFTER transaction committed
-             */
             DB::afterCommit(function () use ($enrollment) {
-                event(new EnrollmentConfirmed($enrollment->id));
+                event(new CourseEnrollmentCreated($enrollment->id));
             });
         });
     }
@@ -61,7 +58,7 @@ class CourseEnrollmentObserver
             $enrollment->status === 'completed'
         ) {
             DB::afterCommit(function () use ($enrollment) {
-                event(new CourseCompleted($enrollment->id));
+                event(new ContentCompleted('course_enrollment', $enrollment->id));
             });
         }
     }
