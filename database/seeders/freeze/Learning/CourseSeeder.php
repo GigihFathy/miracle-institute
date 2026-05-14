@@ -20,7 +20,6 @@ class CourseSeeder extends Seeder
             'poster' => 'images/dummyPNG.png',
             'credit' => 3,
             'description' => 'Core discipleship topics for new members and mentors',
-            'quota' => 50,
             'status' => 'active',
         ]);
 
@@ -31,7 +30,6 @@ class CourseSeeder extends Seeder
             'poster' => 'images/dummyPNG.png',
             'credit' => 4,
             'description' => 'Basic structure and delivery of sermons',
-            'quota' => 40,
             'status' => 'active',
         ]);
     }

@@ -23,7 +23,6 @@ class CourseFactory extends Factory
             'poster' => 'courses/default.jpg',
             'credit' => $this->faker->numberBetween(1, 6),
             'description' => $this->faker->paragraph(),
-            'quota' => $this->faker->numberBetween(20, 100),
             'status' => 'active',
         ];
     }

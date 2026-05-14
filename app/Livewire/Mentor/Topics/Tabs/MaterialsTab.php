@@ -46,7 +46,7 @@ class MaterialsTab extends Component
     {
         abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
 
-        if ($this->topic->materials()->count() >= 3) {
+        if ($this->topic->materials()->count() >= 5) {
             session()->flash('error', 'Batas material per topic sudah penuh.');
             return;
         }
@@ -85,22 +85,8 @@ class MaterialsTab extends Component
 
     private function availableMaterialTypes(): array
     {
-        $all = ['pdf', 'ptt', 'video'];
-
-        $materials = Material::query()
-            ->where('topic_id', $this->topic->id)
-            ->get(['id', 'type']);
-
-        $used = $materials->pluck('type')->unique()->values()->all();
-
-        if ($this->editingMaterialId) {
-            $current = $materials->firstWhere('id', $this->editingMaterialId)?->type;
-            $available = array_values(array_diff($all, array_diff($used, [$current])));
-
-            return array_values(array_unique($available));
-        }
-
-        return array_values(array_diff($all, $used));
+        // Allow any type to be added (user requested ability to add multiple of same type)
+        return ['pdf', 'ppt', 'video'];
     }
 
     public function saveMaterial(): void
@@ -179,6 +165,21 @@ class MaterialsTab extends Component
             }
 
             $material->delete();
+
+            // Reorder remaining materials' sort_order sequentially starting from 1
+            $remaining = Material::query()
+                ->where('topic_id', $this->topic->id)
+                ->orderBy('sort_order')
+                ->orderBy('created_at')
+                ->get();
+
+            foreach ($remaining as $index => $m) {
+                $newOrder = $index + 1;
+                if ($m->sort_order !== $newOrder) {
+                    $m->sort_order = $newOrder;
+                    $m->save();
+                }
+            }
         });
 
         $this->selectedMaterialId = Material::query()
@@ -230,7 +231,7 @@ class MaterialsTab extends Component
                 ? ($selectedMaterial->external_url ?: ($selectedMaterial->path ? Storage::disk('public')->url($selectedMaterial->path) : null))
                 : null,
             'materialTypeOptions' => $this->availableMaterialTypes(),
-            'canAddMaterial' => $materials->count() < 3,
+            'canAddMaterial' => $materials->count() < 5,
         ]);
     }
 }

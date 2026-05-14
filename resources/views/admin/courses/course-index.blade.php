@@ -34,7 +34,6 @@
                     <th class="p-3 text-left">Title</th>
                     <th>Program</th>
                     <th>Credit</th>
-                    <th>Quota</th>
                     <th></th>
                 </tr>
             </thead>
@@ -45,7 +44,6 @@
                         <td class="p-3 font-medium">{{ $course->title }}</td>
                         <td>{{ $course->studyProgram?->title }}</td>
                         <td>{{ $course->credit }}</td>
-                        <td>{{ $course->quota }}</td>
                         <td class="flex gap-2 p-3">
                             <button wire:click="edit('{{ $course->id }}')" class="text-blue-600">Edit</button>
                             <button wire:click="delete('{{ $course->id }}')" class="text-red-600">Delete</button>
@@ -70,9 +68,8 @@
             <input wire:model="title" placeholder="Title" class="w-full border p-2 rounded-xl">
             <textarea wire:model="description" placeholder="Description" class="w-full border p-2 rounded-xl"></textarea>
 
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 gap-3">
                 <input wire:model="credit" type="number" placeholder="Credit" class="border p-2 rounded-xl">
-                <input wire:model="quota" type="number" placeholder="Quota" class="border p-2 rounded-xl">
 
                 <select wire:model="study_program_id" class="border p-2 rounded-xl">
                     <option value="">Select Program</option>

@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('poster')->nullable();
             $table->unsignedInteger('credit')->default(0);
             $table->longText('description')->nullable();
-            $table->unsignedInteger('quota')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();
         });

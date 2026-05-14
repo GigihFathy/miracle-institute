@@ -99,10 +99,6 @@
                                 {{ strtoupper($material->type) }} · {{ ucfirst($material->status) }}
                             </div>
                         </div>
-
-                        <span class="rounded-full border px-2 py-1 text-[11px] uppercase text-slate-600">
-                            Edit
-                        </span>
                     </div>
                 </button>
             @empty
