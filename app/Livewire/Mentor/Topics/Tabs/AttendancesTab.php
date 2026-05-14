@@ -3,6 +3,7 @@
 namespace App\Livewire\Mentor\Topics\Tabs;
 
 use App\Livewire\Concerns\InteractsWithMentorTopic;
+use App\Livewire\Concerns\WithTableState;
 use App\Models\Attendance;
 use App\Models\Topic;
 use Livewire\Component;
@@ -10,10 +11,23 @@ use Livewire\Component;
 class AttendancesTab extends Component
 {
     use InteractsWithMentorTopic;
+    use WithTableState;
 
     public Topic $topic;
 
     public bool $canManageAttendance = false;
+
+    protected string $pageName = 'attendancesPage';
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage($this->pageName);
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage($this->pageName);
+    }
 
     public function mount(string $topicId): void
     {
@@ -27,21 +41,23 @@ class AttendancesTab extends Component
         );
     }
 
-    
-
     public function render()
     {
         $attendances = Attendance::query()
-            ->with(['user', 'videoSession'])
+            ->with('user')
             ->whereHas('videoSession', function ($query) {
                 $query->where('topic_id', $this->topic->id);
             })
+            ->when(filled($this->search), function ($query) {
+                $query->whereHas('user', function ($userQuery) {
+                    $userQuery->where('name', 'like', '%' . $this->search . '%');
+                });
+            })
             ->latest()
-            ->get();
+            ->paginate($this->perPage, ['*'], $this->pageName);
 
         return view('livewire.mentor.topics.tabs.attendances-tab', [
-            'sessions' => $this->topic->videoSessions()->latest('start_at')->get(),
-            'attendancesBySession' => $attendances->groupBy('video_session_id'),
+            'attendances' => $attendances,
         ]);
     }
 }

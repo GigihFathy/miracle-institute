@@ -37,13 +37,6 @@
                                 {{ $course->description }}
                             </p>
                         </div>
-        
-                        @if($isMentor)
-                            <a href="{{ route('mentor.topics.index') }}"
-                               class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#004777] px-4 py-2 text-xs sm:text-sm font-medium text-white hover:bg-[#003560] transition">
-                                Manage Topics
-                            </a>
-                        @endif
                     </div>
         
                     <div class="flex flex-wrap gap-2">

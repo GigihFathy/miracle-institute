@@ -3,18 +3,31 @@
 namespace App\Livewire\Mentor\Topics\Tabs;
 
 use App\Livewire\Concerns\InteractsWithMentorTopic;
+use App\Livewire\Concerns\WithTableState;
 use App\Models\CourseEnrollment;
 use App\Models\Topic;
-use App\Models\TopicProgress;
 use Livewire\Component;
 
 class StudentsTab extends Component
 {
     use InteractsWithMentorTopic;
+    use WithTableState;
 
     public Topic $topic;
 
     public bool $canManageStudents = false;
+
+    protected string $pageName = 'studentsPage';
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage($this->pageName);
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage($this->pageName);
+    }
 
     public function mount(string $topicId): void
     {
@@ -30,35 +43,21 @@ class StudentsTab extends Component
 
     public function render()
     {
-        $enrollments = CourseEnrollment::query()
-            ->with('user')
+        $students = CourseEnrollment::query()
+            ->with([
+                'user',
+                'topicProgresses' => function ($query) {
+                    $query->where('topic_id', $this->topic->id);
+                },
+            ])
             ->where('course_id', $this->topic->course_id)
-            ->get();
-
-        $progressMap = TopicProgress::query()
-            ->where('topic_id', $this->topic->id)
-            ->whereIn('course_enrollment_id', $enrollments->pluck('id'))
-            ->get()
-            ->keyBy('course_enrollment_id');
-
-        $students = $enrollments->map(function ($enrollment) use ($progressMap) {
-            $progress = $progressMap->get($enrollment->id);
-
-            $status = $progress->status ?? 'not_started';
-
-            $percent = match ($status) {
-                'completed' => 100,
-                'in_progress' => 50,
-                default => 0,
-            };
-
-            return [
-                'enrollment' => $enrollment,
-                'progress' => $progress,
-                'status' => $status,
-                'percent' => $percent,
-            ];
-        });
+            ->when(filled($this->search), function ($query) {
+                $query->whereHas('user', function ($userQuery) {
+                    $userQuery->where('name', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->latest('created_at')
+            ->paginate($this->perPage, ['*'], $this->pageName);
 
         return view('livewire.mentor.topics.tabs.students-tab', [
             'students' => $students,

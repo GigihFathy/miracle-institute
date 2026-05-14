@@ -2,6 +2,14 @@
     <section class="rounded-2xl border bg-white p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div class="space-y-2">
+                <a href="{{ url()->previous() }}"
+                   onclick="if (window.history.length > 1) { event.preventDefault(); window.history.back(); }"
+                   class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M11.78 4.22a.75.75 0 0 1 0 1.06L7.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Back</span>
+                </a>
                 <div class="text-xs uppercase tracking-wide text-slate-400">
                     Mentor Workspace · {{ $topic->course?->title }}
                 </div>
@@ -11,17 +19,6 @@
                 <p class="max-w-3xl text-sm text-slate-600">
                     Workspace ringkas untuk mengelola materi, session, attendance, collaborator, dan assessment.
                 </p>
-            </div>
-
-            <div class="flex gap-3">
-                <a href="{{ route('topics.show', $topic->slug) }}"
-                   class="rounded-xl border px-4 py-2 text-sm">
-                    Visit Topic
-                </a>
-                <a href="{{ route('mentor.topics.index') }}"
-                   class="rounded-xl border px-4 py-2 text-sm">
-                    Back
-                </a>
             </div>
         </div>
 
