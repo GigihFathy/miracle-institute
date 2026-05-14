@@ -30,4 +30,13 @@ class CertificateReadyNotification extends Notification implements ShouldQueue
                 'certificate' => $this->certificate,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'certificate_id' => $this->certificate->id,
+            'course_id' => $this->certificate->course_id,
+            'message' => 'Selamat! Sertifikat kamu sudah terbit dan siap untuk diunduh.',
+        ];
+    }
 }

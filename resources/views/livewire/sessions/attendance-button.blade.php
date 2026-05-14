@@ -44,19 +44,19 @@
     @endif
 
     <div class="flex flex-wrap gap-2">
-        @if(! $attendance)
+        @if(!$attendance)
             <button wire:click="joinSession"
                     wire:loading.attr="disabled"
                     wire:target="joinSession,refreshAttendance"
-                    @disabled(! $canJoin)
+                    @disabled(!$canJoin)
                     class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 Join Session
             </button>
-        @elseif(! $attendance->clock_out_at)
+        @elseif(!$attendance->clock_out_at)
             <button wire:click="clockOut"
                     wire:loading.attr="disabled"
                     wire:target="clockOut,refreshAttendance"
-                    @disabled(! $canClockOut)
+                    @disabled(!$canClockOut)
                     class="px-4 py-2 rounded-xl border text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                 Clock Out
             </button>

@@ -4,12 +4,11 @@ namespace App\Observers;
 
 use App\Email\Events\AttendanceIssueDetected;
 use App\Models\Attendance;
-use Illuminate\Support\Facades\DB;
-
-// Attendance Observer ['present', 'late', 'absent']
 
 class AttendanceObserver
 {
+    public $afterCommit = true;
+
     public function created(Attendance $attendance): void
     {
         $this->dispatchIssueIfNeeded($attendance);
@@ -17,7 +16,7 @@ class AttendanceObserver
 
     public function updated(Attendance $attendance): void
     {
-        if (! $attendance->wasChanged('status')) {
+        if (!$attendance->wasChanged('status')) {
             return;
         }
 
@@ -43,12 +42,10 @@ class AttendanceObserver
             $issueType = 'absent';
         }
 
-        if (! $issueType) {
+        if (!$issueType) {
             return;
         }
 
-        DB::afterCommit(function () use ($attendance, $issueType) {
-            event(new AttendanceIssueDetected($attendance->id, $issueType));
-        });
+        event(new AttendanceIssueDetected($attendance->id, $issueType));
     }
 }

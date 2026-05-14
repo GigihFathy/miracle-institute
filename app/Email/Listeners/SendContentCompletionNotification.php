@@ -7,9 +7,8 @@ use App\Models\CourseEnrollment;
 use App\Models\TopicProgress;
 use App\Notifications\CourseCompletedNotification;
 use App\Notifications\TopicCompletedNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendContentCompletionNotification implements ShouldQueue
+class SendContentCompletionNotification 
 {
     public function handle(ContentCompleted $event): void
     {

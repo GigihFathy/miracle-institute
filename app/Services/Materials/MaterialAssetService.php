@@ -53,7 +53,7 @@ class MaterialAssetService
                 ];
             }
 
-            if (! empty($externalUrl)) {
+            if (!empty($externalUrl)) {
                 $url = $this->youtube->normalizeVideoUrl($externalUrl);
                 $this->cleanupPrevious($material);
 
@@ -82,7 +82,7 @@ class MaterialAssetService
 
     public function resolvePreviewUrl(?Material $material): ?string
     {
-        if (! $material) {
+        if (!$material) {
             return null;
         }
 
@@ -107,7 +107,7 @@ class MaterialAssetService
 
     private function cleanupPrevious(?Material $material): void
     {
-        if (! $material) {
+        if (!$material) {
             return;
         }
 

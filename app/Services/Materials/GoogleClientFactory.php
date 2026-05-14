@@ -14,11 +14,11 @@ class GoogleClientFactory
         /** @var User|null $user */
         $user = auth()->user();
 
-        if (! $user) {
+        if (!$user) {
             throw new RuntimeException('User belum login.');
         }
 
-        if (! $user->google_access_token) {
+        if (!$user->google_access_token) {
             throw new RuntimeException('Google belum terhubung. Silakan login / connect akun Google terlebih dahulu.');
         }
 
@@ -46,17 +46,17 @@ class GoogleClientFactory
             'created' => now()->timestamp,
         ]);
 
-        if (! $client->isAccessTokenExpired()) {
+        if (!$client->isAccessTokenExpired()) {
             return $client;
         }
 
-        if (! $user->google_refresh_token) {
+        if (!$user->google_refresh_token) {
             throw new RuntimeException('Access token Google sudah kedaluwarsa dan refresh token tidak tersedia. Hubungkan ulang akun Google.');
         }
 
         $newToken = $client->fetchAccessTokenWithRefreshToken($user->google_refresh_token);
 
-        if (! empty($newToken['error'])) {
+        if (!empty($newToken['error'])) {
             $message = $newToken['error_description'] ?? $newToken['error'];
 
             if ($newToken['error'] === 'invalid_grant') {

@@ -5,9 +5,8 @@ namespace App\Email\Listeners;
 use App\Email\Events\CourseEnrollmentCreated;
 use App\Models\CourseEnrollment;
 use App\Notifications\EnrollmentConfirmedNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendCourseEnrollmentNotification implements ShouldQueue
+class SendCourseEnrollmentNotification
 {
     public function handle(CourseEnrollmentCreated $event): void
     {

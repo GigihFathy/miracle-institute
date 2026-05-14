@@ -43,7 +43,7 @@ class GoogleDriveService
 
     public function deleteById(?string $fileId): void
     {
-        if (! $fileId) {
+        if (!$fileId) {
             return;
         }
 
@@ -58,7 +58,7 @@ class GoogleDriveService
 
     public function toPreviewUrl(?string $fileId): ?string
     {
-        if (! $fileId) {
+        if (!$fileId) {
             return null;
         }
 

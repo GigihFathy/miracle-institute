@@ -30,4 +30,12 @@ class AssessmentAvailableNotification extends Notification implements ShouldQueu
                 'assessment' => $this->assessment,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'assessment_id' => $this->assessment->id,
+            'message' => 'Assessment baru telah tersedia untuk Anda kerjakan.'
+        ];
+    }
 }

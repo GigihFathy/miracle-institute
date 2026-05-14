@@ -23,7 +23,7 @@ class ScheduleVideoSessionReminderJob implements ShouldQueue
     {
         $session = VideoSession::query()->find($this->videoSessionId);
 
-        if (! $session || ! $session->start_at || $session->start_at->isPast()) {
+        if (!$session ||!$session->start_at || $session->start_at->isPast()) {
             return;
         }
 

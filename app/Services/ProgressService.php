@@ -140,7 +140,7 @@ class ProgressService
                 $isSatisfied = true;
             } elseif ($sessionEnded && $attendance && $attendance->status === 'absent') {
                 $isSatisfied = true;
-            } elseif ($sessionEnded && ! $attendance) {
+            } elseif ($sessionEnded &&!$attendance) {
                 $isSatisfied = true;
             }
 
@@ -169,15 +169,15 @@ class ProgressService
 
         $reasons = [];
 
-        if (! $allMaterialsCompleted) {
+        if (!$allMaterialsCompleted) {
             $reasons[] = 'Semua materi harus selesai terlebih dahulu.';
         }
 
-        if (! $allSessionsClosed) {
+        if (!$allSessionsClosed) {
             $reasons[] = 'Masih ada sesi video yang belum berakhir.';
         }
 
-        if (! $allSessionsRequirementMet) {
+        if (!$allSessionsRequirementMet) {
             $reasons[] = 'Masih ada syarat sesi yang belum terpenuhi.';
         }
 
@@ -246,7 +246,7 @@ class ProgressService
             ->where('course_id', $courseId)
             ->first();
 
-        if (! $assessment) {
+        if (!$assessment) {
             return null;
         }
 
@@ -255,7 +255,7 @@ class ProgressService
             ->where('course_id', $courseId)
             ->first();
 
-        if (! $enrollment) {
+        if (!$enrollment) {
             return null;
         }
 
@@ -293,7 +293,7 @@ class ProgressService
                     'course_id' => $courseId,
                 ]);
 
-                if (! $certificate->certificate_number) {
+                if (!$certificate->certificate_number) {
                     $certificate->certificate_number = $this->generateCertificateNumber();
                 }
 
@@ -344,7 +344,7 @@ class ProgressService
 
     private function sessionHasEnded($session): bool
     {
-        if (! $session->end_at) {
+        if (!$session->end_at) {
             return false;
         }
 
@@ -363,7 +363,7 @@ class ProgressService
             ->where('course_id', $courseId)
             ->first();
 
-        if (! $enrollment) {
+        if (!$enrollment) {
             throw ValidationException::withMessages([
                 'course' => 'User belum terdaftar pada course ini.',
             ]);

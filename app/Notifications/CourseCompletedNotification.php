@@ -30,4 +30,12 @@ class CourseCompletedNotification extends Notification implements ShouldQueue
                 'enrollment' => $this->enrollment,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'course_id' => $this->enrollment->course_id,
+            'message' => 'Selamat, kamu telah menyelesaikan course ini.'
+        ];
+    }
 }

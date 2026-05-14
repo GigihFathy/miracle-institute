@@ -38,7 +38,7 @@ class GoogleClientService
 
             $newToken = $client->fetchAccessTokenWithRefreshToken($user->google_refresh_token);
 
-            if (! empty($newToken['error'])) {
+            if (!empty($newToken['error'])) {
                 $message = $newToken['error_description'] ?? $newToken['error'];
                 throw new RuntimeException("Gagal refresh token Google: $message");
             }

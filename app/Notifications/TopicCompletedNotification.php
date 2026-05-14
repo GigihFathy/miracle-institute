@@ -30,4 +30,13 @@ class TopicCompletedNotification extends Notification implements ShouldQueue
                 'progress' => $this->progress,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'topic_progress_id' => $this->progress->id,
+            'topic_id' => $this->progress->topic_id,
+            'message' => 'Kamu telah berhasil menyelesaikan satu topik pembelajaran.',
+        ];
+    }
 }

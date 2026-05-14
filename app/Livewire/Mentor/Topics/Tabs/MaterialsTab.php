@@ -134,13 +134,13 @@ class MaterialsTab extends Component
             ? Material::query()->where('topic_id', $this->topic->id)->findOrFail($this->editingMaterialId)
             : null;
 
-        if ($this->materialType === 'video' && ! $this->materialExternalUrl && ! $this->materialFile && ! ($existing?->external_url)) {
+        if ($this->materialType === 'video' &&!$this->materialExternalUrl &&!$this->materialFile &&!($existing?->external_url)) {
             throw ValidationException::withMessages([
                 'materialExternalUrl' => 'Video wajib memakai URL YouTube.',
             ]);
         }
 
-        if (in_array($this->materialType, ['pdf', 'ppt'], true) && ! $this->materialFile && ! ($existing?->path)) {
+        if (in_array($this->materialType, ['pdf', 'ppt'], true) &&!$this->materialFile &&!($existing?->path)) {
             throw ValidationException::withMessages([
                 'materialFile' => 'File PDF/PPT wajib diunggah.',
             ]);
@@ -229,7 +229,7 @@ class MaterialsTab extends Component
             ? $materials->firstWhere('id', $this->selectedMaterialId)
             : $materials->first();
 
-        if (! $selectedMaterial && $materials->isNotEmpty()) {
+        if (!$selectedMaterial && $materials->isNotEmpty()) {
             $selectedMaterial = $materials->first();
             $this->selectedMaterialId = $selectedMaterial->id;
         }

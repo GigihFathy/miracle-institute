@@ -48,7 +48,7 @@ class YouTubeService
     {
         $id = $this->extractVideoId($input);
 
-        if (! $id) {
+        if (!$id) {
             throw new RuntimeException('URL atau ID YouTube tidak valid.');
         }
 
@@ -59,7 +59,7 @@ class YouTubeService
     {
         $id = $this->extractVideoId((string) $input);
 
-        if (! $id) {
+        if (!$id) {
             return null;
         }
 
@@ -68,13 +68,13 @@ class YouTubeService
 
     public function deleteByUrl(?string $url): void
     {
-        if (! $url) {
+        if (!$url) {
             return;
         }
 
         $id = $this->extractVideoId($url);
 
-        if (! $id) {
+        if (!$id) {
             return;
         }
 

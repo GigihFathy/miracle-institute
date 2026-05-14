@@ -2,26 +2,50 @@
 
 namespace App\Providers;
 
+
+// FOR CORE EVENTS & LISTENERS
+
+use App\Events\AssessmentPassed;
+
+use App\Listeners\HandleAssessmentPassed;
+
+// FOR MAIL NOTIFICATIONS
+
 use App\Email\Events\AssessmentSubmissionProcessed;
-use App\Email\Events\AttendanceIssueDetected as EmailAttendanceIssueDetected;
+use App\Email\Events\AttendanceIssueDetected;
 use App\Email\Events\ContentCompleted;
 use App\Email\Events\CourseEnrollmentCreated;
 use App\Email\Events\VideoSessionScheduled;
+use App\Email\Events\AssessmentAvailable;
+use App\Email\Events\CertificateIssued;
+
 use App\Email\Listeners\ScheduleVideoSessionReminder;
 use App\Email\Listeners\SendAssessmentSubmissionNotification;
 use App\Email\Listeners\SendAttendanceIssueNotification;
 use App\Email\Listeners\SendContentCompletionNotification;
 use App\Email\Listeners\SendCourseEnrollmentNotification;
 use App\Email\Listeners\SendVideoSessionScheduledNotification;
-use App\Events\AssessmentPassed;
-use App\Events\CertificateGenerated;
-use App\Listeners\HandleAssessmentPassed;
-use App\Listeners\SendCertificateIssuedNotification;
+use App\Email\Listeners\SendAssessmentAvailableEmail;
+use App\Email\Listeners\SendCertificateIssuedNotification;
+
+
 use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
+
+        // Core events and listeners
+        AssessmentPassed::class => [
+            HandleAssessmentPassed::class,
+        ],
+
+        \App\Events\VideoSessionReminderTriggered::class => [
+            \App\Listeners\SendVideoSessionReminderEmail::class,
+        ],
+        
+
+        // For email notifications
         CourseEnrollmentCreated::class => [
             SendCourseEnrollmentNotification::class,
         ],
@@ -30,8 +54,8 @@ class EventServiceProvider extends ServiceProvider
             SendContentCompletionNotification::class,
         ],
 
-        AssessmentSubmissionProcessed::class => [
-            SendAssessmentSubmissionNotification::class,
+        AssessmentAvailable::class => [
+            SendAssessmentAvailableEmail::class,
         ],
 
         VideoSessionScheduled::class => [
@@ -39,49 +63,21 @@ class EventServiceProvider extends ServiceProvider
             ScheduleVideoSessionReminder::class,
         ],
 
-        EmailAttendanceIssueDetected::class => [
+        AttendanceIssueDetected::class => [
             SendAttendanceIssueNotification::class,
         ],
 
-        AssessmentPassed::class => [
-            HandleAssessmentPassed::class,
+
+        AssessmentSubmissionProcessed::class => [
+            SendAssessmentSubmissionNotification::class,
         ],
 
-        CertificateGenerated::class => [
+
+        CertificateIssued::class => [
             SendCertificateIssuedNotification::class,
         ],
 
-        \App\Events\EnrollmentConfirmed::class => [
-            \App\Listeners\SendEnrollmentConfirmationEmail::class,
-        ],
-
-        \App\Events\TopicCompleted::class => [
-            \App\Listeners\SendTopicCompletedEmail::class,
-        ],
-
-        \App\Events\CourseCompleted::class => [
-            \App\Listeners\SendCourseCompletedEmail::class,
-        ],
-
-        \App\Events\AssessmentAvailable::class => [
-            \App\Listeners\SendAssessmentAvailableEmail::class,
-        ],
-
-        \App\Events\AssessmentSubmitted::class => [
-            \App\Listeners\SendAssessmentSubmissionReceiptEmail::class,
-        ],
-
-        \App\Events\AttendanceIssueDetected::class => [
-            \App\Listeners\SendAttendanceIssueEmail::class,
-        ],
-
-        \App\Events\CertificateIssued::class => [
-            \App\Listeners\SendCertificateReadyEmail::class,
-        ],
-
-        \App\Events\VideoSessionReminderTriggered::class => [
-            \App\Listeners\SendVideoSessionReminderEmail::class,
-        ],
+        
     ];
 
     public function boot(): void

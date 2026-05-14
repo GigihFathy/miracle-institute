@@ -46,7 +46,7 @@ class TopicPlayer extends Component
 
         $this->isMentor = $user ? $user->hasRole('disciples') : false;
         $this->canOpenMentorWorkspace = $this->isMentor && $this->canOpenMentorWorkspaceForTopic();
-        $this->canStudentInteract = auth()->check() && ! $this->canOpenMentorWorkspace;
+        $this->canStudentInteract = auth()->check() &&!$this->canOpenMentorWorkspace;
 
         $this->activeMaterialId = $this->materialsQuery()->value('id');
 
@@ -64,7 +64,7 @@ class TopicPlayer extends Component
     {
         $exists = $this->materialsQuery()->whereKey($materialId)->exists();
 
-        if (! $exists) {
+        if (!$exists) {
             return;
         }
 
@@ -76,7 +76,7 @@ class TopicPlayer extends Component
     {
         abort_unless($this->canStudentInteract, 403);
 
-        if (! $this->activeMaterialId) {
+        if (!$this->activeMaterialId) {
             return;
         }
 
@@ -93,7 +93,7 @@ class TopicPlayer extends Component
     {
         abort_unless($this->canStudentInteract, 403);
 
-        if (! $this->activeMaterialId) {
+        if (!$this->activeMaterialId) {
             session()->flash('error', 'Tidak ada material aktif.');
             return;
         }
@@ -130,7 +130,7 @@ class TopicPlayer extends Component
 
         $snapshot = $progressService->topicCompletionSnapshot(auth()->id(), $this->topic->id);
 
-        if (! $snapshot['can_complete']) {
+        if (!$snapshot['can_complete']) {
             session()->flash('error', implode(' ', $snapshot['reasons']));
             return;
         }
@@ -144,7 +144,7 @@ class TopicPlayer extends Component
 
     public function sessionPhase(VideoSession $session): string
     {
-        if (! $session->start_at || ! $session->end_at) {
+        if (!$session->start_at ||!$session->end_at) {
             return 'invalid';
         }
 
@@ -193,7 +193,7 @@ class TopicPlayer extends Component
 
     public function sessionCountdownLabel(VideoSession $session): string
     {
-        if (! $session->start_at || ! $session->end_at) {
+        if (!$session->start_at ||!$session->end_at) {
             return 'Session schedule belum lengkap.';
         }
 
@@ -223,7 +223,7 @@ class TopicPlayer extends Component
         $user = auth()->user();
         $now = now();
 
-        if (! $user->hasRole('student') && session('active_role') !== 'student') {
+        if (!$user->hasRole('student') && session('active_role') !== 'student') {
             return redirect()->away($session->zoom_link);
         }
 
@@ -259,12 +259,12 @@ class TopicPlayer extends Component
             ? $materials->firstWhere('id', $this->activeMaterialId)
             : $materials->first();
 
-        if (! $activeMaterial && $materials->isNotEmpty()) {
+        if (!$activeMaterial && $materials->isNotEmpty()) {
             $activeMaterial = $materials->first();
             $this->activeMaterialId = $activeMaterial->id;
         }
 
-        if ($activeMaterial && ! $this->activeMaterialId) {
+        if ($activeMaterial &&!$this->activeMaterialId) {
             $this->activeMaterialId = $activeMaterial->id;
         }
 
@@ -347,7 +347,7 @@ class TopicPlayer extends Component
                 $completionSnapshot = app(ProgressService::class)
                     ->topicCompletionSnapshot(auth()->id(), $this->topic->id);
 
-                $canMarkComplete = ! ($activeMaterialProgress?->status === 'completed');
+                $canMarkComplete =!($activeMaterialProgress?->status === 'completed');
             }
         }
 
@@ -382,7 +382,7 @@ class TopicPlayer extends Component
             ->orderBy('sort_order')
             ->orderBy('created_at');
 
-        if (! $this->canOpenMentorWorkspace) {
+        if (!$this->canOpenMentorWorkspace) {
             $query->where('status', 'active')
                 ->where('visibility', 'public');
         }
@@ -397,7 +397,7 @@ class TopicPlayer extends Component
             ->where('course_id', $this->topic->course_id)
             ->first();
 
-        if (! $enrollment) {
+        if (!$enrollment) {
             $this->topicCompleted = false;
             $this->topicStatus = null;
             return;
@@ -418,7 +418,7 @@ class TopicPlayer extends Component
 
     private function canOpenMentorWorkspaceForTopic(): bool
     {
-        if (! auth()->check()) {
+        if (!auth()->check()) {
             return false;
         }
 
@@ -484,7 +484,7 @@ class TopicPlayer extends Component
 
     private function resolveMaterialPreviewUrl($material, ?string $youtubeId = null): ?string
     {
-        if (! $material) {
+        if (!$material) {
             return null;
         }
 
@@ -567,10 +567,10 @@ class TopicPlayer extends Component
 
         $parts = parse_url($input);
 
-        if (! empty($parts['query'])) {
+        if (!empty($parts['query'])) {
             parse_str($parts['query'], $query);
 
-            if (! empty($query['v']) && preg_match('/^[A-Za-z0-9_-]{11}$/', $query['v'])) {
+            if (!empty($query['v']) && preg_match('/^[A-Za-z0-9_-]{11}$/', $query['v'])) {
                 return $query['v'];
             }
         }

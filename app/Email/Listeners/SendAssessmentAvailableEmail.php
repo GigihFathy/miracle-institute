@@ -6,9 +6,9 @@ use App\Events\AssessmentAvailable;
 use App\Models\Assessment;
 use App\Models\User;
 use App\Notifications\AssessmentAvailableNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendAssessmentAvailableEmail implements ShouldQueue
+
+class SendAssessmentAvailableEmail
 {
     public function handle(AssessmentAvailable $event): void
     {

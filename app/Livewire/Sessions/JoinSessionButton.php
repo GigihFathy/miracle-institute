@@ -57,7 +57,7 @@ class JoinSessionButton extends Component
             $this->stateBadgeClass = 'bg-slate-100 text-slate-700';
         }
 
-        if (! $this->attendance) {
+        if (!$this->attendance) {
             $this->attendanceBadgeClass = 'bg-slate-100 text-slate-700';
         } else {
             $this->attendanceBadgeClass = match ($this->attendance->status) {
@@ -74,7 +74,7 @@ class JoinSessionButton extends Component
             && $now->betweenIncluded($start, $end);
 
         $this->canClockOut = (bool) $this->attendance
-            && ! $this->attendance->clock_out_at
+            &&!$this->attendance->clock_out_at
             && $now->betweenIncluded($start, $end);
     }
 
@@ -82,7 +82,7 @@ class JoinSessionButton extends Component
     {
         $this->refreshAttendance();
 
-        if (! $this->canJoin) {
+        if (!$this->canJoin) {
             session()->flash('error', 'Session sudah tidak tersedia.');
             return null;
         }
@@ -94,7 +94,7 @@ class JoinSessionButton extends Component
     {
         $this->refreshAttendance();
 
-        if (! $this->attendance) {
+        if (!$this->attendance) {
             session()->flash('error', 'Attendance belum tercatat.');
             return;
         }
@@ -104,7 +104,7 @@ class JoinSessionButton extends Component
             return;
         }
 
-        if (! $this->canClockOut) {
+        if (!$this->canClockOut) {
             session()->flash('error', 'Clock out hanya bisa dilakukan saat session masih aktif.');
             return;
         }
@@ -114,7 +114,7 @@ class JoinSessionButton extends Component
             ->lockForUpdate()
             ->first();
 
-        if ($attendance && ! $attendance->clock_out_at) {
+        if ($attendance &&!$attendance->clock_out_at) {
             $attendance->update([
                 'clock_out_at' => now(),
             ]);

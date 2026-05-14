@@ -103,7 +103,7 @@ class MaterialIndex extends Component
 
         if ($topicId) {
             $this->topic_id = $topicId;
-            if (! in_array($topicId, $this->openTopics, true)) {
+            if (!in_array($topicId, $this->openTopics, true)) {
                 $this->openTopics[] = $topicId;
             }
             $this->type = $this->availableTypes[0] ?? null;
@@ -126,7 +126,7 @@ class MaterialIndex extends Component
         $this->external_url = $row->external_url ?? '';
         $this->materialFile = null;
 
-        if (! in_array($row->topic_id, $this->openTopics, true)) {
+        if (!in_array($row->topic_id, $this->openTopics, true)) {
             $this->openTopics[] = $row->topic_id;
         }
 
@@ -142,7 +142,7 @@ class MaterialIndex extends Component
             : null;
 
         // max 3 materials per topic
-        if (! $this->editingId) {
+        if (!$this->editingId) {
             $currentCount = Material::query()
                 ->where('topic_id', $this->topic_id)
                 ->count();
@@ -266,7 +266,7 @@ class MaterialIndex extends Component
 
     public function getAvailableTypesProperty(): array
     {
-        if (! $this->topic_id) {
+        if (!$this->topic_id) {
             return Material::TYPES;
         }
 
@@ -279,7 +279,7 @@ class MaterialIndex extends Component
 
         $available = array_values(array_diff(Material::TYPES, $usedTypes));
 
-        if ($this->editingId && $this->type && ! in_array($this->type, $available, true)) {
+        if ($this->editingId && $this->type &&!in_array($this->type, $available, true)) {
             $available[] = $this->type;
         }
 

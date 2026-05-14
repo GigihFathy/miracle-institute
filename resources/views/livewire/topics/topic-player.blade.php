@@ -87,9 +87,9 @@
                 </button>
             </div>
 
-            @if($canStudentInteract && ! $topicCompleted && $activeMaterial && $isStudent)
+            @if($canStudentInteract &&!$topicCompleted && $activeMaterial && $isStudent)
                 @php
-                    $isLocked = ! $hasSessionEnded;
+                    $isLocked =!$hasSessionEnded;
                 @endphp
 
                 <button

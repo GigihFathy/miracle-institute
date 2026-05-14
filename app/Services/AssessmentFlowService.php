@@ -45,11 +45,11 @@ class AssessmentFlowService
     {
         $latestAttempt = $this->latestAttempt($assessmentId, $userId);
 
-        if (! $latestAttempt) {
+        if (!$latestAttempt) {
             return true;
         }
 
-        return ! $latestAttempt->passed;
+        return!$latestAttempt->passed;
     }
 
     public function startAttempt(string $assessmentId, string $userId): AssessmentAttempt
@@ -118,7 +118,7 @@ class AssessmentFlowService
 
         $snapshot = $attempt->question_snapshot ?? [];
 
-        if (! is_array($snapshot) || empty($snapshot)) {
+        if (!is_array($snapshot) || empty($snapshot)) {
             $snapshot = $this->resolveQuestions($attempt->assessment)->pluck('id')->values()->all();
 
             $attempt->forceFill([
@@ -151,7 +151,7 @@ class AssessmentFlowService
             ->with('options')
             ->findOrFail($questionId);
 
-        if (! in_array($question->id, $attempt->question_snapshot ?? [], true)) {
+        if (!in_array($question->id, $attempt->question_snapshot ?? [], true)) {
             throw ValidationException::withMessages([
                 'question' => 'Question tidak valid untuk attempt ini.',
             ]);
@@ -165,7 +165,7 @@ class AssessmentFlowService
 
         $validOption = $question->options->contains(fn ($option) => (string) $option->id === (string) $optionId);
 
-        if (! $validOption) {
+        if (!$validOption) {
             throw ValidationException::withMessages([
                 'option' => 'Pilihan jawaban tidak valid.',
             ]);
@@ -256,7 +256,7 @@ class AssessmentFlowService
                     }
                 }
 
-                $answeredCount = $questions->count() - $questions->filter(fn ($q) => ! $answers->has($q->id))->count();
+                $answeredCount = $questions->count() - $questions->filter(fn ($q) =>!$answers->has($q->id))->count();
                 $unanswered = max(0, $attempt->total_questions - $answeredCount);
 
                 $score = $attempt->total_questions > 0
@@ -296,7 +296,7 @@ class AssessmentFlowService
             ->where('course_id', $assessment->course_id)
             ->first();
 
-        if (! $enrollment) {
+        if (!$enrollment) {
             throw ValidationException::withMessages([
                 'course' => 'User belum terdaftar pada course ini.',
             ]);
@@ -315,7 +315,7 @@ class AssessmentFlowService
                 ->where('status', 'completed')
                 ->count() === count($topicIds);
 
-        if (! $allTopicsCompleted) {
+        if (!$allTopicsCompleted) {
             throw ValidationException::withMessages([
                 'assessment' => 'Assessment baru bisa dimulai setelah seluruh topik selesai.',
             ]);
