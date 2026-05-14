@@ -2,7 +2,7 @@
     $generalRoutes = [
         ['label' => 'Dashboard', 'route' => 'explore.dashboard'],
         ['label' => 'Courses', 'route' => 'courses.index'],
-        ['label' => 'Articles', 'route' => 'articles.index'],
+        // ['label' => 'Articles', 'route' => 'articles.index'],
     ];
 
     $navClass = function ($routeName) {
