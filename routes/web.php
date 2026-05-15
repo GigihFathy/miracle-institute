@@ -46,7 +46,7 @@ use App\Livewire\Dashboard\MyLearning;
 use App\Livewire\Frontend\LandingPage;
 
 use App\Livewire\Mentor\Dashboard\MentorDashboard;
-use App\Livewire\Mentor\Topics\TopicIndex as MentorTopicIndex;
+// use App\Livewire\Mentor\Topics\TopicIndex as MentorTopicIndex;
 use App\Livewire\Mentor\Topics\TopicWorkspace;
 
 use App\Livewire\Topics\TopicPlayer;
@@ -262,9 +262,6 @@ Route::prefix('{locale}')
                         ->middleware('permission:manage_topics')
                         ->name('dashboard');
 
-                    Route::get('/topics', MentorTopicIndex::class)
-                        ->middleware('permission:manage_topics')
-                        ->name('topics.index');
 
                     Route::get('/topics/{slug}', TopicWorkspace::class)
                         ->middleware('permission:manage_topics')
