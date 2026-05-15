@@ -1,14 +1,26 @@
 <?php
 
 return [
-    'sessions' => 'Sesi',
-    'join_session' => 'Ikuti Sesi',
-    'attendance' => 'Kehadiran',
-    'upcoming_sessions' => 'Sesi yang Akan Datang',
-    'session_reminder' => 'Pengingat Sesi',
-    'session_scheduled' => 'Sesi Terjadwal',
-    'join_now' => 'Ikuti Sekarang',
-    'session_completed' => 'Sesi Selesai',
-    'session_feedback' => 'Umpan Balik Sesi',
-    'attendance_recorded' => 'Kehadiran Tercatat',
+
+    'phase' => [
+        'upcoming' => 'Terjadwal',
+        'live' => 'Live',
+        'ended' => 'Selesai',
+        'invalid' => 'Tidak tersedia',
+    ],
+
+    'button' => [
+        'upcoming' => 'Belum Dimulai',
+        'live' => 'Gabung Sesi',
+        'ended' => 'Selesai',
+        'invalid' => 'Tidak Tersedia',
+    ],
+
+    'countdown' => [
+        'invalid' => 'Jadwal sesi belum lengkap.',
+        'starts_in' => 'Dimulai dalam :duration',
+        'ends_in' => 'Berakhir dalam :duration',
+        'completed' => 'Sesi selesai',
+    ],
+
 ];
