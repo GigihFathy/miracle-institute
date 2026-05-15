@@ -22,7 +22,7 @@ class MaterialIndex extends Component
     use WithFileUploads;
 
     public bool $showModal = false;
-    public bool $uploading = false; // skeleton loader
+    public bool $uploading = false;
     public array $openTopics = [];
 
     public ?string $editingId = null;
@@ -243,7 +243,7 @@ class MaterialIndex extends Component
             ->orderBy('name')
             ->get();
 
-        // generate video thumbnails for table
+      
         $topics->each(function ($topic) {
             $topic->materials->each(function ($material) {
                 if ($material->type === 'video' && $material->external_url) {
