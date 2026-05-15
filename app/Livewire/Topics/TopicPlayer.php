@@ -141,10 +141,9 @@ class TopicPlayer extends Component
 
         session()->flash('success', 'Topik berhasil ditandai sebagai selesai.');
     }
-
     public function sessionPhase(VideoSession $session): string
     {
-        if (!$session->start_at ||!$session->end_at) {
+        if (! $session->start_at || ! $session->end_at) {
             return 'invalid';
         }
 
@@ -164,13 +163,37 @@ class TopicPlayer extends Component
     public function sessionButtonText(VideoSession $session): string
     {
         return match ($this->sessionPhase($session)) {
-            'upcoming' => 'Not Started',
-            'live' => 'Join Session',
-            'ended' => 'Completed',
-            default => 'Unavailable',
+            'upcoming' => __('general.topic_player.sessions.actions.not_started'),
+            'live' => __('general.topic_player.sessions.actions.join_session'),
+            'ended' => __('general.topic_player.sessions.actions.completed'),
+            default => __('general.topic_player.sessions.actions.unavailable'),
         };
     }
 
+    public function sessionCountdownLabel(VideoSession $session): string
+    {
+        if (! $session->start_at || ! $session->end_at) {
+            return __('general.topic_player.sessions.countdown_invalid');
+        }
+
+        $now = now();
+
+        if ($now->lt($session->start_at)) {
+            return __('general.topic_player.sessions.starts_in') . ' ' . $this->formatDuration(
+                $now->diffInSeconds($session->start_at)
+            );
+        }
+
+        if ($now->betweenIncluded($session->start_at, $session->end_at)) {
+            return __('general.topic_player.sessions.ends_in') . ' ' . $this->formatDuration(
+                $now->diffInSeconds($session->end_at)
+            );
+        }
+
+        return __('general.topic_player.sessions.completed_label');
+    }
+
+    
     public function sessionBadgeClass(VideoSession $session): string
     {
         return match ($this->sessionPhase($session)) {
@@ -180,6 +203,7 @@ class TopicPlayer extends Component
             default => 'bg-slate-100 text-slate-700 border-slate-200',
         };
     }
+    
 
     public function sessionButtonClass(VideoSession $session): string
     {
@@ -191,24 +215,6 @@ class TopicPlayer extends Component
         };
     }
 
-    public function sessionCountdownLabel(VideoSession $session): string
-    {
-        if (!$session->start_at ||!$session->end_at) {
-            return 'Session schedule belum lengkap.';
-        }
-
-        $now = now();
-
-        if ($now->lt($session->start_at)) {
-            return 'Starts in ' . $this->formatDuration($now->diffInSeconds($session->start_at));
-        }
-
-        if ($now->betweenIncluded($session->start_at, $session->end_at)) {
-            return 'Ends in ' . $this->formatDuration($now->diffInSeconds($session->end_at));
-        }
-
-        return 'Session completed';
-    }
 
     public function joinSession(string $sessionId)
     {
@@ -611,23 +617,35 @@ class TopicPlayer extends Component
         return null;
     }
 
-    private function formatDuration(int $seconds): string
+    protected function formatDuration(int $seconds): string
     {
         $hours = intdiv($seconds, 3600);
         $minutes = intdiv($seconds % 3600, 60);
-        $secs = $seconds % 60;
+        $remainingSeconds = $seconds % 60;
 
         $parts = [];
 
         if ($hours > 0) {
-            $parts[] = $hours . 'h';
+            $parts[] = trans_choice(
+                'general.topic_player.sessions.duration.hours',
+                $hours,
+                ['count' => $hours]
+            );
         }
 
         if ($minutes > 0 || $hours > 0) {
-            $parts[] = $minutes . 'm';
+            $parts[] = trans_choice(
+                'general.topic_player.sessions.duration.minutes',
+                $minutes,
+                ['count' => $minutes]
+            );
         }
 
-        $parts[] = $secs . 's';
+        $parts[] = trans_choice(
+            'general.topic_player.sessions.duration.seconds',
+            $remainingSeconds,
+            ['count' => $remainingSeconds]
+        );
 
         return implode(' ', $parts);
     }

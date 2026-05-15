@@ -2,20 +2,20 @@
     $isStudent = auth()->check() && session('active_role') === 'student';
 @endphp
 
-<div class="space-y-6 lg:px-36 pb-10">
-    <section class="rounded-3xl bg-white border p-6 sm:p-8 space-y-5 shadow-sm">
+<div class="space-y-6 pb-10 lg:px-36">
+    <section class="space-y-5 rounded-3xl border bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div class="space-y-3 min-w-0">
+            <div class="min-w-0 space-y-3">
                 <div class="text-xs uppercase tracking-wide text-[#004777]/60">
                     {{ $topic->course?->title }}
                 </div>
 
                 <div class="space-y-2">
-                    <h1 class="text-2xl sm:text-3xl font-bold text-[#004777]">
+                    <h1 class="text-2xl font-bold text-[#004777] sm:text-3xl">
                         {{ $topic->name }}
                     </h1>
 
-                    <p class="text-[#004777]/75 max-w-3xl leading-7">
+                    <p class="max-w-3xl leading-7 text-[#004777]/75">
                         {{ $topic->description }}
                     </p>
                 </div>
@@ -34,33 +34,33 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
             <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#35A7FF]/8 p-4">
-                <div class="text-xs text-[#004777]/70">Materials</div>
-                <div class="text-2xl font-bold mt-1 text-[#004777]">
+                <div class="text-xs text-[#004777]/70">{{ __('general.topic_player.stats.materials') }}</div>
+                <div class="mt-1 text-2xl font-bold text-[#004777]">
                     {{ $materials->count() }}
                 </div>
             </div>
 
             <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#35A7FF]/8 p-4">
-                <div class="text-xs text-[#004777]/70">Attendance Records</div>
-                <div class="text-2xl font-bold mt-1 text-[#004777]">
+                <div class="text-xs text-[#004777]/70">{{ __('general.topic_player.stats.attendance_records') }}</div>
+                <div class="mt-1 text-2xl font-bold text-[#004777]">
                     {{ $attendanceStats['checked_in'] ?? 0 }}
                 </div>
             </div>
 
             <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#35A7FF]/8 p-4">
-                <div class="text-xs text-[#004777]/70">Sessions</div>
-                <div class="text-2xl font-bold mt-1 text-[#004777]">
+                <div class="text-xs text-[#004777]/70">{{ __('general.topic_player.stats.sessions') }}</div>
+                <div class="mt-1 text-2xl font-bold text-[#004777]">
                     {{ $topic->videoSessions->count() }}
                 </div>
             </div>
 
             <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#35A7FF]/8 p-4">
-                <div class="text-xs text-[#004777]/70">Progress</div>
-                <div class="text-2xl font-bold mt-1 text-[#004777]">
+                <div class="text-xs text-[#004777]/70">{{ __('general.topic_player.stats.progress') }}</div>
+                <div class="mt-1 text-2xl font-bold text-[#004777]">
                     @if($isMentor)
-                        REVIEW
+                        {{ __('general.topic_player.progress.review') }}
                     @else
                         {{ strtoupper($topicStatus ?? 'not_started') }}
                     @endif
@@ -68,28 +68,28 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-2 justify-between items-center">
+        <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="flex flex-wrap gap-2">
                 <button
                     type="button"
                     wire:click="setTab('materials')"
-                    class="px-4 py-2 rounded-xl border transition {{ $activeTab === 'materials' ? 'bg-[#004777] text-white border-[#004777]' : 'bg-white text-[#004777] hover:bg-[#35A7FF]/10 border-[#35A7FF]/30' }}"
+                    class="rounded-xl border px-4 py-2 transition {{ $activeTab === 'materials' ? 'border-[#004777] bg-[#004777] text-white' : 'border-[#35A7FF]/30 bg-white text-[#004777] hover:bg-[#35A7FF]/10' }}"
                 >
-                    Materials
+                    {{ __('general.topic_player.tabs.materials') }}
                 </button>
 
                 <button
                     type="button"
                     wire:click="setTab('sessions')"
-                    class="px-4 py-2 rounded-xl border transition {{ $activeTab === 'sessions' ? 'bg-[#004777] text-white border-[#004777]' : 'bg-white text-[#004777] hover:bg-[#35A7FF]/10 border-[#35A7FF]/30' }}"
+                    class="rounded-xl border px-4 py-2 transition {{ $activeTab === 'sessions' ? 'border-[#004777] bg-[#004777] text-white' : 'border-[#35A7FF]/30 bg-white text-[#004777] hover:bg-[#35A7FF]/10' }}"
                 >
-                    Sessions
+                    {{ __('general.topic_player.tabs.sessions') }}
                 </button>
             </div>
 
-            @if($canStudentInteract &&!$topicCompleted && $activeMaterial && $isStudent)
+            @if($canStudentInteract && ! $topicCompleted && $activeMaterial && $isStudent)
                 @php
-                    $isLocked =!$hasSessionEnded;
+                    $isLocked = ! $hasSessionEnded;
                 @endphp
 
                 <button
@@ -98,27 +98,27 @@
                     wire:loading.attr="disabled"
                     wire:target="markViewed"
                     @disabled($isLocked)
-                    class="group relative px-6 py-2 rounded-xl font-semibold border transition-all duration-300 flex items-center gap-2
+                    class="group relative flex items-center gap-2 rounded-xl border px-6 py-2 font-semibold transition-all duration-300
                     {{ $isLocked
-                        ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-80'
-                        : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 hover:shadow-emerald-200/50 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'
+                        ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400 opacity-80'
+                        : 'border-emerald-600 bg-emerald-600 text-white hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-200/50 active:translate-y-0'
                     }}"
                 >
                     @if($isLocked)
                         <svg xmlns="http://www.w3.org" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Attend session to complete</span>
+                        <span>{{ __('general.topic_player.actions.attend_to_complete') }}</span>
                     @else
                         <svg xmlns="http://www.w3.org" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
-                        <span>Selesaikan Unit</span>
+                        <span>{{ __('general.topic_player.actions.complete_unit') }}</span>
                     @endif
 
                     @if($isLocked)
-                        <span class="absolute -top-10 left-1/2 -translate-x-1/2 scale-0 transition-all rounded bg-gray-800 p-2 text-xs text-white group-hover:scale-100 whitespace-nowrap">
-                            Tombol akan aktif setelah sesi berakhir
+                        <span class="absolute left-1/2 -top-10 -translate-x-1/2 scale-0 whitespace-nowrap rounded bg-gray-800 p-2 text-xs text-white transition-all group-hover:scale-100">
+                            {{ __('general.topic_player.actions.locked_tooltip') }}
                         </span>
                     @endif
                 </button>
@@ -132,17 +132,17 @@
             x-data="{ openMaterialCompleteModal: false }"
             x-on:material-complete-done.window="openMaterialCompleteModal = false"
         >
-            <div class="rounded-2xl bg-white border p-5 space-y-4">
+            <div class="space-y-4 rounded-2xl border bg-white p-5">
                 <div class="flex items-end justify-between gap-4">
                     <div>
-                        <h2 class="text-lg font-semibold">Material Library</h2>
+                        <h2 class="text-lg font-semibold">{{ __('general.topic_player.materials.title') }}</h2>
                         <p class="text-sm text-slate-500">
-                            Semua materi dalam topik ini dikumpulkan di satu tempat.
+                            {{ __('general.topic_player.materials.subtitle') }}
                         </p>
                     </div>
 
                     <div wire:loading wire:target="selectMaterial" class="text-xs text-slate-500">
-                        Memuat materi...
+                        {{ __('general.topic_player.loading.select_material') }}
                     </div>
                 </div>
 
@@ -164,8 +164,8 @@
                         wire:click="selectMaterial('{{ $material->id }}')"
                         wire:loading.attr="disabled"
                         wire:target="selectMaterial"
-                        class="shrink-0 w-[280px] overflow-hidden text-left rounded-2xl border transition snap-start disabled:opacity-70
-                        {{ $isActive ? 'bg-[#004777] text-white border-[#004777] shadow-sm' : 'bg-white border-[#35A7FF]/30 hover:border-[#35A7FF] hover:shadow-sm' }}"
+                        class="w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition disabled:opacity-70
+                        {{ $isActive ? 'border-[#004777] bg-[#004777] text-white shadow-sm' : 'border-[#35A7FF]/30 bg-white hover:border-[#35A7FF] hover:shadow-sm' }}"
                     >
                         @if($isVideo && $thumbnailUrl)
                             <div class="relative aspect-video overflow-hidden bg-slate-200">
@@ -173,7 +173,7 @@
 
                                 <img
                                     src="{{ $thumbnailUrl }}"
-                                    alt="Thumbnail {{ $material->name }}"
+                                    alt="{{ __('general.topic_player.materials.thumbnail_alt', ['name' => $material->name]) }}"
                                     loading="lazy"
                                     class="relative h-full w-full object-cover"
                                     onload="this.previousElementSibling?.remove()"
@@ -187,17 +187,17 @@
                                 </div>
                             </div>
                         @else
-                            <div class="flex aspect-video items-center justify-center bg-slate-100 relative overflow-hidden">
+                            <div class="relative flex aspect-video items-center justify-center overflow-hidden bg-slate-100">
                                 @if($thumbnailUrl)
-                                    <img src="{{ $thumbnailUrl }}" class="absolute inset-0 w-full h-full object-cover opacity-30" alt="Doc Thumbnail">
+                                    <img src="{{ $thumbnailUrl }}" class="absolute inset-0 h-full w-full object-cover opacity-30" alt="{{ __('general.topic_player.materials.doc_thumbnail_alt') }}">
                                 @endif
-                                <div class="rounded-2xl border bg-white px-4 py-3 text-center relative z-10 shadow-sm">
+                                <div class="relative z-10 rounded-2xl border bg-white px-4 py-3 text-center shadow-sm">
                                     <div class="text-xs font-semibold text-slate-500">
                                         {{ strtoupper($material->type) }}
                                     </div>
 
                                     <div class="mt-1 text-sm font-semibold text-slate-900">
-                                        Document
+                                        {{ __('general.topic_player.materials.document_label') }}
                                     </div>
                                 </div>
                             </div>
@@ -228,15 +228,15 @@
                     @endif
                 @empty
                     <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
-                        <div class="font-semibold text-slate-900">Materi sedang dipersiapkan</div>
-                        <p class="text-sm text-slate-600 mt-1 leading-6">
-                            Mentor belum mengunggah materi untuk topik ini.
+                        <div class="font-semibold text-slate-900">{{ __('general.topic_player.materials.empty.title') }}</div>
+                        <p class="mt-1 text-sm leading-6 text-slate-600">
+                            {{ __('general.topic_player.materials.empty.description') }}
                         </p>
                     </div>
                 @endforelse
             </div>
 
-            <div class="rounded-2xl bg-white border p-5 space-y-4">
+            <div class="space-y-4 rounded-2xl border bg-white p-5">
                 @if($activeMaterial)
                     @php
                         $activeCardData = $materialCards[(string) $activeMaterial->id] ?? [];
@@ -253,22 +253,22 @@
                             </h2>
 
                             <p class="text-sm text-slate-500">
-                                Type: {{ strtoupper($activeMaterial->type) }}
+                                {{ __('general.topic_player.materials.type_label', ['type' => strtoupper($activeMaterial->type)]) }}
                             </p>
                         </div>
 
                         @if($canStudentInteract)
                             @if($activeMaterialProgress?->status === 'completed')
-                                <span class="px-3 py-1 rounded-full text-xs bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    MATERIAL COMPLETED
+                                <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700">
+                                    {{ __('general.topic_player.materials.completed_badge') }}
                                 </span>
                             @else
                                 <button
                                     type="button"
                                     x-on:click="openMaterialCompleteModal = true"
-                                    class="px-4 py-2 rounded-xl bg-[#004777] text-white text-sm transition hover:bg-[#003560]"
+                                    class="rounded-xl bg-[#004777] px-4 py-2 text-sm text-white transition hover:bg-[#003560]"
                                 >
-                                    Mark Complete
+                                    {{ __('general.topic_player.materials.mark_complete') }}
                                 </button>
                             @endif
                         @endif
@@ -277,25 +277,25 @@
                     <div wire:loading.class="opacity-60" wire:target="selectMaterial">
                         @if($materialUrl)
                             @if($activeMaterial->type === 'video')
-                                <div class="max-w-3xl mx-auto space-y-4">
-                                    <div class="relative aspect-video rounded-2xl overflow-hidden bg-slate-900 group shadow-sm border border-slate-200">
+                                <div class="mx-auto max-w-3xl space-y-4">
+                                    <div class="group relative aspect-video overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-sm">
                                         @if($finalThumbnailUrl)
                                             <img
                                                 src="{{ $finalThumbnailUrl }}"
-                                                alt="Thumbnail {{ $activeMaterial->name }}"
+                                                alt="{{ __('general.topic_player.materials.thumbnail_alt', ['name' => $activeMaterial->name]) }}"
                                                 loading="lazy"
                                                 class="h-full w-full object-cover opacity-80 transition duration-300 group-hover:scale-105 group-hover:opacity-100"
                                             >
                                         @else
                                             <div class="absolute inset-0 flex items-center justify-center bg-slate-100">
-                                                <span class="text-slate-400 text-sm">Thumbnail tidak tersedia</span>
+                                                <span class="text-sm text-slate-400">{{ __('general.topic_player.materials.thumbnail_not_available') }}</span>
                                             </div>
                                         @endif
 
                                         @if($finalWatchUrl)
                                             <a href="{{ $finalWatchUrl }}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 flex items-center justify-center">
                                                 <div class="grid h-16 w-16 place-items-center rounded-full bg-white/90 text-[#004777] shadow-lg transition-transform group-hover:scale-110">
-                                                    <svg xmlns="http://www.w3.org" class="h-8 w-8 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                                    <svg xmlns="http://www.w3.org" class="ml-1 h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                                                     </svg>
                                                 </div>
@@ -309,13 +309,13 @@
                                                 href="{{ $finalWatchUrl }}"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                class="rounded-xl border px-5 py-2.5 text-sm font-semibold bg-[#004777] text-white hover:bg-[#003560] transition shadow-sm"
+                                                class="rounded-xl border bg-[#004777] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#003560]"
                                             >
-                                                Tonton di YouTube
+                                                {{ __('general.topic_player.materials.watch_youtube') }}
                                             </a>
                                         </div>
                                         <div class="text-center text-xs text-slate-500">
-                                            Video akan dibuka di tab baru untuk pengalaman menonton terbaik.
+                                            {{ __('general.topic_player.materials.youtube_hint') }}
                                         </div>
                                     @endif
                                 </div>
@@ -334,25 +334,24 @@
                                         href="{{ $materialUrl }}"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="inline-flex rounded-xl bg-[#004777] px-4 py-2 text-sm font-medium text-white hover:bg-[#003560]"
+                                        class="inline-flex rounded-xl bg-[#004777] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#003560]"
                                     >
-                                        Open / download material
+                                        {{ __('general.topic_player.materials.open_download') }}
                                     </a>
                                 </div>
-
                             @endif
                         @else
                             <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
                                 <div class="font-semibold text-slate-900">
-                                    Preview belum tersedia
+                                    {{ __('general.topic_player.materials.preview_not_available.title') }}
                                 </div>
 
-                                <p class="text-sm text-slate-600 mt-1 leading-6">
-                                    Material ini sudah terdaftar, tetapi URL/file preview belum valid atau belum tersedia.
+                                <p class="mt-1 text-sm leading-6 text-slate-600">
+                                    {{ __('general.topic_player.materials.preview_not_available.description') }}
                                 </p>
 
                                 @if($finalSourceValue)
-                                    <div class="mt-3 rounded-xl bg-white border p-3 text-xs text-slate-500 break-all">
+                                    <div class="mt-3 break-all rounded-xl border bg-white p-3 text-xs text-slate-500">
                                         {{ $finalSourceValue }}
                                     </div>
                                 @endif
@@ -361,16 +360,16 @@
                     </div>
                 @elseif($hasMaterials)
                     <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
-                        <div class="font-semibold text-slate-900">Pilih materi untuk melihat detail</div>
-                        <p class="text-sm text-slate-600 mt-1">
-                            Klik salah satu card materi di atas untuk membuka preview atau file terkait.
+                        <div class="font-semibold text-slate-900">{{ __('general.topic_player.materials.select_hint.title') }}</div>
+                        <p class="mt-1 text-sm text-slate-600">
+                            {{ __('general.topic_player.materials.select_hint.description') }}
                         </p>
                     </div>
                 @else
                     <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
-                        <div class="font-semibold text-slate-900">Belum ada materi tersedia</div>
-                        <p class="text-sm text-slate-600 mt-1 leading-6">
-                            Mentor belum menyiapkan materi untuk topik ini.
+                        <div class="font-semibold text-slate-900">{{ __('general.topic_player.materials.no_materials.title') }}</div>
+                        <p class="mt-1 leading-6 text-sm text-slate-600">
+                            {{ __('general.topic_player.materials.no_materials.description') }}
                         </p>
                     </div>
                 @endif
@@ -391,11 +390,11 @@
                         class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
                     >
                         <h3 class="text-lg font-semibold text-slate-950">
-                            Tandai material selesai?
+                            {{ __('general.topic_player.materials.complete_modal.title') }}
                         </h3>
 
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Material <span class="font-semibold">{{ $activeMaterial->name }}</span> akan ditandai selesai. Progress topik akan diperbarui otomatis.
+                            {!! __('general.topic_player.materials.complete_modal.description', ['name' => e($activeMaterial->name)]) !!}
                         </p>
 
                         <div class="mt-5 flex justify-end gap-2">
@@ -404,7 +403,7 @@
                                 x-on:click="openMaterialCompleteModal = false"
                                 class="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
                             >
-                                Cancel
+                                {{ __('general.topic_player.actions.cancel') }}
                             </button>
 
                             <button
@@ -415,10 +414,10 @@
                                 class="rounded-xl bg-[#004777] px-4 py-2 text-sm font-medium text-white hover:bg-[#003560] disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 <span wire:loading.remove wire:target="confirmMaterialCompletion">
-                                    Confirm
+                                    {{ __('general.topic_player.actions.confirm') }}
                                 </span>
                                 <span wire:loading wire:target="confirmMaterialCompletion">
-                                    Processing...
+                                    {{ __('general.topic_player.loading.processing') }}
                                 </span>
                             </button>
                         </div>
@@ -430,12 +429,12 @@
 
     @if($activeTab === 'sessions')
         <section class="space-y-4">
-            <div class="rounded-2xl bg-white border p-5 space-y-4">
+            <div class="space-y-4 rounded-2xl border bg-white p-5">
                 <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                     <div>
-                        <h2 class="text-lg font-semibold">Sessions</h2>
+                        <h2 class="text-lg font-semibold">{{ __('general.topic_player.sessions.title') }}</h2>
                         <p class="text-sm text-slate-500">
-                            Cek jadwal sesi dan join hanya saat window sesi aktif.
+                            {{ __('general.topic_player.sessions.subtitle') }}
                         </p>
                     </div>
                 </div>
@@ -451,11 +450,26 @@
                     $endIso = $session->end_at?->toIso8601String();
 
                     $attendanceBadgeClass = match ($attendance?->status) {
-                        'present' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                        'late' => 'bg-amber-100 text-amber-700 border-amber-200',
-                        'absent' => 'bg-rose-100 text-rose-700 border-rose-200',
-                        default => 'bg-slate-100 text-slate-700 border-slate-200',
+                        'present' => 'border-emerald-200 bg-emerald-100 text-emerald-700',
+                        'late' => 'border-amber-200 bg-amber-100 text-amber-700',
+                        'absent' => 'border-rose-200 bg-rose-100 text-rose-700',
+                        default => 'border-slate-200 bg-slate-100 text-slate-700',
                     };
+
+                    $sessionLabels = [
+                        'scheduled' => __('general.topic_player.sessions.states.scheduled'),
+                        'live' => __('general.topic_player.sessions.states.live'),
+                        'completed' => __('general.topic_player.sessions.states.completed'),
+                        'unavailable' => __('general.topic_player.sessions.states.unavailable'),
+                        'not_started' => __('general.topic_player.sessions.actions.not_started'),
+                        'join_session' => __('general.topic_player.sessions.actions.join_session'),
+                        'completed_button' => __('general.topic_player.sessions.actions.completed'),
+                        'unavailable_button' => __('general.topic_player.sessions.actions.unavailable'),
+                        'countdown_invalid' => __('general.topic_player.sessions.countdown_invalid'),
+                        'completed_label' => __('general.topic_player.sessions.completed_label'),
+                        'starts_in' => __('general.topic_player.sessions.starts_in'),
+                        'ends_in' => __('general.topic_player.sessions.ends_in'),
+                    ];
                 @endphp
 
                 <div
@@ -465,9 +479,10 @@
                         initialPhase: @js($phase),
                         title: @js($session->title),
                         startLabel: @js($session->start_at?->format('d M Y, H:i') ?? '-'),
-                        endLabel: @js($session->end_at?->format('H:i') ?? '-')
+                        endLabel: @js($session->end_at?->format('H:i') ?? '-'),
+                        labels: @js($sessionLabels),
                     })"
-                    class="rounded-2xl bg-white border p-5 space-y-4 shadow-sm"
+                    class="space-y-4 rounded-2xl border bg-white p-5 shadow-sm"
                 >
                     <div class="space-y-1">
                         <div class="font-semibold">{{ $session->title }}</div>
@@ -481,11 +496,11 @@
 
                     <div class="flex items-center justify-between gap-3">
                         <div class="text-sm">
-                            Status: <span class="font-medium" x-text="stateLabel"></span>
+                            {{ __('general.topic_player.sessions.status_label') }} <span class="font-medium" x-text="stateLabel"></span>
                         </div>
 
                         @if($attendance)
-                            <span class="text-xs px-2 py-1 rounded-full border {{ $attendanceBadgeClass }}">
+                            <span class="rounded-full border px-2 py-1 text-[11px] {{ $attendanceBadgeClass }}">
                                 {{ strtoupper($attendance->status) }}
                             </span>
                         @endif
@@ -497,8 +512,8 @@
 
                     @if($attendance)
                         <div class="space-y-1 text-sm">
-                            <div>Check in: {{ $attendance->check_in_at?->format('d M Y, H:i') ?? '-' }}</div>
-                            <div>Check out: {{ $attendance->clock_out_at?->format('d M Y, H:i') ?? '-' }}</div>
+                            <div>{{ __('general.topic_player.sessions.check_in') }}: {{ $attendance->check_in_at?->format('d M Y, H:i') ?? '-' }}</div>
+                            <div>{{ __('general.topic_player.sessions.check_out') }}: {{ $attendance->clock_out_at?->format('d M Y, H:i') ?? '-' }}</div>
                         </div>
                     @endif
 
@@ -508,14 +523,14 @@
                                 type="button"
                                 x-on:click="openModal()"
                                 :disabled="!canJoin"
-                                class="px-4 py-2 rounded-xl border text-sm font-medium transition"
+                                class="rounded-xl border px-4 py-2 text-sm font-medium transition"
                                 :class="buttonClass"
                             >
                                 <span x-text="buttonText">{{ $buttonText }}</span>
                             </button>
                         @else
-                            <span class="px-4 py-2 rounded-xl border border-[#35A7FF]/30 bg-[#35A7FF]/10 text-xs text-[#004777]/80">
-                                Read-only review
+                            <span class="rounded-xl border border-[#35A7FF]/30 bg-[#35A7FF]/10 px-4 py-2 text-xs text-[#004777]/80">
+                                {{ __('general.topic_player.sessions.read_only') }}
                             </span>
                         @endif
                     </div>
@@ -528,12 +543,12 @@
                         x-on:keydown.escape.window="closeModal()"
                         x-on:click.self="closeModal()"
                     >
-                        <div class="w-full max-w-2xl rounded-3xl bg-white shadow-2xl max-h-[92vh] overflow-y-auto">
+                        <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
                             <div class="flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6 sm:py-5">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-slate-900">Join Session</h3>
+                                    <h3 class="text-lg font-semibold text-slate-900">{{ __('general.topic_player.sessions.join_modal.title') }}</h3>
                                     <p class="mt-1 text-sm text-slate-500">
-                                        Student akan dicatat ke attendance sebelum diarahkan ke meeting.
+                                        {{ __('general.topic_player.sessions.join_modal.subtitle') }}
                                     </p>
                                 </div>
 
@@ -542,22 +557,22 @@
                                     x-on:click="closeModal()"
                                     class="rounded-xl border px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
                                 >
-                                    Close
+                                    {{ __('general.topic_player.actions.close') }}
                                 </button>
                             </div>
 
-                            <div class="px-5 py-5 sm:px-6 sm:py-6 space-y-4">
-                                <div class="grid gap-3 sm:grid-cols-2 text-sm">
+                            <div class="space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+                                <div class="grid gap-3 text-sm sm:grid-cols-2">
                                     <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">Title</div>
+                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.title') }}</div>
                                         <div class="mt-1 font-semibold text-slate-900">{{ $session->title }}</div>
                                     </div>
 
                                     <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">Status</div>
+                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.status') }}</div>
                                         <div class="mt-1">
                                             <span
-                                                class="inline-flex rounded-full px-3 py-1 text-xs font-semibold border"
+                                                class="inline-flex rounded-full border px-3 py-1 text-xs font-semibold"
                                                 :class="badgeClass"
                                                 x-text="stateLabel"
                                             ></span>
@@ -565,14 +580,14 @@
                                     </div>
 
                                     <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">Start</div>
+                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.start') }}</div>
                                         <div class="mt-1 font-semibold text-slate-900">
                                             {{ $session->start_at?->format('d M Y, H:i') ?? '-' }}
                                         </div>
                                     </div>
 
                                     <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">End</div>
+                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.end') }}</div>
                                         <div class="mt-1 font-semibold text-slate-900">
                                             {{ $session->end_at?->format('d M Y, H:i') ?? '-' }}
                                         </div>
@@ -580,12 +595,12 @@
                                 </div>
 
                                 <div class="rounded-xl border border-slate-200 bg-white p-4">
-                                    <div class="text-xs uppercase tracking-wide text-slate-500">Countdown</div>
+                                    <div class="text-xs uppercase tracking-wide text-slate-500">{{ __('general.topic_player.sessions.countdown') }}</div>
                                     <div class="mt-1 text-base font-semibold text-slate-900" x-text="countdownLabel"></div>
                                 </div>
 
                                 <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                                    Clock-in deadline: {{ $session->start_at?->copy()->addMinutes(45)?->format('d M Y, H:i') ?? '-' }}
+                                    {{ __('general.topic_player.sessions.clock_in_deadline', ['time' => $session->start_at?->copy()->addMinutes(45)?->format('d M Y, H:i') ?? '-']) }}
                                 </div>
 
                                 <div class="flex items-center justify-end gap-3 border-t pt-4">
@@ -594,7 +609,7 @@
                                         x-on:click="closeModal()"
                                         class="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
                                     >
-                                        Cancel
+                                        {{ __('general.topic_player.actions.cancel') }}
                                     </button>
 
                                     <button
@@ -605,7 +620,7 @@
                                         class="rounded-xl px-4 py-2 text-sm font-medium transition"
                                         :class="buttonClass"
                                     >
-                                        Join &amp; Log Attendance
+                                        {{ __('general.topic_player.sessions.join_and_log') }}
                                     </button>
                                 </div>
                             </div>
@@ -614,16 +629,15 @@
                 </div>
             @empty
                 <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
-                    <div class="font-semibold text-slate-900">Belum ada sesi terjadwal</div>
-                    <p class="text-sm text-slate-600 mt-1 leading-6">
-                        Mentor belum menjadwalkan sesi untuk topik ini.
+                    <div class="font-semibold text-slate-900">{{ __('general.topic_player.sessions.empty.title') }}</div>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                        {{ __('general.topic_player.sessions.empty.description') }}
                     </p>
                 </div>
             @endforelse
         </section>
     @endif
 </div>
-
 @once
     <script>
         document.addEventListener('alpine:init', () => {
@@ -631,6 +645,8 @@
                 open: false,
                 now: Date.now(),
                 timer: null,
+
+                labels: cfg.labels ?? {},
 
                 startAt: cfg.startAt ? new Date(cfg.startAt).getTime() : null,
                 endAt: cfg.endAt ? new Date(cfg.endAt).getTime() : null,
@@ -669,11 +685,11 @@
                 },
 
                 get stateLabel() {
-                    if (this.phase === 'upcoming') return 'Scheduled';
-                    if (this.phase === 'live') return 'Live';
-                    if (this.phase === 'ended') return 'Completed';
+                    if (this.phase === 'upcoming') return this.labels.scheduled ?? 'Scheduled';
+                    if (this.phase === 'live') return this.labels.live ?? 'Live';
+                    if (this.phase === 'ended') return this.labels.completed ?? 'Completed';
 
-                    return 'Unavailable';
+                    return this.labels.unavailable ?? 'Unavailable';
                 },
 
                 get badgeClass() {
@@ -697,20 +713,20 @@
                 },
 
                 get buttonText() {
-                    if (this.phase === 'upcoming') return 'Not Started';
-                    if (this.phase === 'live') return 'Join Session';
-                    if (this.phase === 'ended') return 'Completed';
+                    if (this.phase === 'upcoming') return this.labels.not_started ?? 'Not Started';
+                    if (this.phase === 'live') return this.labels.join_session ?? 'Join Session';
+                    if (this.phase === 'ended') return this.labels.completed_button ?? 'Completed';
 
-                    return 'Unavailable';
+                    return this.labels.unavailable_button ?? 'Unavailable';
                 },
 
                 get countdownLabel() {
                     if (!this.startAt || !this.endAt) {
-                        return 'Session schedule belum lengkap.';
+                        return this.labels.countdown_invalid ?? 'Session schedule is incomplete.';
                     }
 
                     if (this.phase === 'ended') {
-                        return 'Session completed';
+                        return this.labels.completed_label ?? 'Session completed';
                     }
 
                     let target = this.phase === 'upcoming' ? this.startAt : this.endAt;
@@ -724,12 +740,11 @@
 
                     if (h > 0) parts.push(`${h}h`);
                     if (m > 0 || h > 0) parts.push(`${m}m`);
-
                     parts.push(`${s}s`);
 
                     return this.phase === 'upcoming'
-                        ? `Starts in ${parts.join(' ')}`
-                        : `Ends in ${parts.join(' ')}`;
+                        ? `${this.labels.starts_in ?? 'Starts in'} ${parts.join(' ')}`
+                        : `${this.labels.ends_in ?? 'Ends in'} ${parts.join(' ')}`;
                 },
 
                 openModal() {
