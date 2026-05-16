@@ -136,6 +136,7 @@ class TopicIndex extends Component
             'teachers' => User::whereHas('roles', fn ($q) => $q->where('name', 'disciples'))
                 ->orderBy('name')
                 ->get(),
+            'selectedCourse' => $this->courseFilter ? Course::find($this->courseFilter) : null,
             'stats' => [
                 'courses' => Course::count(),
                 'topics' => Topic::count(),

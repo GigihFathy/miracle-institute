@@ -8,7 +8,6 @@ use App\Http\Controllers\VideoSessionJoinController;
 
 use App\Livewire\Admin\Assessments\AssessmentIndex as AdminAssessmentIndex;
 use App\Livewire\Admin\Assessments\QuestionManager;
-use App\Livewire\Admin\Attendances\AttendanceIndex;
 use App\Livewire\Admin\Certificates\CertificateIndex;
 use App\Livewire\Admin\Courses\CourseIndex;
 use App\Livewire\Admin\Dashboard\DashboardIndex;
@@ -326,17 +325,58 @@ Route::prefix('{locale}')
                         ->middleware('permission:manage_topics')
                         ->name('topics.index');
 
-                    Route::get('/materials', MaterialIndex::class)
+                    Route::get('/materials', function () {
+                        $topicFilter = request()->query('topicFilter');
+
+                        if ($topicFilter) {
+                            return redirect(localized_route('admin.materials.index', ['topicFilter' => $topicFilter]));
+                        }
+
+                        return redirect(localized_route('admin.topics.index'));
+                    })->middleware('permission:manage_topics')->name('materials.legacy');
+
+                    Route::get('/materials/{topicFilter}', MaterialIndex::class)
+                        ->whereUuid('topicFilter')
                         ->middleware('permission:manage_topics')
                         ->name('materials.index');
 
-                    Route::get('/sessions', VideoSessionIndex::class)
+                    Route::get('/sessions', function () {
+                        $topicFilter = request()->query('topicFilter');
+
+                        if ($topicFilter) {
+                            return redirect(localized_route('admin.sessions.index', ['topicFilter' => $topicFilter]));
+                        }
+
+                        return redirect(localized_route('admin.topics.index'));
+                    })->middleware('permission:manage_topics')->name('sessions.legacy');
+
+                    Route::get('/sessions/{topicFilter}', VideoSessionIndex::class)
+                        ->whereUuid('topicFilter')
                         ->middleware('permission:manage_topics')
                         ->name('sessions.index');
 
-                    Route::get('/attendances', AttendanceIndex::class)
-                        ->middleware('permission:view_reports')
-                        ->name('attendances.index');
+                    Route::get('/attendances', function () {
+                        $topicFilter = request()->query('topicFilter');
+                        $sessionFilter = request()->query('sessionFilter');
+
+                        if ($topicFilter) {
+                            return redirect(localized_route('admin.sessions.index', ['topicFilter' => $topicFilter]));
+                        }
+
+                        if ($sessionFilter) {
+                            $session = \App\Models\VideoSession::query()->whereKey($sessionFilter)->first();
+
+                            if ($session) {
+                                return redirect(localized_route('admin.sessions.index', ['topicFilter' => $session->topic_id]));
+                            }
+                        }
+
+                        return redirect(localized_route('admin.topics.index'));
+                    })->middleware('permission:view_reports')->name('attendances.legacy');
+
+                    Route::get('/attendances/{topicFilter}', function (string $topicFilter) {
+                        return redirect(localized_route('admin.sessions.index', ['topicFilter' => $topicFilter]));
+                    })->whereUuid('topicFilter')->middleware('permission:view_reports')->name('attendances.index');
 
                     Route::get('/users', UserIndex::class)
                         ->middleware('permission:manage_users')

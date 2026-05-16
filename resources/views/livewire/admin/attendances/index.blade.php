@@ -11,6 +11,27 @@
         </div>
     </x-ui.page-header>
 
+    @if($selectedCourse || $selectedTopic || $selectedSession)
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            <div class="flex flex-wrap items-center gap-2">
+                <span>{{ __('admin.attendances.filters.all_courses') }}:</span>
+                <span class="font-semibold text-slate-900">{{ $selectedCourse?->title ?? __('admin.attendances.filters.all_courses') }}</span>
+
+                @if($selectedTopic)
+                    <span class="text-slate-400">/</span>
+                    <span>{{ __('admin.attendances.filters.all_topics') }}:</span>
+                    <span class="font-semibold text-slate-900">{{ $selectedTopic->name }}</span>
+                @endif
+
+                @if($selectedSession)
+                    <span class="text-slate-400">/</span>
+                    <span>{{ __('admin.attendances.filters.all_sessions') }}:</span>
+                    <span class="font-semibold text-slate-900">{{ $selectedSession->title }}</span>
+                @endif
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
         @foreach([
             ['label' => __('admin.attendances.stats.total'), 'value' => $stats['total']],

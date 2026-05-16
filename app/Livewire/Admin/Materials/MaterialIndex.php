@@ -6,9 +6,9 @@ use App\Livewire\Concerns\WithAdminTableState;
 use App\Models\Course;
 use App\Models\Material;
 use App\Models\Topic;
-use App\Models\User;
 use App\Services\Materials\MaterialAssetService;
 use App\Services\Materials\YoutubeService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -47,11 +47,15 @@ class MaterialIndex extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'courseFilter' => ['except' => ''],
-        'topicFilter' => ['except' => ''],
         'typeFilter' => ['except' => ''],
         'visibilityFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
     ];
+
+    public function mount(?string $topicFilter = null): void
+    {
+        $this->topicFilter = $topicFilter ?? '';
+    }
 
     protected function rules(): array
     {
@@ -101,13 +105,13 @@ class MaterialIndex extends Component
     {
         $this->resetForm();
 
-        if ($topicId) {
-            $this->topic_id = $topicId;
-            if (!in_array($topicId, $this->openTopics, true)) {
-                $this->openTopics[] = $topicId;
-            }
-            $this->type = $this->availableTypes[0] ?? null;
+        $this->topic_id = $topicId ?: ($this->topicFilter ?: null);
+
+        if ($this->topic_id && !in_array($this->topic_id, $this->openTopics, true)) {
+            $this->openTopics[] = $this->topic_id;
         }
+
+        $this->type = $this->availableTypes[0] ?? null;
 
         $this->showModal = true;
     }
@@ -141,29 +145,16 @@ class MaterialIndex extends Component
             ? Material::findOrFail($this->editingId)
             : null;
 
-        // max 3 materials per topic
+        // max 5 materials per topic
         if (!$this->editingId) {
             $currentCount = Material::query()
                 ->where('topic_id', $this->topic_id)
                 ->count();
-            if ($currentCount >= 3) {
+            if ($currentCount >= 5) {
                 throw ValidationException::withMessages([
-                    'topic_id' => 'Setiap topic hanya boleh memiliki maksimal 3 material.',
+                    'topic_id' => 'Setiap topic hanya boleh memiliki maksimal 5 material.',
                 ]);
             }
-        }
-
-        // duplicate type prevention
-        $duplicateCheck = Material::query()
-            ->where('topic_id', $this->topic_id)
-            ->where('type', $this->type)
-            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
-            ->exists();
-
-        if ($duplicateCheck) {
-            throw ValidationException::withMessages([
-                'type' => 'Tipe material "' . strtoupper((string) $this->type) . '" sudah ada di topic ini.',
-            ]);
         }
 
         try {
@@ -182,7 +173,7 @@ class MaterialIndex extends Component
 
         $payload = [
             'topic_id' => $this->topic_id,
-            'uploader_id' => auth()->id(),
+            'uploader_id' => Auth::id(),
             'name' => $this->name,
             'type' => $this->type,
             'path' => $asset['path'],
@@ -224,26 +215,16 @@ class MaterialIndex extends Component
             ->with([
                 'course',
                 'materials' => fn ($q) => $q
-                    ->when($this->typeFilter, fn ($q) => $q->where('type', $this->typeFilter))
-                    ->when($this->visibilityFilter, fn ($q) => $q->where('visibility', $this->visibilityFilter))
-                    ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
-                    ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
                     ->orderBy('sort_order')
                     ->orderBy('created_at'),
             ])
-            ->when($this->courseFilter, fn ($q) => $q->where('course_id', $this->courseFilter))
             ->when($this->topicFilter, fn ($q) => $q->where('id', $this->topicFilter))
-            ->when($this->search, fn ($q) => $q->where(function ($inner) {
-                $inner->where('name', 'like', "%{$this->search}%")
-                    ->orWhereHas('course', fn ($cq) => $cq->where('title', 'like', "%{$this->search}%"))
-                    ->orWhereHas('materials', fn ($mq) => $mq->where('name', 'like', "%{$this->search}%"));
-            }))
+            ->when($this->courseFilter, fn ($q) => $q->where('course_id', $this->courseFilter))
             ->orderBy('course_id')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
-      
         $topics->each(function ($topic) {
             $topic->materials->each(function ($material) {
                 if ($material->type === 'video' && $material->external_url) {
@@ -257,33 +238,21 @@ class MaterialIndex extends Component
             });
         });
 
+        $selectedTopic = $this->topicFilter
+            ? Topic::with(['course', 'materials' => fn ($q) => $q->orderBy('sort_order')->orderBy('created_at')])->find($this->topicFilter)
+            : null;
+
         return view('livewire.admin.materials.index', [
             'topics' => $topics,
             'courses' => Course::orderBy('title')->get(),
-            'users' => User::orderBy('name')->get(),
+            'selectedCourse' => $this->courseFilter ? Course::find($this->courseFilter) : null,
+            'selectedTopic' => $selectedTopic,
         ])->layout('layouts.admin');
     }
 
     public function getAvailableTypesProperty(): array
     {
-        if (!$this->topic_id) {
-            return Material::TYPES;
-        }
-
-        $usedTypes = Material::query()
-            ->where('topic_id', $this->topic_id)
-            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
-            ->distinct()
-            ->pluck('type')
-            ->toArray();
-
-        $available = array_values(array_diff(Material::TYPES, $usedTypes));
-
-        if ($this->editingId && $this->type &&!in_array($this->type, $available, true)) {
-            $available[] = $this->type;
-        }
-
-        return $available;
+        return Material::TYPES;
     }
 
     public function getIsTopicFullProperty(): array
@@ -291,7 +260,7 @@ class MaterialIndex extends Component
         return Topic::query()
             ->withCount('materials')
             ->get()
-            ->mapWithKeys(fn ($topic) => [$topic->id => $topic->materials_count >= 3])
+            ->mapWithKeys(fn ($topic) => [$topic->id => $topic->materials_count >= 5])
             ->all();
     }
 

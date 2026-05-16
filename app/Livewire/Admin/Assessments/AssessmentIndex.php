@@ -135,6 +135,7 @@ class AssessmentIndex extends Component
         return view('livewire.admin.assessments.index', [
             'rows' => $rows,
             'courses' => Course::orderBy('title')->get(),
+            'selectedCourse' => $this->courseFilter ? Course::find($this->courseFilter) : null,
         ])->layout('layouts.admin');
     }
 

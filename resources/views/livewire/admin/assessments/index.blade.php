@@ -9,6 +9,13 @@
         </button>
     </x-ui.page-header>
 
+    @if($selectedCourse)
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            {{ __('admin.assessments.filters.all_courses') }}:
+            <span class="font-semibold text-slate-900">{{ $selectedCourse->title }}</span>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-3">
         <input wire:model.live="search"
             class="w-full rounded-xl border px-4 py-2"

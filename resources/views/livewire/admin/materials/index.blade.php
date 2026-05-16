@@ -4,144 +4,76 @@
         subtitle="{{ __('admin.materials.page_subtitle') }}"
     />
 
-    <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
-        <input wire:model.live="search" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.materials.search_placeholder') }}">
-
-        <select wire:model.live="courseFilter" class="rounded-xl border px-4 py-2">
-            <option value="">{{ __('admin.materials.filters.all_courses') }}</option>
-            @foreach($courses as $course)
-                <option value="{{ $course->id }}">{{ $course->title }}</option>
-            @endforeach
-        </select>
-
-        <select wire:model.live="topicFilter" class="rounded-xl border px-4 py-2">
-            <option value="">{{ __('admin.materials.filters.all_topics') }}</option>
-            @foreach($topics as $topic)
-                <option value="{{ $topic->id }}">{{ $topic->course?->title }} · {{ $topic->name }}</option>
-            @endforeach
-        </select>
-
-        <select wire:model.live="typeFilter" class="rounded-xl border px-4 py-2">
-            <option value="">{{ __('admin.materials.filters.all_types') }}</option>
-            <option value="pdf">{{ __('admin.materials.types.pdf') }}</option>
-            <option value="ppt">{{ __('admin.materials.types.ppt') }}</option>
-            <option value="video">{{ __('admin.materials.types.video') }}</option>
-        </select>
-
-        <select wire:model.live="statusFilter" class="rounded-xl border px-4 py-2">
-            <option value="">{{ __('admin.materials.filters.all_status') }}</option>
-            <option value="active">{{ __('admin.materials.status.active') }}</option>
-            <option value="inactive">{{ __('admin.materials.status.inactive') }}</option>
-        </select>
-    </div>
-
-    <div class="space-y-4">
-        @forelse($topics->groupBy('course_id') as $group)
-            @php($course = $group->first()?->course)
-            <div class="overflow-hidden rounded-2xl border bg-white">
-                <div class="flex items-center justify-between border-b bg-slate-50 p-4">
+    @if($selectedTopic)
+        <div class="space-y-4">
+            <div class="rounded-2xl border bg-white p-4">
+                <div class="flex items-center justify-between gap-4">
                     <div>
-                        <h2 class="font-semibold">{{ $course?->title }}</h2>
-                        <p class="text-xs text-slate-500">{{ __('admin.materials.course_group', ['count' => $group->count()]) }}</p>
+                        <h2 class="font-semibold">{{ $selectedTopic->course?->title }} · {{ $selectedTopic->name }}</h2>
+                        @if($selectedTopic->description)
+                            <p class="text-xs text-slate-500">{{ Str::limit($selectedTopic->description, 200) }}</p>
+                        @endif
                     </div>
-                    <a href="{{ localized_route('admin.topics.index', ['courseFilter' => $course?->id]) }}" class="text-sm underline">
-                        {{ __('admin.materials.actions.open_topics') }}
-                    </a>
-                </div>
-
-                <div class="divide-y">
-                    @foreach($group as $topic)
-                        <div class="p-4">
-                            <div class="flex items-center justify-between gap-3">
-                                <div>
-                                    <div class="font-semibold">{{ $topic->name }}</div>
-                                    <div class="text-xs text-slate-500">
-                                        {{ __('admin.materials.topic_meta', [
-                                            'materials' => $topic->materials->count(),
-                                            'visibility' => $topic->visibility,
-                                            'status' => $topic->status,
-                                        ]) }}
-                                    </div>
-                                </div>
-
-                                <div class="flex gap-2">
-                                    <button wire:click="toggleTopic('{{ $topic->id }}')" class="rounded-lg border px-3 py-1 text-sm">
-                                        {{ in_array($topic->id, $openTopics) ? __('admin.materials.actions.hide') : __('admin.materials.actions.show') }}
-                                    </button>
-
-                                    @if(($this->isTopicFull[$topic->id] ?? false))
-                                        <button
-                                            class="flex cursor-not-allowed items-center gap-1 rounded-lg bg-slate-300 px-3 py-1 text-sm text-slate-500"
-                                            title="{{ __('admin.materials.full_tooltip') }}"
-                                            disabled
-                                        >
-                                            <span>{{ __('admin.materials.actions.add') }}</span>
-                                            <span class="rounded-full bg-red-100 px-1 py-0.5 text-xs text-red-700">FULL</span>
-                                        </button>
-                                    @else
-                                        <button wire:click="create('{{ $topic->id }}')" class="rounded-lg bg-slate-900 px-3 py-1 text-sm text-white transition-colors hover:bg-slate-800">
-                                            {{ __('admin.materials.actions.add') }}
-                                        </button>
-                                    @endif
-                                </div>
-                            </div>
-
-                            @if(in_array($topic->id, $openTopics))
-                                <div class="mt-4 overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead class="border-b bg-white">
-                                            <tr>
-                                                <th class="p-4 text-left">{{ __('admin.materials.table.name') }}</th>
-                                                <th class="p-4">{{ __('admin.materials.table.type') }}</th>
-                                                <th class="p-4">{{ __('admin.materials.table.source') }}</th>
-                                                <th class="p-4">{{ __('admin.materials.table.visibility') }}</th>
-                                                <th class="p-4">{{ __('admin.materials.table.status') }}</th>
-                                                <th class="p-4">{{ __('admin.materials.table.action') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($topic->materials as $row)
-                                                <tr class="border-t hover:bg-slate-50">
-                                                    <td class="p-4">
-                                                        <div class="font-medium">{{ $row->name }}</div>
-                                                        <div class="text-xs text-slate-500">{{ __('admin.materials.sort_order', ['count' => $row->sort_order]) }}</div>
-                                                    </td>
-                                                    <td class="p-4">{{ strtoupper($row->type) }}</td>
-                                                    <td class="break-all p-4 text-xs text-slate-500">
-                                                        {{ $row->path ?: $row->external_url }}
-                                                    </td>
-                                                    <td class="p-4">{{ __('admin.materials.visibility.' . $row->visibility, [], $row->visibility) }}</td>
-                                                    <td class="p-4">{{ __('admin.materials.status.' . $row->status, [], $row->status) }}</td>
-                                                    <td class="p-4">
-                                                        <div class="flex gap-3">
-                                                            <button wire:click="edit('{{ $row->id }}')" class="text-sm text-blue-600">{{ __('admin.materials.actions.edit') }}</button>
-                                                            <button wire:click="delete('{{ $row->id }}')" class="text-sm text-rose-600">{{ __('admin.materials.actions.delete') }}</button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-
-                                            @if($topic->materials->isEmpty())
-                                                <tr>
-                                                    <td colspan="6" class="p-6 text-center text-slate-500">
-                                                        {{ __('admin.materials.empty_materials') }}
-                                                    </td>
-                                                </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
+                    <div class="flex items-center gap-2">
+                            <a href="{{ localized_route('admin.topics.index', ['courseFilter' => $selectedTopic->course_id]) }}" class="rounded-xl border px-4 py-2 text-sm">
+                                Back
+                        </a>
+                        @if(($this->isTopicFull[$selectedTopic->id] ?? false))
+                            <button class="rounded-xl bg-slate-300 px-4 py-2 text-sm text-slate-500" disabled>
+                                {{ __('admin.materials.actions.add') }}
+                                <span class="ml-1 rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold text-red-700">MAX 5</span>
+                            </button>
+                        @else
+                            <button wire:click="create('{{ $selectedTopic->id }}')" class="rounded-xl bg-slate-900 px-4 py-2 text-sm text-white">
+                                {{ __('admin.materials.actions.add') }}
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
-        @empty
-            <div class="rounded-2xl border bg-white p-6 text-center text-slate-500">
-                {{ __('admin.materials.empty') }}
+
+            <div class="overflow-hidden rounded-2xl border bg-white">
+                <div class="p-4">
+                    <table class="w-full text-sm">
+                        <thead class="border-b bg-white">
+                            <tr>
+                                <th class="p-4 text-left">{{ __('admin.materials.table.name') }}</th>
+                                <th class="p-4">{{ __('admin.materials.table.type') }}</th>
+                                <th class="p-4">{{ __('admin.materials.table.source') }}</th>
+                                <th class="p-4">{{ __('admin.materials.table.visibility') }}</th>
+                                <th class="p-4">{{ __('admin.materials.table.status') }}</th>
+                                <th class="p-4">{{ __('admin.materials.table.action') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($selectedTopic->materials as $row)
+                                <tr class="border-t hover:bg-slate-50">
+                                    <td class="p-4">
+                                        <div class="font-medium">{{ $row->name }}</div>
+                                        <div class="text-xs text-slate-500">{{ __('admin.materials.sort_order', ['count' => $row->sort_order]) }}</div>
+                                    </td>
+                                    <td class="p-4">{{ strtoupper($row->type) }}</td>
+                                    <td class="break-all p-4 text-xs text-slate-500">{{ $row->path ?: $row->external_url }}</td>
+                                    <td class="p-4">{{ __('admin.materials.visibility.' . $row->visibility, [], $row->visibility) }}</td>
+                                    <td class="p-4">{{ __('admin.materials.status.' . $row->status, [], $row->status) }}</td>
+                                    <td class="p-4">
+                                        <div class="flex gap-3">
+                                            <button wire:click="edit('{{ $row->id }}')" class="text-sm text-blue-600">{{ __('admin.materials.actions.edit') }}</button>
+                                                <button wire:click="delete('{{ $row->id }}')" wire:confirm="Delete this material?" class="text-sm text-rose-600">{{ __('admin.materials.actions.delete') }}</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="p-6 text-center text-slate-500">{{ __('admin.materials.empty_materials') }}</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        @endforelse
-    </div>
+        </div>
+    @endif
 
     <template x-teleport="body">
         <div x-show="open"
@@ -158,12 +90,20 @@
                 </div>
 
                 <div class="space-y-3">
-                    <select wire:model.live="topic_id" class="w-full rounded-xl border px-4 py-2">
-                        <option value="">{{ __('admin.materials.form.select_topic') }}</option>
-                        @foreach($topics as $t)
-                            <option value="{{ $t->id }}">{{ $t->course?->title }} · {{ $t->name }}</option>
-                        @endforeach
-                    </select>
+                    @if($selectedTopic)
+                        <input
+                            value="{{ $selectedTopic->course?->title }} · {{ $selectedTopic->name }}"
+                            disabled
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-slate-600"
+                        >
+                    @else
+                        <select wire:model.live="topic_id" class="w-full rounded-xl border px-4 py-2">
+                            <option value="">{{ __('admin.materials.form.select_topic') }}</option>
+                            @foreach($topics as $t)
+                                <option value="{{ $t->id }}">{{ $t->course?->title }} · {{ $t->name }}</option>
+                            @endforeach
+                        </select>
+                    @endif
 
                     <input wire:model.live="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.materials.form.name_placeholder') }}">
 

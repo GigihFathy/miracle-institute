@@ -8,6 +8,7 @@ use App\Models\Topic;
 use App\Models\VideoSession;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 
 class VideoSessionIndex extends Component
@@ -34,15 +35,23 @@ class VideoSessionIndex extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'courseFilter' => ['except' => ''],
-        'topicFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
         'perPage' => ['except' => 10],
     ];
 
+    public function mount(?string $topicFilter = null): void
+    {
+        $this->topicFilter = $topicFilter ?? '';
+    }
+
     protected function rules(): array
     {
         return [
-            'topic_id' => 'required|exists:topics,id',
+            'topic_id' => [
+                'required',
+                'exists:topics,id',
+                Rule::unique('video_sessions', 'topic_id')->ignore($this->editingId),
+            ],
             'title' => 'required|string|max:255',
             'zoom_link' => 'required|url|max:255',
             'start_at' => 'required|date',
@@ -111,6 +120,14 @@ class VideoSessionIndex extends Component
     public function create(): void
     {
         $this->resetForm();
+        $this->topic_id = $this->topicFilter ?: null;
+        if ($this->topic_id) {
+            $topic = Topic::with('course')->find($this->topic_id);
+            if ($topic) {
+                $this->topicSearch = trim(($topic->course?->title ? $topic->course->title . ' · ' : '') . $topic->name);
+                $this->showTopicResults = false;
+            }
+        }
         $this->showModal = true;
     }
 
@@ -182,12 +199,22 @@ class VideoSessionIndex extends Component
             ->when($this->topicFilter, fn ($q) => $q->where('topic_id', $this->topicFilter))
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter));
 
+        $selectedTopic = $this->topicFilter
+            ? Topic::with('course')->find($this->topicFilter)
+            : null;
+
+        $selectedSession = $this->topicFilter
+            ? VideoSession::with(['topic.course', 'attendances.user'])->where('topic_id', $this->topicFilter)->first()
+            : null;
+
         return view('livewire.admin.sessions.index', [
             'rows' => (clone $baseQuery)->latest('start_at')->paginate($this->perPage),
             'courses' => Course::orderBy('title')->get(),
             'topics' => Topic::with('course')->orderBy('name')->get(),
             'topicOptions' => $this->topicOptions,
-            'selectedTopic' => $this->selectedTopic,
+            'selectedCourse' => $this->courseFilter ? Course::find($this->courseFilter) : null,
+            'selectedFilterTopic' => $selectedTopic,
+            'selectedFilterSession' => $selectedSession,
             'stats' => [
                 'total' => (clone $baseQuery)->count(),
                 'scheduled' => (clone $baseQuery)->where('status', 'scheduled')->count(),

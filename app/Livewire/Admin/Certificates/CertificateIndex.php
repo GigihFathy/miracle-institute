@@ -134,6 +134,8 @@ class CertificateIndex extends Component
             'courses' => Course::orderBy('title')->get(),
             'topics' => Topic::with('course')->orderBy('name')->get(),
             'users' => User::orderBy('name')->get(),
+            'selectedCourse' => $this->courseFilter ? Course::find($this->courseFilter) : null,
+            'selectedTopic' => $this->topicFilter ? Topic::with('course')->find($this->topicFilter) : null,
             'stats' => [
                 'total' => (clone $baseQuery)->count(),
                 'issued' => (clone $baseQuery)->where('status', 'issued')->count(),

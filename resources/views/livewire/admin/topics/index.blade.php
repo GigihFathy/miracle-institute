@@ -9,6 +9,13 @@
         </button>
     </x-ui.page-header>
 
+    @if($selectedCourse)
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            {{ __('admin.topics.filters.all_courses') }}:
+            <span class="font-semibold text-slate-900">{{ $selectedCourse->title }}</span>
+        </div>
+    @endif
+
     <div class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         @foreach([
             ['Courses', $stats['courses']],
@@ -109,17 +116,12 @@
                                     {{ __('admin.topics.actions.sessions') }}
                                 </a>
 
-                                <a href="{{ localized_route('admin.assessments.index', ['topicFilter' => $row->id]) }}"
+                                <a href="{{ localized_route('admin.assessments.index', ['courseFilter' => $row->course_id]) }}"
                                    class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
                                     {{ __('admin.topics.actions.assessments') }}
                                 </a>
 
-                                <a href="{{ localized_route('admin.attendances.index', ['topicFilter' => $row->id]) }}"
-                                   class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
-                                    {{ __('admin.topics.actions.attendances') }}
-                                </a>
-
-                                <a href="{{ localized_route('admin.certificates.index', ['topicFilter' => $row->id]) }}"
+                                <a href="{{ localized_route('admin.certificates.index', ['courseFilter' => $row->course_id]) }}"
                                    class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
                                     {{ __('admin.topics.actions.certificates') }}
                                 </a>

@@ -82,24 +82,9 @@
                                     {{ __('admin.courses.actions.topics') }}
                                 </a>
 
-                                <a href="{{ localized_route('admin.materials.index', ['courseFilter' => $row->id]) }}"
-                                   class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
-                                    {{ __('admin.courses.actions.materials') }}
-                                </a>
-
-                                <a href="{{ localized_route('admin.sessions.index', ['courseFilter' => $row->id]) }}"
-                                   class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
-                                    {{ __('admin.courses.actions.sessions') }}
-                                </a>
-
                                 <a href="{{ localized_route('admin.assessments.index', ['courseFilter' => $row->id]) }}"
                                    class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
                                     {{ __('admin.courses.actions.assessments') }}
-                                </a>
-
-                                <a href="{{ localized_route('admin.certificates.index', ['courseFilter' => $row->id]) }}"
-                                   class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
-                                    {{ __('admin.courses.actions.certificates') }}
                                 </a>
 
                                 <div class="my-1 w-full border-t"></div>

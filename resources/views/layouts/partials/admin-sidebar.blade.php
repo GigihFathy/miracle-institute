@@ -14,11 +14,6 @@
 
     $learningMenus = [
         ['label' => __('admin.sidebar.courses'), 'route' => 'admin.courses.index'],
-        ['label' => __('admin.sidebar.topics'), 'route' => 'admin.topics.index'],
-        ['label' => __('admin.sidebar.materials'), 'route' => 'admin.materials.index'],
-        ['label' => __('admin.sidebar.sessions'), 'route' => 'admin.sessions.index'],
-        ['label' => __('admin.sidebar.attendances'), 'route' => 'admin.attendances.index'],
-        ['label' => __('admin.sidebar.assessments'), 'route' => 'admin.assessments.index'],
         ['label' => __('admin.sidebar.certificates'), 'route' => 'admin.certificates.index'],
     ];
 
@@ -30,7 +25,6 @@
         'admin.topics.index' => 'manage_topics',
         'admin.materials.index' => 'manage_topics',
         'admin.sessions.index' => 'manage_topics',
-        'admin.attendances.index' => 'view_reports',
         'admin.assessments.index' => 'manage_assessments',
         'admin.certificates.index' => 'manage_certificates',
 
@@ -62,11 +56,6 @@
 
     $isLearningActive =
         request()->routeIs('admin.courses.*') ||
-        request()->routeIs('admin.topics.*') ||
-        request()->routeIs('admin.materials.*') ||
-        request()->routeIs('admin.sessions.*') ||
-        request()->routeIs('admin.attendances.*') ||
-        request()->routeIs('admin.assessments.*') ||
         request()->routeIs('admin.certificates.*');
 @endphp
 

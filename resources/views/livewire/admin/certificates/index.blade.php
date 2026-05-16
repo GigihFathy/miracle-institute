@@ -9,6 +9,13 @@
         </button>
     </x-ui.page-header>
 
+    @if($selectedCourse)
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            {{ __('admin.certificates.filters.all_courses') }}:
+            <span class="font-semibold text-slate-900">{{ $selectedCourse->title }}</span>
+        </div>
+    @endif
+
     <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
         <div class="rounded-2xl border bg-white p-5">
             <div class="text-xs text-slate-500">{{ __('admin.certificates.stats.total') }}</div>
