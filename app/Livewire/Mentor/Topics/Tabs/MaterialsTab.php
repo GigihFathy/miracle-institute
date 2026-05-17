@@ -5,15 +5,17 @@ namespace App\Livewire\Mentor\Topics\Tabs;
 use App\Livewire\Concerns\InteractsWithMentorTopic;
 use App\Models\Material;
 use App\Models\Topic;
+use App\Services\Materials\MaterialAssetService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class MaterialsTab extends Component
 {
     use InteractsWithMentorTopic;
+    use WithFileUploads;
 
     public Topic $topic;
 
@@ -25,7 +27,8 @@ class MaterialsTab extends Component
     public string $materialName = '';
     public string $materialType = 'pdf';
     public string $materialStatus = 'active';
-    public ?string $materialExternalUrl = null;
+    public string $materialExternalUrl = '';
+    public mixed $materialFile = null;
     public int $materialSortOrder = 1;
 
     public function mount(string $topicId): void
@@ -34,12 +37,16 @@ class MaterialsTab extends Component
 
         abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
 
-        $this->selectedMaterialId = $this->topic->materials()
-            ->orderBy('sort_order')
-            ->orderBy('created_at')
-            ->value('id');
-
+        $this->selectedMaterialId = $this->materialsQuery()->value('id');
         $this->materialSortOrder = ($this->topic->materials()->max('sort_order') ?? 0) + 1;
+    }
+
+    // Fungsi Lifecycle: Membersihkan input saat Type diubah
+    public function updatedMaterialType(): void
+    {
+        $this->materialFile = null;
+        $this->materialExternalUrl = '';
+        $this->resetErrorBag(['materialFile', 'materialExternalUrl']);
     }
 
     public function openMaterialModal(): void
@@ -67,7 +74,8 @@ class MaterialsTab extends Component
         $this->materialName = $material->name;
         $this->materialType = $material->type;
         $this->materialStatus = $material->status;
-        $this->materialExternalUrl = $material->external_url;
+        $this->materialExternalUrl = $material->external_url ?? '';
+        $this->materialFile = null;
         $this->materialSortOrder = $material->sort_order;
 
         $this->showMaterialModal = true;
@@ -80,7 +88,11 @@ class MaterialsTab extends Component
 
     public function selectMaterial(string $materialId): void
     {
-        $this->selectedMaterialId = $materialId;
+        $exists = $this->materialsQuery()->whereKey($materialId)->exists();
+
+        if ($exists) {
+            $this->selectedMaterialId = $materialId;
+        }
     }
 
     private function availableMaterialTypes(): array
@@ -98,57 +110,65 @@ class MaterialsTab extends Component
         $this->validate([
             'materialName' => ['required', 'string', 'max:255'],
             'materialType' => ['required', Rule::in($availableTypes)],
-            'materialStatus' => ['required', Rule::in(['active', 'inactive'])],
-            'materialSortOrder' => ['required', 'integer', 'min:1'],
+            'materialStatus' => ['required', Rule::in(Material::STATUSES)],
+            'materialSortOrder' => ['required', 'integer', 'min:0'],
             'materialExternalUrl' => ['nullable', 'url', 'max:2048'],
+            'materialFile' => ['nullable', 'file', 'max:51200'],
         ]);
 
-        $material = $this->editingMaterialId
+        $existing = $this->editingMaterialId
             ? Material::query()->where('topic_id', $this->topic->id)->findOrFail($this->editingMaterialId)
             : null;
 
-        if ($this->materialType === 'video' && !$this->materialExternalUrl) {
+        if ($this->materialType === 'video' &&!$this->materialExternalUrl &&!$this->materialFile &&!($existing?->external_url)) {
             throw ValidationException::withMessages([
-                'materialExternalUrl' => 'Video wajib memakai external path.',
+                'materialExternalUrl' => 'Video wajib memakai URL YouTube.',
             ]);
         }
 
-        DB::transaction(function () use ($material) {
-            $path = $material?->path;
+        if (in_array($this->materialType, ['pdf', 'ppt'], true) &&!$this->materialFile &&!($existing?->path)) {
+            throw ValidationException::withMessages([
+                'materialFile' => 'File PDF/PPT wajib diunggah.',
+            ]);
+        }
 
-            if ($this->materialType === 'video') {
-                if ($path) {
-                    Storage::disk('public')->delete($path);
-                }
-                $path = null;
-            }
+        $isEditing = (bool) $this->editingMaterialId;
+
+        DB::transaction(function () use ($existing, &$material) {
+            $asset = app(MaterialAssetService::class)->sync(
+                material: $existing,
+                type: $this->materialType,
+                file: $this->materialFile,
+                externalUrl: $this->materialExternalUrl ?: null,
+                title: $this->materialName
+            );
 
             $payload = [
                 'topic_id' => $this->topic->id,
                 'uploader_id' => auth()->id(),
                 'name' => $this->materialName,
                 'type' => $this->materialType,
-                'path' => $path,
-                'external_url' => $this->materialType === 'video' ? $this->materialExternalUrl : null,
+                'path' => $asset['path'],
+                'external_url' => $asset['external_url'],
                 'visibility' => 'public',
                 'sort_order' => $this->materialSortOrder,
                 'status' => $this->materialStatus,
             ];
 
-            if ($material) {
-                $material->update($payload);
-                $this->selectedMaterialId = $material->id;
+            if ($existing) {
+                $existing->update($payload);
+                $material = $existing;
                 return;
             }
 
-            $created = Material::create($payload);
-            $this->selectedMaterialId = $created->id;
+            $material = Material::create($payload);
         });
 
+        $this->selectedMaterialId = $material->id;
         $this->closeMaterialModal();
         $this->resetMaterialForm();
 
-        session()->flash('success', $this->editingMaterialId ? 'Material berhasil diperbarui.' : 'Material berhasil ditambahkan.');
+        session()->flash('success', $isEditing ? 'Material berhasil diperbarui.' : 'Material berhasil ditambahkan.');
     }
 
     public function deleteMaterial(string $id): void
@@ -160,10 +180,7 @@ class MaterialsTab extends Component
             ->findOrFail($id);
 
         DB::transaction(function () use ($material) {
-            if ($material->path) {
-                Storage::disk('public')->delete($material->path);
-            }
-
+            app(MaterialAssetService::class)->delete($material);
             $material->delete();
 
             // Reorder remaining materials' sort_order sequentially starting from 1
@@ -199,6 +216,7 @@ class MaterialsTab extends Component
             'materialType',
             'materialStatus',
             'materialExternalUrl',
+            'materialFile',
             'materialSortOrder',
         ]);
 
@@ -209,11 +227,7 @@ class MaterialsTab extends Component
 
     public function render()
     {
-        $materials = $this->topic->materials()
-            ->with('uploader')
-            ->orderBy('sort_order')
-            ->orderBy('created_at')
-            ->get();
+        $materials = $this->materialsQuery()->get();
 
         $selectedMaterial = $this->selectedMaterialId
             ? $materials->firstWhere('id', $this->selectedMaterialId)
@@ -227,11 +241,17 @@ class MaterialsTab extends Component
         return view('livewire.mentor.topics.tabs.materials-tab', [
             'materials' => $materials,
             'selectedMaterial' => $selectedMaterial,
-            'materialPreviewUrl' => $selectedMaterial
-                ? ($selectedMaterial->external_url ?: ($selectedMaterial->path ? Storage::disk('public')->url($selectedMaterial->path) : null))
-                : null,
+            'materialPreviewUrl' => app(MaterialAssetService::class)->resolvePreviewUrl($selectedMaterial),
             'materialTypeOptions' => $this->availableMaterialTypes(),
             'canAddMaterial' => $materials->count() < 5,
         ]);
+    }
+
+    private function materialsQuery()
+    {
+        return $this->topic->materials()
+            ->with('uploader')
+            ->orderBy('sort_order')
+            ->orderBy('created_at');
     }
 }

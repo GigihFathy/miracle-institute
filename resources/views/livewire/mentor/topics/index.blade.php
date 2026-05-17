@@ -1,10 +1,10 @@
 <div class="space-y-6 lg:px-36">
     <x-ui.page-header
-        title="Mentored Topics"
-        subtitle="Daftar topic yang bisa kamu kelola."
+        title="{{ __('mentor.topics.index.page_title') }}"
+        subtitle="{{ __('mentor.topics.index.page_subtitle') }}"
     >
-        <a href="{{ route('mentor.dashboard') }}" class="rounded-xl border px-4 py-2 text-sm">
-            Back
+        <a href="{{ localized_route('mentor.dashboard') }}" class="rounded-xl border px-4 py-2 text-sm">
+            {{ __('mentor.topics.index.back') }}
         </a>
     </x-ui.page-header>
 
@@ -12,7 +12,7 @@
         <input
             wire:model.live="search"
             class="w-full rounded-xl border px-4 py-2 md:w-1/2"
-            placeholder="Search topic..."
+            placeholder="{{ __('mentor.topics.index.search_placeholder') }}"
         >
     </div>
 
@@ -45,17 +45,19 @@
                     <div class="grid grid-cols-3 gap-2 text-sm">
                         <div class="rounded-xl border p-3 text-center">
                             <div class="font-semibold">{{ $topic->materials_count }}</div>
-                            <div class="text-xs text-slate-500">Materials</div>
+                            <div class="text-xs text-slate-500">{{ __('mentor.topics.index.metrics.materials') }}</div>
                         </div>
 
                         <div class="rounded-xl border p-3 text-center">
                             <div class="font-semibold">{{ $studentCounts[$topic->id] ?? 0 }}</div>
-                            <div class="text-xs text-slate-500">Students</div>
+                            <div class="text-xs text-slate-500">{{ __('mentor.topics.index.metrics.students') }}</div>
                         </div>
 
                         <div class="rounded-xl border p-3 text-center">
-                            <div class="font-semibold">{{ $topic->course->assessment->status == "active" ? "ACTIVE" : "INACTIVE" }}</div>
-                            <div class="text-xs text-slate-500">Assessment</div>
+                            <div class="font-semibold">
+                                {{ $topic->course->assessment->status == 'active' ? __('mentor.topics.index.metrics.active') : __('mentor.topics.index.metrics.inactive') }}
+                            </div>
+                            <div class="text-xs text-slate-500">{{ __('mentor.topics.index.metrics.assessment') }}</div>
                         </div>
                     </div>
 
@@ -65,18 +67,18 @@
                         </span>
 
                         <a
-                            href="{{ route('mentor.topics.show', $topic->slug) }}"
+                            href="{{ localized_route('mentor.topics.show', $topic->slug) }}"
                             class="rounded-xl bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700"
                         >
-                            Open
+                            {{ __('mentor.topics.index.open') }}
                         </a>
                     </div>
                 </div>
             </div>
         @empty
             <x-ui.empty-state
-                title="Belum ada topic"
-                description="Kamu belum menjadi mentor di topik mana pun."
+                title="{{ __('mentor.topics.index.empty.title') }}"
+                description="{{ __('mentor.topics.index.empty.description') }}"
             />
         @endforelse
     </div>

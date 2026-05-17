@@ -28,17 +28,24 @@ class TopicIndex extends Component
     public string $status = 'active';
     public int $sort_order = 0;
 
-    public string $courseFilter = '';
     public string $teacherFilter = '';
     public string $statusFilter = '';
 
+    public ?Course $selectedCourse = null;
+
     protected $queryString = [
         'search' => ['except' => ''],
-        'courseFilter' => ['except' => ''],
         'teacherFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
         'perPage' => ['except' => 10],
     ];
+
+    public function mount(?string $courseFilter = null): void
+    {
+        if ($courseFilter) {
+            $this->selectedCourse = Course::find($courseFilter);
+        }
+    }
 
     protected function rules(): array
     {
@@ -55,7 +62,16 @@ class TopicIndex extends Component
 
     public function create(): void
     {
+        if ($this->selectedCourse) {
+            $this->course_id = $this->selectedCourse->id;
+        }
+
         $this->resetForm();
+
+        if ($this->selectedCourse) {
+            $this->course_id = $this->selectedCourse->id;
+        }
+
         $this->showModal = true;
     }
 
@@ -110,11 +126,10 @@ class TopicIndex extends Component
 
     public function render()
     {
-        $rows = Topic::with(['course', 'teacher'])
+        $rows = Topic::with(['course', 'teacher', 'course.certificates'])
             ->withCount([
                 'materials',
                 'videoSessions',
-                'certificates',
             ])
             ->with(['course.assessment'])
             ->when($this->search, function ($q) {
@@ -123,7 +138,7 @@ class TopicIndex extends Component
                         ->orWhere('category', 'like', "%{$this->search}%");
                 });
             })
-            ->when($this->courseFilter, fn ($q) => $q->where('course_id', $this->courseFilter))
+            ->when($this->selectedCourse, fn ($q) => $q->where('course_id', $this->selectedCourse->id))
             ->when($this->teacherFilter, fn ($q) => $q->where('teacher_id', $this->teacherFilter))
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->orderBy('course_id')
@@ -131,20 +146,28 @@ class TopicIndex extends Component
             ->orderBy('name')
             ->paginate($this->perPage);
 
+        $selectedCourse = $this->selectedCourse;
+
         return view('livewire.admin.topics.index', [
             'rows' => $rows,
-            'courses' => Course::orderBy('title')->get(),
             'teachers' => User::whereHas('roles', fn ($q) => $q->where('name', 'disciples'))
                 ->orderBy('name')
                 ->get(),
+            'selectedCourse' => $selectedCourse,
             'stats' => [
-                'courses' => Course::count(),
-                'topics' => Topic::count(),
-                'materials' => Material::count(),
-                'sessions' => VideoSession::count(),
-                'certificates' => Certificate::count(),
+                'courses' => 1,
+                'topics' => $selectedCourse ? Topic::where('course_id', $selectedCourse->id)->count() : Topic::count(),
+                'materials' => $selectedCourse
+                    ? Material::whereHas('topic', fn ($q) => $q->where('course_id', $selectedCourse->id))->count()
+                    : Material::count(),
+                'sessions' => $selectedCourse
+                    ? VideoSession::whereHas('topic', fn ($q) => $q->where('course_id', $selectedCourse->id))->count()
+                    : VideoSession::count(),
+                'certificates' => $selectedCourse
+                    ? Certificate::where('course_id', $selectedCourse->id)->count()
+                    : Certificate::count(),
             ],
-        ])->layout('layouts.admin');
+        ]);
     }
 
     private function resetForm(): void

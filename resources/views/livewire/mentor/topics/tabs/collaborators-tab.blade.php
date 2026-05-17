@@ -1,14 +1,14 @@
 <section class="rounded-2xl border bg-white p-5">
     <div class="flex items-center justify-between gap-4">
         <div>
-            <h2 class="text-lg font-semibold">Collaborators</h2>
-            <p class="text-sm text-slate-500">Mentor utama dan collaborator pada topic ini.</p>
+            <h2 class="text-lg font-semibold">{{ __('mentor.topic_tabs.collaborators.title') }}</h2>
+            <p class="text-sm text-slate-500">{{ __('mentor.topic_tabs.collaborators.subtitle') }}</p>
         </div>
 
         <button type="button"
                 wire:click="openCollaboratorModal"
                 class="rounded-xl bg-slate-900 px-4 py-2 text-sm text-white hover:bg-slate-700">
-            Invite Collaborator
+            {{ __('mentor.topic_tabs.collaborators.actions.invite') }}
         </button>
     </div>
 
@@ -21,7 +21,7 @@
                 </div>
 
                 <span class="rounded-full border px-2 py-1 text-[11px] uppercase tracking-wide text-slate-600">
-                    owner
+                    {{ __('mentor.topic_tabs.collaborators.owner') }}
                 </span>
             </div>
         </div>
@@ -48,48 +48,48 @@
                                 {{ $permissionLabels[$permission->permission] ?? $permission->permission }}
                             </span>
                         @empty
-                            <span class="text-xs text-slate-500">No custom permissions</span>
+                            <span class="text-xs text-slate-500">{{ __('mentor.topic_tabs.collaborators.no_custom_permissions') }}</span>
                         @endforelse
 
                         <button type="button"
                                 wire:click="editCollaborator('{{ $collaborator->id }}')"
                                 class="rounded-xl border px-3 py-2 text-xs text-slate-700 hover:bg-slate-50">
-                            Edit
+                            {{ __('mentor.topic_tabs.collaborators.actions.edit') }}
                         </button>
 
                         <button type="button"
                                 wire:click="removeCollaborator('{{ $collaborator->id }}')"
                                 class="rounded-xl border px-3 py-2 text-xs text-rose-600 hover:bg-rose-50">
-                            Remove
+                            {{ __('mentor.topic_tabs.collaborators.actions.remove') }}
                         </button>
                     </div>
                 </div>
             </div>
         @empty
             <div class="rounded-xl border border-dashed p-6 text-sm text-slate-500">
-                Belum ada collaborator.
+                {{ __('mentor.topic_tabs.collaborators.empty') }}
             </div>
         @endforelse
     </div>
 
     <x-ui.mentor.modal
         :show="$showCollaboratorModal"
-        title="{{ $editingCollaboratorId ? 'Edit Collaborator' : 'Invite Collaborator' }}"
-        subtitle="Hanya akun Mentor/Disciples yang dapat ditambahkan."
+        title="{{ $editingCollaboratorId ? __('mentor.topic_tabs.collaborators.modal.edit_title') : __('mentor.topic_tabs.collaborators.modal.add_title') }}"
+        subtitle="{{ __('mentor.topic_tabs.collaborators.modal.subtitle') }}"
         wire:click="closeCollaboratorModal"
     >
         <form wire:submit.prevent="saveCollaborator" class="space-y-4">
             <div class="grid gap-4">
-                @if(!$editingCollaboratorId)
+                @if(! $editingCollaboratorId)
                     <div>
-                        <label class="text-xs font-medium text-slate-500">Search User</label>
-                        <input wire:model.live="collaboratorSearch" class="mt-1 w-full rounded-xl border px-4 py-2" placeholder="Name or email">
+                        <label class="text-xs font-medium text-slate-500">{{ __('mentor.topic_tabs.collaborators.form.search_user') }}</label>
+                        <input wire:model.live="collaboratorSearch" class="mt-1 w-full rounded-xl border px-4 py-2" placeholder="{{ __('mentor.topic_tabs.collaborators.form.search_placeholder') }}">
                     </div>
 
                     <div>
-                        <label class="text-xs font-medium text-slate-500">Select User</label>
+                        <label class="text-xs font-medium text-slate-500">{{ __('mentor.topic_tabs.collaborators.form.select_user') }}</label>
                         <select wire:model.defer="collaboratorUserId" class="mt-1 w-full rounded-xl border px-4 py-2">
-                            <option value="">Pilih Mentor</option>
+                            <option value="">{{ __('mentor.topic_tabs.collaborators.form.select_placeholder') }}</option>
                             @foreach($eligibleUsers as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }} · {{ $user->email }}</option>
                             @endforeach
@@ -97,19 +97,19 @@
                         @error('collaboratorUserId') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
 
                         @if($eligibleUsers->isEmpty())
-                            <p class="mt-2 text-sm text-slate-500">Tidak ada mentor yang cocok atau sudah terhubung ke topic ini.</p>
+                            <p class="mt-2 text-sm text-slate-500">{{ __('mentor.topic_tabs.collaborators.form.no_eligible_users') }}</p>
                         @endif
                     </div>
                 @else
                     <div class="rounded-xl border bg-slate-50 p-4">
-                        <div class="text-xs text-slate-500">User</div>
+                        <div class="text-xs text-slate-500">{{ __('mentor.topic_tabs.collaborators.form.user') }}</div>
                         <div class="mt-1 text-sm font-medium">{{ $collaborators->firstWhere('id', $editingCollaboratorId)?->user?->name }}</div>
                         <div class="text-xs text-slate-500">{{ $collaborators->firstWhere('id', $editingCollaboratorId)?->user?->email }}</div>
                     </div>
                 @endif
 
                 <div>
-                    <div class="text-xs font-medium text-slate-500">Permissions</div>
+                    <div class="text-xs font-medium text-slate-500">{{ __('mentor.topic_tabs.collaborators.form.permissions') }}</div>
                     <div class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                         @foreach($permissionLabels as $permission => $label)
                             <label class="flex items-center gap-2 rounded-xl border px-4 py-3 text-sm">
@@ -123,10 +123,10 @@
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-slate-500">Status</label>
+                    <label class="text-xs font-medium text-slate-500">{{ __('mentor.topic_tabs.collaborators.form.status') }}</label>
                     <select wire:model.defer="collaboratorStatus" class="mt-1 w-full rounded-xl border px-4 py-2">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="active">{{ __('mentor.topic_tabs.collaborators.form.status_active') }}</option>
+                        <option value="inactive">{{ __('mentor.topic_tabs.collaborators.form.status_inactive') }}</option>
                     </select>
                     @error('collaboratorStatus') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
                 </div>
@@ -134,10 +134,10 @@
 
             <div class="flex items-center justify-end gap-3 border-t pt-4">
                 <button type="button" wire:click="closeCollaboratorModal" class="rounded-xl border px-4 py-2 text-sm text-slate-600">
-                    Cancel
+                    {{ __('mentor.topic_tabs.collaborators.form.cancel') }}
                 </button>
                 <button type="submit" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
-                    {{ $editingCollaboratorId ? 'Update Collaborator' : 'Save Collaborator' }}
+                    {{ $editingCollaboratorId ? __('mentor.topic_tabs.collaborators.form.update') : __('mentor.topic_tabs.collaborators.form.save') }}
                 </button>
             </div>
         </form>

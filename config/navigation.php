@@ -71,13 +71,7 @@ return [
             ],
             [
                 'label' => 'Topics',
-                'route' => 'admin.topics.index',
-                'roles' => ['admin'],
-                'ability' => 'manage_topics',
-            ],
-            [
-                'label' => 'Materials',
-                'route' => 'admin.materials.index',
+                'route' => 'admin.topics.legacy',
                 'roles' => ['admin'],
                 'ability' => 'manage_topics',
             ],
@@ -92,12 +86,6 @@ return [
                 'route' => 'admin.assessments.index',
                 'roles' => ['admin'],
                 'ability' => 'manage_assessments',
-            ],
-            [
-                'label' => 'Certificates',
-                'route' => 'admin.certificates.index',
-                'roles' => ['admin'],
-                'ability' => 'manage_certificates',
             ],
             [
                 'label' => 'Articles',

@@ -30,4 +30,12 @@ class EnrollmentConfirmedNotification extends Notification implements ShouldQueu
                 'enrollment' => $this->enrollment,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'course_id' => $this->enrollment->course_id,
+            'message' => 'Pendaftaran course kamu telah berhasil dikonfirmasi.'
+        ];
+    }
 }

@@ -40,7 +40,7 @@
                             <td class="p-4">{{ $assessment->passing_grade }}</td>
                             <td class="p-4">{{ $assessment->status }}</td>
                             <td class="p-4">
-                                <a href="{{ route('admin.assessments.questions', $assessment->id) }}"
+                                <a href="{{ localized_route('admin.assessments.index', ['courseFilter' => $assessment->course_id]) }}"
                                    class="text-slate-900 underline">
                                     Manage Questions
                                 </a>

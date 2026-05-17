@@ -28,7 +28,6 @@ class CourseIndex extends Component
     public string $title = '';
     public string $slug = '';
     public string $poster = '';
-    public int $credit;
     public string $description = '';
     public string $status = 'active';
 
@@ -49,7 +48,6 @@ class CourseIndex extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'poster' => 'nullable|string|max:255',
-            'credit' => 'required|integer|min:0',
             'description' => 'required|string',
             'status' => 'required|string|max:50',
         ];
@@ -77,7 +75,6 @@ class CourseIndex extends Component
         $this->title = $row->title;
         $this->slug = $row->slug;
         $this->poster = $row->poster;
-        $this->credit = (int) $row->credit;
         $this->description = $row->description;
         $this->status = $row->status;
 
@@ -95,7 +92,6 @@ class CourseIndex extends Component
                 'title' => $this->title,
                 'slug' => Str::slug($this->title),
                 'poster' => $this->poster,
-                'credit' => $this->credit,
                 'description' => $this->description,
                 'status' => $this->status,
             ]
@@ -159,7 +155,6 @@ class CourseIndex extends Component
             'title',
             'slug',
             'poster',
-            'credit',
             'description',
             'status',
         ]);

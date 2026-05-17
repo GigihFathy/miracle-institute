@@ -27,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'dob' => 'date',
+        'google_token_expires_at' => 'datetime',
     ];
 
     public function hasRole(string $role): bool
@@ -41,11 +42,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Role::class, 'role_user')
             ->withPivot('assigned_at')
             ->withTimestamps();
-    }
-
-    public function socialAccounts()
-    {
-        return $this->hasMany(SocialAccount::class);
     }
 
     public function courseEnrollments()
@@ -117,5 +113,11 @@ class User extends Authenticatable implements MustVerifyEmail
                 $q->where('name', $permission);
             })
             ->exists();
+    }
+
+    public function hasGoogleToken(): bool
+    {
+        return !empty($this->google_access_token)
+            && !empty($this->google_refresh_token);
     }
 }

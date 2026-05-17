@@ -1,5 +1,5 @@
-<div class="max-w-6xl mx-auto px-4">
-    <div class="rounded-2xl bg-white border overflow-hidden">
+<div class="w-full">
+    <div class="overflow-hidden rounded-2xl border border-[#004777]/10 bg-white">
         <div class="overflow-x-auto">
             <table {{ $attributes->merge(['class' => 'w-full min-w-full text-sm']) }}>
                 {{ $slot }}

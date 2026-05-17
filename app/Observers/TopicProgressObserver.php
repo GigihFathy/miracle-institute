@@ -2,27 +2,32 @@
 
 namespace App\Observers;
 
+use App\Email\Events\ContentCompleted;
+use App\Events\AssessmentAvailable;
 use App\Models\TopicProgress;
-use App\Events\TopicCompleted;
 use App\Services\LearningProgressService;
-use Illuminate\Support\Facades\DB;
-
-// Topic Progress ['not_started', 'in_progress', 'completed']
 
 class TopicProgressObserver
 {
+    public $afterCommit = true;
+
     public function updated(TopicProgress $topicProgress): void
     {
         if (
             $topicProgress->wasChanged('status') &&
             $topicProgress->status === 'completed'
         ) {
-            DB::afterCommit(function () use ($topicProgress) {
-                event(new TopicCompleted($topicProgress->id));
-            });
+            event(new ContentCompleted('topic_progress', $topicProgress->id));
 
-            app(LearningProgressService::class)
-                ->checkAssessmentAvailability($topicProgress);
+            $assessment = app(LearningProgressService::class)
+                ->getAvailableAssessmentFor($topicProgress);
+
+            if ($assessment) {
+                event(new AssessmentAvailable(
+                    $assessment->id,
+                    $topicProgress->courseEnrollment->user_id
+                ));
+            }
         }
     }
 }

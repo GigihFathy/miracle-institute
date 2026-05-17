@@ -2,9 +2,9 @@
 
 <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-[#004777]">{{ $title }}</h1>
+        <h1 class="text-2xl font-bold text-brand-dark">{{ $title }}</h1>
         @if($subtitle)
-            <p class="mt-1 text-sm text-[#004777]/70">{{ $subtitle }}</p>
+            <p class="mt-1 text-sm text-brand-dark/70">{{ $subtitle }}</p>
         @endif
     </div>
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,13 +16,13 @@
 
         <main class="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
             @if (session('success'))
-                <div class="mb-4 rounded-xl bg-emerald-50 text-emerald-700 px-4 py-3 text-sm border border-emerald-200">
+                <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if (session('error'))
-                <div class="mb-4 rounded-xl bg-rose-50 text-rose-700 px-4 py-3 text-sm border border-rose-200">
+                <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                     {{ session('error') }}
                 </div>
             @endif

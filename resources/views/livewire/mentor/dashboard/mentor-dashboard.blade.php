@@ -1,26 +1,38 @@
 <div class="space-y-6 lg:px-36">
     <x-ui.page-header
-        title="Mentor Dashboard"
-        subtitle="Ringkasan singkat untuk mengelola topic, material, dan progres pembelajaran."
+        title="{{ __('mentor.dashboard.page_title') }}"
+        subtitle="{{ __('mentor.dashboard.page_subtitle') }}"
     />
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-3">
         <div class="rounded-2xl border bg-white p-5">
-            <div class="text-xs uppercase tracking-wide text-[#004777]/60">Topics</div>
+            <div class="text-xs uppercase tracking-wide text-[#004777]/60">
+                {{ __('mentor.dashboard.stats.topics') }}
+            </div>
             <div class="mt-2 text-3xl font-bold text-[#004777]">{{ $mentorTopicsCount }}</div>
-            <div class="mt-1 text-sm text-[#004777]/70">Topik yang kamu kelola</div>
+            <div class="mt-1 text-sm text-[#004777]/70">
+                {{ __('mentor.dashboard.stats.topics_hint') }}
+            </div>
         </div>
 
         <div class="rounded-2xl border bg-white p-5">
-            <div class="text-xs uppercase tracking-wide text-[#004777]/60">Materials</div>
+            <div class="text-xs uppercase tracking-wide text-[#004777]/60">
+                {{ __('mentor.dashboard.stats.materials') }}
+            </div>
             <div class="mt-2 text-3xl font-bold text-[#004777]">{{ $mentorMaterialsCount }}</div>
-            <div class="mt-1 text-sm text-[#004777]/70">Materi yang kamu upload</div>
+            <div class="mt-1 text-sm text-[#004777]/70">
+                {{ __('mentor.dashboard.stats.materials_hint') }}
+            </div>
         </div>
 
         <div class="rounded-2xl border bg-white p-5">
-            <div class="text-xs uppercase tracking-wide text-[#004777]/60">Students</div>
+            <div class="text-xs uppercase tracking-wide text-[#004777]/60">
+                {{ __('mentor.dashboard.stats.students') }}
+            </div>
             <div class="mt-2 text-3xl font-bold text-[#004777]">{{ $mentorStudentsCount }}</div>
-            <div class="mt-1 text-sm text-[#004777]/70">Siswa yang terhubung</div>
+            <div class="mt-1 text-sm text-[#004777]/70">
+                {{ __('mentor.dashboard.stats.students_hint') }}
+            </div>
         </div>
     </div>
 
@@ -28,13 +40,13 @@
         <section class="rounded-2xl border bg-white p-5">
             <div class="mb-8 flex items-end justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-semibold text-[#004777]">Managed Courses</h2>
-                    <p class="text-sm text-[#004777]/70">Daftar course yang bisa kamu kelola.</p>
+                    <h2 class="text-lg font-semibold text-[#004777]">
+                        {{ __('mentor.dashboard.managed_courses.title') }}
+                    </h2>
+                    <p class="text-sm text-[#004777]/70">
+                        {{ __('mentor.dashboard.managed_courses.subtitle') }}
+                    </p>
                 </div>
-
-                <a href="{{ route('mentor.topics.index') }}" class="text-sm font-medium text-[#004777] hover:underline">
-                    View all
-                </a>
             </div>
 
             <div class="divide-y divide-[#004777]/10">
@@ -51,17 +63,19 @@
                             x-bind:aria-expanded="open.toString()"
                         >
                             <div>
-                                <div class="text-sm font-semibold text-[#004777]">{{ $course?->title ?? 'No Course' }}</div>
+                                <div class="text-sm font-semibold text-[#004777]">
+                                    {{ $course?->title ?? __('mentor.dashboard.managed_courses.no_course') }}
+                                </div>
                                 <div class="mt-1 text-xs text-[#004777]/60">
-                                    {{ $course?->studyProgram?->title ?? '-' }} · {{ $courseTopics->count() }} topic
+                                    {{ $course?->studyProgram?->title ?? '-' }} · {{ __('mentor.dashboard.managed_courses.topic_count', ['count' => $courseTopics->count()]) }}
                                 </div>
                             </div>
 
                             <div class="flex items-center gap-3">
                                 <span class="rounded-full border border-[#35A7FF]/30 bg-[#35A7FF]/10 px-2 py-1 text-xs text-[#004777]">
-                                    Active
+                                    {{ __('mentor.dashboard.managed_courses.active_badge') }}
                                 </span>
-                                <span class="text-xs font-medium text-[#004777]/60" x-text="open ? 'Hide' : 'Show'"></span>
+                                <span class="text-xs font-medium text-[#004777]/60" x-text="open ? '{{ __('mentor.dashboard.managed_courses.hide') }}' : '{{ __('mentor.dashboard.managed_courses.show') }}'"></span>
                             </div>
                         </button>
 
@@ -70,12 +84,14 @@
                                 <div class="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
                                     <div class="min-w-0">
                                         <div class="truncate text-sm font-medium text-[#004777]">{{ $topic->name }}</div>
-                                        <div class="text-xs text-[#004777]/60">{{ ucfirst($topic->status) }}</div>
+                                        <div class="text-xs text-[#004777]/60">
+                                            {{ ucfirst($topic->status) }}
+                                        </div>
                                     </div>
 
-                                    <a href="{{ route('mentor.topics.show', $topic->slug) }}"
+                                    <a href="{{ localized_route('mentor.topics.show', $topic->slug) }}"
                                        class="shrink-0 rounded-xl bg-[#004777] px-3 py-2 text-xs font-medium text-white hover:bg-[#003560]">
-                                        Manage
+                                        {{ __('mentor.dashboard.managed_courses.manage') }}
                                     </a>
                                 </div>
                             @endforeach
@@ -83,7 +99,7 @@
                     </div>
                 @empty
                     <div class="rounded-2xl border border-dashed border-[#35A7FF]/30 p-6 text-sm text-[#004777]/60">
-                        Belum ada topic yang kamu kelola.
+                        {{ __('mentor.dashboard.managed_courses.empty') }}
                     </div>
                 @endforelse
             </div>
@@ -91,8 +107,12 @@
 
         <section class="rounded-2xl border bg-white p-5">
             <div class="mb-4">
-                <h2 class="text-lg font-semibold text-[#004777]">Recent Materials</h2>
-                <p class="text-sm text-[#004777]/70">Materi terakhir yang kamu tambahkan.</p>
+                <h2 class="text-lg font-semibold text-[#004777]">
+                    {{ __('mentor.dashboard.recent_materials.title') }}
+                </h2>
+                <p class="text-sm text-[#004777]/70">
+                    {{ __('mentor.dashboard.recent_materials.subtitle') }}
+                </p>
             </div>
 
             <div class="divide-y divide-[#004777]/10">
@@ -112,7 +132,9 @@
                         </div>
                     </div>
                 @empty
-                    <div class="py-6 text-sm text-[#004777]/60">Belum ada materi.</div>
+                    <div class="py-6 text-sm text-[#004777]/60">
+                        {{ __('mentor.dashboard.recent_materials.empty') }}
+                    </div>
                 @endforelse
             </div>
         </section>

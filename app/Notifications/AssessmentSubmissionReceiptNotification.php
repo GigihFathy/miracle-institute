@@ -30,4 +30,14 @@ class AssessmentSubmissionReceiptNotification extends Notification implements Sh
                 'attempt' => $this->attempt,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'attempt_id' => $this->attempt->id,
+            'assessment_id' => $this->attempt->assessment_id,
+            'passed' => $this->attempt->passed,
+            'message' => 'Jawaban assessment kamu berhasil diterima dan sedang diproses.',
+        ];
+    }
 }

@@ -30,7 +30,7 @@ class CertificateService
                 ->lockForUpdate()
                 ->first();
 
-            if ($existing && $existing->status === 'issued' && $existing->file_path) {
+            if ($existing && $existing->status === 'issued') {
                 return $existing;
             }
 
@@ -57,28 +57,12 @@ class CertificateService
 
             $sequence = Certificate::query()
                 ->where('course_id', $course->id)
+                ->where('user_id', $user->id)
                 ->lockForUpdate()
                 ->count() + 1;
 
             $certificateNumber = $this->generateCertificateNumber($course, $sequence);
             $issuedAt = now();
-
-            $payload = [
-                'certificateNumber' => $certificateNumber,
-                'courseCode' => $this->courseCode($course),
-                'course' => $course,
-                'user' => $user,
-                'issuedAt' => $issuedAt,
-                'frontDate' => $this->formatDateLong($issuedAt),
-                'sequenceLabel' => str_pad((string) $sequence, 4, '0', STR_PAD_LEFT),
-                'frontSummary' => $this->buildFrontSummary($course, $user, $topics->count()),
-                'backTopics' => $this->buildBackTopics($course, $user),
-                'achievementSummary' => $this->buildAchievementSummary($course, $user, $topics->count()),
-                'logoBase64' => $this->placeholderImageBase64(),
-            ];
-
-            $pdf = Pdf::loadView('pdf.certificates.course', $payload)
-                ->setPaper('a4', 'portrait');
 
             $certificate = $existing ?? new Certificate();
 
@@ -127,6 +111,7 @@ class CertificateService
         return $pdf->download($filename);
     }
 
+    
     public function buildBackTopics(Course $course, User $user): array
     {
         $topics = $course->topics()
@@ -271,18 +256,9 @@ class CertificateService
     private function formatDateLong(Carbon $date): string
     {
         $months = [
-            1 => 'Januari',
-            2 => 'Februari',
-            3 => 'Maret',
-            4 => 'April',
-            5 => 'Mei',
-            6 => 'Juni',
-            7 => 'Juli',
-            8 => 'Agustus',
-            9 => 'September',
-            10 => 'Oktober',
-            11 => 'November',
-            12 => 'Desember',
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
 
         return $date->format('d') . ' ' . $months[(int) $date->format('n')] . ' ' . $date->format('Y');

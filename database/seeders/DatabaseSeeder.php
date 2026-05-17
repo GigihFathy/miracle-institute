@@ -209,10 +209,10 @@ class DatabaseSeeder extends Seeder
     private function seedCourses(array $programs, string $asset, $now): array
     {
         $rows = [
-            'discipleship-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Foundations', 'slug' => 'discipleship-foundations', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur dasar pemuridan untuk peserta baru.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(6), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
-            'discipleship-growth-track' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Growth Track', 'slug' => 'discipleship-growth-track', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur pengembangan pemuridan yang sedang berjalan dengan 4 dari 8 topik selesai.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'in_progress', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
-            'sermon-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Foundations', 'slug' => 'sermon-foundations', 'poster' => $asset, 'credit' => 3, 'description' => 'Jalur dasar persiapan sermon dan interpretasi teks.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'bagas.wiratama@edunusa.test', '_program_slug' => 'sermon'],
-            'sermon-outreach-lab' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Outreach Lab', 'slug' => 'sermon-outreach-lab', 'poster' => $asset, 'credit' => 2, 'description' => 'Jalur internal yang belum dibuka untuk peserta; topik masih draft.', 'status' => 'inactive', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now, '_phase' => 'pre_learning', '_teacher_email' => 'nadia.prameswari@edunusa.test', '_program_slug' => 'sermon'],
+            'discipleship-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Foundations', 'slug' => 'discipleship-foundations', 'poster' => $asset, 'description' => 'Jalur dasar pemuridan untuk peserta baru.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(6), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
+            'discipleship-growth-track' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Growth Track', 'slug' => 'discipleship-growth-track', 'poster' => $asset, 'description' => 'Jalur pengembangan pemuridan yang sedang berjalan dengan 4 dari 8 topik selesai.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'in_progress', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
+            'sermon-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Foundations', 'slug' => 'sermon-foundations', 'poster' => $asset, 'description' => 'Jalur dasar persiapan sermon dan interpretasi teks.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'bagas.wiratama@edunusa.test', '_program_slug' => 'sermon'],
+            'sermon-outreach-lab' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Outreach Lab', 'slug' => 'sermon-outreach-lab', 'poster' => $asset, 'description' => 'Jalur internal yang belum dibuka untuk peserta; topik masih draft.', 'status' => 'inactive', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now, '_phase' => 'pre_learning', '_teacher_email' => 'nadia.prameswari@edunusa.test', '_program_slug' => 'sermon'],
         ];
 
         DB::table('courses')->insert(array_map(fn ($row) => collect($row)->except(['_phase','_teacher_email','_program_slug'])->all(), $rows));
@@ -278,17 +278,32 @@ class DatabaseSeeder extends Seeder
     private function seedMaterials(array $topicsByCourse, string $asset, $now): array
     {
         $rows = [];
+        $sampleVideoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygURTmV2ZXIgZ2l2ZSB5b3UgdXCgBwE%3D';
+        $samplePdfPath = 'https://drive.google.com/file/d/1r_UteQTPR3zCdBnryhEABjmhvIdmd-sR/view';
+        $samplePptPath = 'https://drive.google.com/file/d/1bcpUpuKY2plw1Pi8e8lC83TDZtPJ0h5O/view';
+
         foreach ($topicsByCourse as $courseSlug => $topics) {
             foreach ($topics as $topic) {
                 foreach (['video', 'pdf', 'ppt'] as $index => $type) {
+                    $path = null;
+                    $externalUrl = null;
+
+                    if ($type === 'video') {
+                        $externalUrl = $sampleVideoUrl;
+                    } elseif ($type === 'pdf') {
+                        $path = $samplePdfPath;
+                    } elseif ($type === 'ppt') {
+                        $path = $samplePptPath;
+                    }
+
                     $rows[] = [
                         'id' => $this->uuid(),
                         'topic_id' => $topic['id'],
                         'uploader_id' => $topic['teacher_id'],
                         'name' => $topic['name'] . ' ' . strtoupper($type),
                         'type' => $type,
-                        'path' => $type === 'video' ? null : 'materials/' . Str::slug($courseSlug . '-' . $topic['name'] . '-' . $type) . '.' . ($type === 'ppt' ? 'ppt' : $type),
-                        'external_url' => $type === 'video' ? 'https://youtu.be/' . Str::lower(Str::random(11)) : null,
+                        'path' => $path,
+                        'external_url' => $externalUrl,
                         'visibility' => 'public',
                         'sort_order' => $index + 1,
                         'status' => $topic['status'] === 'published' ? 'active' : 'inactive',
@@ -298,6 +313,7 @@ class DatabaseSeeder extends Seeder
                 }
             }
         }
+
         DB::table('materials')->insert($rows);
         return $rows;
     }

@@ -17,6 +17,8 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
+        'drive_root_folder' => env('GOOGLE_DRIVE_ROOT_FOLDER'),
+        'youtube_default_privacy' => env('GOOGLE_YOUTUBE_DEFAULT_PRIVACY', 'unlisted'),
     ],
 
     'postmark' => [

@@ -18,7 +18,6 @@ class CourseSeeder extends Seeder
             'title' => 'Foundational Discipleship',
             'slug' => 'foundational-discipleship',
             'poster' => 'images/dummyPNG.png',
-            'credit' => 3,
             'description' => 'Core discipleship topics for new members and mentors',
             'status' => 'active',
         ]);
@@ -28,7 +27,6 @@ class CourseSeeder extends Seeder
             'title' => 'Sermon Basics',
             'slug' => 'sermon-basics',
             'poster' => 'images/dummyPNG.png',
-            'credit' => 4,
             'description' => 'Basic structure and delivery of sermons',
             'status' => 'active',
         ]);

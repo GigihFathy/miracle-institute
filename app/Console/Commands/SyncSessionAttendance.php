@@ -9,6 +9,9 @@ use App\Models\VideoSession;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
+
+
+// Menyesuaikan Session yang sedang on going dan completed dan Attendances berkaitan session tersebut
 class SyncSessionAttendance extends Command
 {
     protected $signature = 'sessions:sync-attendance';
@@ -55,7 +58,7 @@ class SyncSessionAttendance extends Command
                     ->where('end_at', '>', $now)
                     ->exists();
 
-                if (! $topicHasRemainingSessions) {
+                if (!$topicHasRemainingSessions) {
                     TopicProgress::query()
                         ->where('topic_id', $topic->id)
                         ->whereIn('course_enrollment_id', $enrollments->pluck('id'))

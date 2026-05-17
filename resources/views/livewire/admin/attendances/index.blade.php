@@ -1,44 +1,42 @@
-<div x-data="{ open: @entangle('showModal').live }" class="max-w-6xl mx-auto px-4 space-y-6">
-
+<div x-data="{ open: @entangle('showModal').live }" class="space-y-6">
     <x-ui.page-header
-        title="Attendances"
-        subtitle="Kelola absensi peserta per video session."
+        title="{{ __('admin.attendances.page_title') }}"
+        subtitle="{{ __('admin.attendances.page_subtitle') }}"
     >
         <div>
             <button wire:click="create"
-                class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-                + New Attendance
+                class="rounded-xl border border-brand-dark/20 bg-transparent px-4 py-2 text-sm text-brand-dark transition hover:bg-brand/10">
+                {{ __('admin.attendances.actions.create') }}
             </button>
         </div>
     </x-ui.page-header>
 
-    {{-- STATS --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {{-- scope banner removed per UI simplification request --}}
+
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
         @foreach([
-            ['label'=>'Total','value'=>$stats['total']],
-            ['label'=>'Present','value'=>$stats['present']],
-            ['label'=>'Late','value'=>$stats['late']],
-            ['label'=>'Absent','value'=>$stats['absent']],
+            ['label' => __('admin.attendances.stats.total'), 'value' => $stats['total']],
+            ['label' => __('admin.attendances.stats.present'), 'value' => $stats['present']],
+            ['label' => __('admin.attendances.stats.late'), 'value' => $stats['late']],
+            ['label' => __('admin.attendances.stats.absent'), 'value' => $stats['absent']],
         ] as $card)
-            <div class="rounded-2xl bg-white border p-5">
+            <div class="rounded-2xl border bg-white p-5">
                 <div class="text-xs text-slate-500">{{ $card['label'] }}</div>
-                <div class="text-2xl font-bold mt-1">
+                <div class="mt-1 text-2xl font-bold">
                     {{ number_format($card['value']) }}
                 </div>
             </div>
         @endforeach
     </div>
 
-    {{-- FILTER --}}
-    <div class="rounded-2xl bg-white border p-4">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-
+    <div class="rounded-2xl border bg-white p-4">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
             <input wire:model.live="search"
-                class="border rounded-xl px-4 py-2"
-                placeholder="Search user/session...">
+                class="rounded-xl border px-4 py-2"
+                placeholder="{{ __('admin.attendances.search_placeholder') }}">
 
-            <select wire:model.live="topicFilter" class="border rounded-xl px-4 py-2">
-                <option value="">All topics</option>
+            <select wire:model.live="topicFilter" class="rounded-xl border px-4 py-2">
+                <option value="">{{ __('admin.attendances.filters.all_topics') }}</option>
                 @foreach($topics as $topic)
                     <option value="{{ $topic->id }}">
                         {{ $topic->course?->title }} · {{ $topic->name }}
@@ -46,8 +44,8 @@
                 @endforeach
             </select>
 
-            <select wire:model.live="sessionFilter" class="border rounded-xl px-4 py-2">
-                <option value="">All sessions</option>
+            <select wire:model.live="sessionFilter" class="rounded-xl border px-4 py-2">
+                <option value="">{{ __('admin.attendances.filters.all_sessions') }}</option>
                 @foreach($sessions as $session)
                     <option value="{{ $session->id }}">
                         {{ $session->topic?->name }} · {{ $session->title }}
@@ -55,32 +53,30 @@
                 @endforeach
             </select>
 
-            <select wire:model.live="statusFilter" class="border rounded-xl px-4 py-2">
-                <option value="">All status</option>
-                <option value="present">Present</option>
-                <option value="late">Late</option>
-                <option value="absent">Absent</option>
+            <select wire:model.live="statusFilter" class="rounded-xl border px-4 py-2">
+                <option value="">{{ __('admin.attendances.filters.all_status') }}</option>
+                <option value="present">{{ __('admin.attendances.status.present') }}</option>
+                <option value="late">{{ __('admin.attendances.status.late') }}</option>
+                <option value="absent">{{ __('admin.attendances.status.absent') }}</option>
             </select>
 
-            <select wire:model.live="perPage" class="border rounded-xl px-4 py-2">
-                <option value="10">10 / page</option>
-                <option value="25">25 / page</option>
-                <option value="50">50 / page</option>
+            <select wire:model.live="perPage" class="rounded-xl border px-4 py-2">
+                <option value="10">{{ trans_choice('admin.attendances.per_page', 10) }}</option>
+                <option value="25">{{ trans_choice('admin.attendances.per_page', 25) }}</option>
+                <option value="50">{{ trans_choice('admin.attendances.per_page', 50) }}</option>
             </select>
-
         </div>
     </div>
 
-    {{-- TABLE --}}
     <x-ui.table-shell class="table-auto">
         <thead class="bg-slate-50 text-left">
             <tr>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Session</th>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Topic</th>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">User</th>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Status</th>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Check In</th>
-                <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Action</th>
+                <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.attendances.table.session') }}</th>
+                <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.attendances.table.topic') }}</th>
+                <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.attendances.table.user') }}</th>
+                <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.attendances.table.status') }}</th>
+                <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.attendances.table.check_in') }}</th>
+                <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.attendances.table.action') }}</th>
             </tr>
         </thead>
 
@@ -104,36 +100,34 @@
                         <div class="text-xs text-slate-500">{{ $row->user?->email }}</div>
                     </td>
 
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <span class="px-2 py-1 rounded-full text-xs bg-slate-100">
-                            {{ $row->status }}
+                    <td class="whitespace-nowrap px-4 py-3">
+                        <span class="rounded-full bg-slate-100 px-2 py-1 text-xs">
+                            {{ __('admin.attendances.status.' . $row->status, [], $row->status) }}
                         </span>
                     </td>
 
-                    <td class="px-4 py-3 whitespace-nowrap text-sm">
+                    <td class="whitespace-nowrap px-4 py-3 text-sm">
                         {{ $row->check_in_at?->format('d M Y H:i') ?? '-' }}
                     </td>
 
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-2 whitespace-nowrap">
-                            
-                                    <button wire:click="edit('{{ $row->id }}')"
-                                        class="px-3 py-1.5 rounded-lg text-xs bg-blue-100 text-blue-700 hover:bg-blue-200">
-                                        Edit
-                                    </button>
+                            <button wire:click="edit('{{ $row->id }}')"
+                                class="rounded-lg bg-blue-100 px-3 py-1.5 text-xs text-blue-700 hover:bg-blue-200">
+                                {{ __('admin.attendances.actions.edit') }}
+                            </button>
 
-                                    <button wire:click="delete('{{ $row->id }}')"
-                                        class="px-3 py-1.5 rounded-lg text-xs bg-red-100 text-red-700 hover:bg-red-200">
-                                        Delete
-                                    </button>
-
+                            <button wire:click="delete('{{ $row->id }}')"
+                                class="rounded-lg bg-red-100 px-3 py-1.5 text-xs text-red-700 hover:bg-red-200">
+                                {{ __('admin.attendances.actions.delete') }}
+                            </button>
                         </div>
                     </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="6" class="px-4 py-6 text-center text-slate-500">
-                        No attendance records found.
+                        {{ __('admin.attendances.empty') }}
                     </td>
                 </tr>
             @endforelse
@@ -142,7 +136,6 @@
 
     <div>{{ $rows->links() }}</div>
 
-    {{-- MODAL --}}
     <template x-teleport="body">
         <div x-show="open"
             x-cloak
@@ -150,17 +143,17 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
             @click.self="open=false; $wire.set('showModal', false)">
 
-            <div class="bg-white w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl p-6 space-y-4">
+            <div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 space-y-4">
 
-                <div class="flex justify-between items-center">
+                <div class="flex items-center justify-between">
                     <h2 class="text-lg font-semibold">
-                        {{ $editingId ? 'Edit Attendance' : 'New Attendance' }}
+                        {{ $editingId ? __('admin.attendances.modal.edit_title') : __('admin.attendances.modal.create_title') }}
                     </h2>
                     <button @click="open=false; $wire.set('showModal', false)">✕</button>
                 </div>
 
-                <select wire:model="video_session_id" class="w-full border rounded-xl px-4 py-2">
-                    <option value="">Select session</option>
+                <select wire:model="video_session_id" class="w-full rounded-xl border px-4 py-2">
+                    <option value="">{{ __('admin.attendances.form.select_session') }}</option>
                     @foreach($sessions as $session)
                         <option value="{{ $session->id }}">
                             {{ $session->topic?->name }} · {{ $session->title }}
@@ -168,8 +161,8 @@
                     @endforeach
                 </select>
 
-                <select wire:model="user_id" class="w-full border rounded-xl px-4 py-2">
-                    <option value="">Select user</option>
+                <select wire:model="user_id" class="w-full rounded-xl border px-4 py-2">
+                    <option value="">{{ __('admin.attendances.form.select_user') }}</option>
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">
                             {{ $user->full_name }} · {{ $user->email }}
@@ -177,33 +170,32 @@
                     @endforeach
                 </select>
 
-                <select wire:model="status" class="w-full border rounded-xl px-4 py-2">
-                    <option value="present">Present</option>
-                    <option value="late">Late</option>
-                    <option value="absent">Absent</option>
+                <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
+                    <option value="present">{{ __('admin.attendances.status.present') }}</option>
+                    <option value="late">{{ __('admin.attendances.status.late') }}</option>
+                    <option value="absent">{{ __('admin.attendances.status.absent') }}</option>
                 </select>
 
                 <input wire:model="check_in_at" type="datetime-local"
-                    class="w-full border rounded-xl px-4 py-2">
+                    class="w-full rounded-xl border px-4 py-2">
 
                 <input wire:model="ip_address"
-                    class="w-full border rounded-xl px-4 py-2"
-                    placeholder="IP Address">
+                    class="w-full rounded-xl border px-4 py-2"
+                    placeholder="{{ __('admin.attendances.form.ip_address_placeholder') }}">
 
                 <div class="flex justify-end gap-2 pt-2">
                     <button @click="open=false; $wire.set('showModal', false)"
-                        class="px-4 py-2 border rounded-xl">
-                        Cancel
+                        class="rounded-xl border px-4 py-2">
+                        {{ __('admin.attendances.actions.cancel') }}
                     </button>
 
                     <button wire:click="save"
-                        class="px-4 py-2 bg-slate-900 text-white rounded-xl">
-                        Save
+                        class="rounded-xl border border-brand-dark/20 bg-transparent px-4 py-2 text-brand-dark transition hover:bg-brand/10">
+                        {{ __('admin.attendances.actions.save') }}
                     </button>
                 </div>
 
             </div>
         </div>
     </template>
-
 </div>

@@ -21,7 +21,6 @@ class CourseFactory extends Factory
             'title' => $title,
             'slug' => Str::slug($title),
             'poster' => 'courses/default.jpg',
-            'credit' => $this->faker->numberBetween(1, 6),
             'description' => $this->faker->paragraph(),
             'status' => 'active',
         ];

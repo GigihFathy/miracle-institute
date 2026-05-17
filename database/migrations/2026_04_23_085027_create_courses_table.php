@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('poster')->nullable();
-            $table->unsignedInteger('credit')->default(0);
             $table->longText('description')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();

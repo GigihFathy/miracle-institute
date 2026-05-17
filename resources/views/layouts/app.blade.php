@@ -10,12 +10,12 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 text-[#004777]">
+<body class="bg-slate-50 text-slate-700">
     <div class="min-h-screen flex">
-        @include('layouts.partials.sidebar')
+        @include('layouts.partials.admin-sidebar')
 
         <div class="flex-1 lg:pl-72">
-            @include('layouts.partials.topbar')
+            @include('layouts.partials.admin-topbar')
 
             <main class="p-4 sm:p-6 lg:p-8">
                 @if (session('success'))
@@ -30,11 +30,6 @@
                     </div>
                 @endif
                 
-                @auth
-                    <div class="mb-6">
-                        @livewire('shared.role-switcher')
-                    </div>
-                @endauth
                 {{ $slot }}
             </main>
         </div>

@@ -1,155 +1,140 @@
-<div x-data="{ open: @entangle('showModal').live }" class="max-w-6xl mx-auto px-4 space-y-6">
-
+<div x-data="{ open: @entangle('showModal').live }" class="space-y-6">
     <x-ui.page-header
-        title="Topics"
-        subtitle="Halaman utama topic. Semua detail content berada di bawah course yang relevan."
+        title="{{ __('admin.topics.page_title') }}"
+        subtitle="{{ __('admin.topics.page_subtitle') }}"
     >
-        <button wire:click="create"
-            class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm">
-            + New Topic
-        </button>
+        <div class="flex items-center gap-2">
+            @if($selectedCourse)
+                <a href="{{ localized_route('admin.courses.index') }}"
+                   class="rounded-xl border px-4 py-2 text-sm">
+                    Back
+                </a>
+            @endif
+
+            <button wire:click="create"
+                class="rounded-xl border border-brand-dark/20 bg-transparent px-4 py-2 text-sm text-brand-dark transition hover:bg-brand/10">
+                {{ __('admin.topics.actions.create') }}
+            </button>
+        </div>
     </x-ui.page-header>
 
-    {{-- STATS --}}
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-        @foreach([
-            ['Courses', $stats['courses']],
-            ['Topics', $stats['topics']],
-            ['Materials', $stats['materials']],
-            ['Sessions', $stats['sessions']],
-            ['Certificates', $stats['certificates']],
-        ] as [$label, $value])
-            <div class="rounded-2xl bg-white border p-5">
-                <div class="text-xs text-slate-500">{{ $label }}</div>
-                <div class="text-2xl font-bold mt-1">
-                    {{ number_format($value) }}
-                </div>
-            </div>
-        @endforeach
-    </div>
+    @if($selectedCourse)
+        <div class="rounded-2xl border bg-white p-4">
+            <div class="text-xs text-slate-500">Selected Course</div>
+            <div class="mt-1 text-lg font-semibold text-slate-900">{{ $selectedCourse->title }}</div>
+        </div>
+    @endif
 
-    {{-- TABLE --}}
     <section class="space-y-4">
-
-        <div class="rounded-2xl bg-white border p-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-
+        <div class="rounded-2xl border bg-white p-4">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <input wire:model.live="search"
-                    class="border rounded-xl px-4 py-2"
-                    placeholder="Search topic...">
-
-                <select wire:model.live="courseFilter"
-                    class="border rounded-xl px-4 py-2">
-                    <option value="">All courses</option>
-                    @foreach($courses as $course)
-                        <option value="{{ $course->id }}">{{ $course->title }}</option>
-                    @endforeach
-                </select>
+                    class="rounded-xl border px-4 py-2"
+                    placeholder="{{ __('admin.topics.search_placeholder') }}">
 
                 <select wire:model.live="teacherFilter"
-                    class="border rounded-xl px-4 py-2">
-                    <option value="">All teachers</option>
+                    class="rounded-xl border px-4 py-2">
+                    <option value="">{{ __('admin.topics.filters.all_teachers') }}</option>
                     @foreach($teachers as $teacher)
                         <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option>
                     @endforeach
                 </select>
 
                 <select wire:model.live="statusFilter"
-                    class="border rounded-xl px-4 py-2">
-                    <option value="">All status</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                    <option value="draft">Draft</option>
+                    class="rounded-xl border px-4 py-2">
+                    <option value="">{{ __('admin.topics.filters.all_status') }}</option>
+                    <option value="published">{{ __('admin.topics.status.published') }}</option>
+                    <option value="archived">{{ __('admin.topics.status.archived') }}</option>
+                    <option value="draft">{{ __('admin.topics.status.draft') }}</option>
                 </select>
-
             </div>
         </div>
 
         <x-ui.table-shell class="table-auto">
             <thead class="bg-slate-50 text-left">
                 <tr>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Course</th>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Topic</th>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Teacher</th>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Order</th>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Content</th>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Status</th>
-                    <th class="px-4 py-3 font-medium text-slate-600 whitespace-nowrap">Action</th>
+                    <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.topics.table.topic') }}</th>
+                    <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.topics.table.teacher') }}</th>
+                    <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.topics.table.order') }}</th>
+                    <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.topics.table.content') }}</th>
+                    <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.topics.table.status') }}</th>
+                    <th class="whitespace-nowrap px-4 py-3 font-medium text-slate-600">{{ __('admin.topics.table.action') }}</th>
                 </tr>
             </thead>
 
             <tbody class="divide-y divide-slate-100 bg-white">
                 @forelse($rows as $row)
                     <tr class="align-top">
-                        <td class="px-4 py-3 whitespace-nowrap">{{ $row->course?->title }}</td>
-
                         <td class="px-4 py-3">
                             <div class="font-medium text-slate-900">{{ $row->name }}</div>
                             <div class="text-xs text-slate-500">{{ $row->category }}</div>
                         </td>
 
-                        <td class="px-4 py-3 whitespace-nowrap">{{ $row->teacher?->full_name }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">{{ $row->sort_order }}</td>
+                        <td class="whitespace-nowrap px-4 py-3">{{ $row->teacher?->full_name }}</td>
+                        <td class="whitespace-nowrap px-4 py-3">{{ $row->sort_order }}</td>
 
                         <td class="px-4 py-3 text-xs text-slate-500">
-                            Materials: {{ $row->materials_count }}<br>
-                            Sessions: {{ $row->video_sessions_count }}<br>
-                            Certificates: {{ $row->certificates_count }}
+                            {{ __('admin.topics.metrics.materials', ['count' => $row->materials_count]) }}<br>
+                            {{ __('admin.topics.metrics.sessions', ['count' => $row->video_sessions_count]) }}<br>
+                            {{ __('admin.topics.metrics.certificates', ['count' => $row->certificates_count]) }}
                         </td>
 
-                        <td class="px-4 py-3 whitespace-nowrap">
-                            <span class="px-2 py-1 rounded-full text-xs bg-slate-100">
-                                {{ $row->status }}
+                        <td class="whitespace-nowrap px-4 py-3">
+                            <span class="rounded-full bg-slate-100 px-2 py-1 text-xs">
+                                {{ __('admin.topics.status.' . $row->status, [], $row->status) }}
                             </span>
                         </td>
 
                         <td class="px-4 py-3">
                             <div class="flex flex-wrap gap-2">
-                                
-                                <a href="{{ route('admin.materials.index', ['topicFilter' => $row->id]) }}"
-                                   class="px-3 py-1.5 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
-                                    Materials
+                                <a href="{{ localized_route('admin.materials.index', ['topicFilter' => $row->id]) }}"
+                                   class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
+                                    {{ __('admin.topics.actions.materials') }}
                                 </a>
 
-                                <a href="{{ route('admin.sessions.index', ['topicFilter' => $row->id]) }}"
-                                   class="px-3 py-1.5 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
-                                    Sessions
+                                <a href="{{ localized_route('admin.sessions.index', ['topicFilter' => $row->id]) }}"
+                                   class="rounded-lg bg-slate-100 px-3 py-1.5 text-xs hover:bg-slate-200">
+                                    {{ __('admin.topics.actions.sessions') }}
                                 </a>
 
-                                <a href="{{ route('admin.assessments.index', ['topicFilter' => $row->id]) }}"
-                                   class="px-3 py-1.5 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
-                                    Assessments
-                                </a>
+                                {{-- Assessments & Certificates actions removed from topic row — available on Courses page only --}}
 
-                                <a href="{{ route('admin.attendances.index', ['topicFilter' => $row->id]) }}"
-                                   class="px-3 py-1.5 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
-                                    Attendances
-                                </a>
+                                <div class="my-1 w-full border-t"></div>
 
-                                <a href="{{ route('admin.certificates.index', ['topicFilter' => $row->id]) }}"
-                                   class="px-3 py-1.5 rounded-lg text-xs bg-slate-100 hover:bg-slate-200">
-                                    Certificates
-                                </a>
+                                <div class="relative group">
+                                    <button wire:click="edit('{{ $row->id }}')"
+                                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition hover:bg-blue-100"
+                                        title="{{ __('admin.topics.actions.edit') }}">
+                                        <span class="sr-only">{{ __('admin.topics.actions.edit') }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4 w-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a2.25 2.25 0 1 1 3.182 3.182L10.582 17.13a4.5 4.5 0 0 1-1.897 1.13L6 19l.74-2.685a4.5 4.5 0 0 1 1.13-1.897L16.862 4.487ZM16.862 4.487 19.5 7.125" />
+                                        </svg>
+                                    </button>
+                                    <span class="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-brand-dark/20 bg-white px-2 py-1 text-[11px] font-medium text-brand-dark opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
+                                        {{ __('admin.topics.actions.edit') }}
+                                    </span>
+                                </div>
 
-                                <div class="w-full border-t my-1"></div>
-
-                                <button wire:click="edit('{{ $row->id }}')"
-                                    class="px-3 py-1.5 rounded-lg text-xs bg-blue-100 text-blue-700 hover:bg-blue-200">
-                                    Edit
-                                </button>
-
-                                <button wire:click="delete('{{ $row->id }}')"
-                                    class="px-3 py-1.5 rounded-lg text-xs bg-red-100 text-red-700 hover:bg-red-200">
-                                    Delete
-                                </button>
-
+                                <div class="relative group">
+                                    <button wire:click="delete('{{ $row->id }}')"
+                                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600 transition hover:bg-rose-100"
+                                        title="{{ __('admin.topics.actions.delete') }}">
+                                        <span class="sr-only">{{ __('admin.topics.actions.delete') }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4 w-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673A2.25 2.25 0 0 1 15.916 21.75H8.084a2.25 2.25 0 0 1-2.245-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                    <span class="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-brand-dark/20 bg-white px-2 py-1 text-[11px] font-medium text-brand-dark opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
+                                        {{ __('admin.topics.actions.delete') }}
+                                    </span>
+                                </div>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-6 text-center text-slate-500">
-                            No data.
+                        <td colspan="6" class="px-4 py-6 text-center text-slate-500">
+                            {{ __('admin.topics.empty') }}
                         </td>
                     </tr>
                 @endforelse
@@ -157,28 +142,23 @@
         </x-ui.table-shell>
 
         <div>{{ $rows->links() }}</div>
-
     </section>
 
-    {{-- MODAL --}}
     <template x-teleport="body">
-        <div 
+        <div
             x-show="open"
             x-cloak
             x-transition
             @click.self="open = false; $wire.set('showModal', false)"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
         >
-
-            <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
-
-                <!-- HEADER -->
-                <div class="flex justify-between items-center p-5 border-b">
+            <div class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b p-5">
                     <h2 class="text-lg font-semibold">
-                        {{ $editingId ? 'Edit Topic' : 'New Topic' }}
+                        {{ $editingId ? __('admin.topics.modal.edit_title') : __('admin.topics.modal.create_title') }}
                     </h2>
 
-                    <button 
+                    <button
                         @click="open = false; $wire.set('showModal', false)"
                         class="text-slate-500 hover:text-black"
                     >
@@ -186,65 +166,60 @@
                     </button>
                 </div>
 
-                <!-- BODY (SCROLL AREA) -->
-                <div class="p-5 space-y-4 overflow-y-auto">
+                <div class="space-y-4 overflow-y-auto p-5">
+                    @if($selectedCourse)
+                        <input
+                            value="{{ $selectedCourse->title }}"
+                            disabled
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-slate-600"
+                        >
+                    @endif
 
-                    <select wire:model="course_id" class="w-full border rounded-xl px-4 py-2">
-                        <option value="">Select course</option>
-                        @foreach($courses as $course)
-                            <option value="{{ $course->id }}">{{ $course->title }}</option>
-                        @endforeach
-                    </select>
-
-                    <select wire:model="teacher_id" class="w-full border rounded-xl px-4 py-2">
-                        <option value="">Select teacher</option>
+                    <select wire:model="teacher_id" class="w-full rounded-xl border px-4 py-2">
+                        <option value="">{{ __('admin.topics.form.select_teacher') }}</option>
                         @foreach($teachers as $teacher)
                             <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option>
                         @endforeach
                     </select>
 
-                    <input wire:model="name" class="w-full border rounded-xl px-4 py-2" placeholder="Name">
-        
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <select wire:model="visibility" class="w-full border rounded-xl px-4 py-2">
-                            <option value="Public">Public</option>
-                            <option value="Private">Private</option>
+                    <input wire:model="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.name_placeholder') }}">
+
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <select wire:model="visibility" class="w-full rounded-xl border px-4 py-2">
+                            <option value="Public">{{ __('admin.topics.visibility.public') }}</option>
+                            <option value="Private">{{ __('admin.topics.visibility.private') }}</option>
                         </select>
 
-                        <select wire:model="status" class="w-full border rounded-xl px-4 py-2">
-                            <option value="published">Published</option>
-                            <option value="archived">Archived</option>
-                            <option value="draft">Draft</option>
+                        <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
+                            <option value="published">{{ __('admin.topics.status.published') }}</option>
+                            <option value="archived">{{ __('admin.topics.status.archived') }}</option>
+                            <option value="draft">{{ __('admin.topics.status.draft') }}</option>
                         </select>
                     </div>
 
-                    <input wire:model="sort_order" type="number" class="w-full border rounded-xl px-4 py-2" placeholder="Sort order">
+                    <input wire:model="sort_order" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.sort_order_placeholder') }}">
 
-                    <textarea wire:model="description" rows="4" class="w-full border rounded-xl px-4 py-2" placeholder="Description"></textarea>
-
+                    <textarea wire:model="description" rows="4" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.description_placeholder') }}"></textarea>
                 </div>
 
-                <!-- FOOTER -->
-                <div class="flex justify-between items-center p-5 border-t bg-slate-50">
+                <div class="flex items-center justify-between border-t bg-slate-50 p-5">
                     <div class="flex gap-2">
-                        <button 
+                        <button
                             @click="open = false; $wire.set('showModal', false)"
-                            class="px-4 py-2 border rounded-xl"
+                            class="rounded-xl border px-4 py-2"
                         >
-                            Cancel
+                            {{ __('admin.topics.actions.cancel') }}
                         </button>
 
-                        <button 
+                        <button
                             wire:click="save"
-                            class="px-4 py-2 bg-slate-900 text-white rounded-xl"
+                            class="rounded-xl border border-brand-dark/20 bg-transparent px-4 py-2 text-brand-dark transition hover:bg-brand/10"
                         >
-                            Save
+                            {{ __('admin.topics.actions.save') }}
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
     </template>
-
 </div>

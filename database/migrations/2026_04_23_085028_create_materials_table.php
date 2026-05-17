@@ -20,7 +20,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('name')->default('Unnamed File');
-            $table->string('type'); // video, pdf, ppt, link, assessment
+            $table->string('type'); // video, pdf, ppt
             $table->string('path')->nullable();
             $table->string('external_url')->nullable();
 

@@ -1,20 +1,53 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Authentication Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used during authentication for various
-    | messages that we need to display to the user. You are free to modify
-    | these language lines according to your application's requirements.
-    |
-    */
-
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+
+    'login' => [
+        'title' => 'Login',
+        'subtitle' => 'Login to continue.',
+        'email_placeholder' => 'Email',
+        'password_placeholder' => 'Password',
+        'remember_me' => 'Remember me',
+        'submit' => 'Login',
+        'forgot_password' => 'Forgot password?',
+        'create_account' => 'Create account',
+    ],
+
+    'register' => [
+        'title' => 'Sign Up',
+        'subtitle' => 'Create a new account.',
+        'name_placeholder' => 'Name',
+        'email_placeholder' => 'Email',
+        'password_placeholder' => 'Password',
+        'confirm_password_placeholder' => 'Confirm password',
+        'submit' => 'Create account',
+        'already_have_account' => 'Already have an account?',
+    ],
+
+    'forgot_password' => [
+        'title' => 'Forgot Password',
+        'subtitle' => 'Enter your email to receive a reset link.',
+        'email_placeholder' => 'Email',
+        'submit' => 'Send reset link',
+        'back_to_login' => 'Back to login',
+    ],
+
+    'reset_password' => [
+        'title' => 'Reset Password',
+        'subtitle' => 'Create a new password.',
+        'email_placeholder' => 'Email',
+        'password_placeholder' => 'New password',
+        'confirm_password_placeholder' => 'Confirm new password',
+        'submit' => 'Reset password',
+    ],
+
+    'verify_email' => [
+        'title' => 'Verify your email',
+        'subtitle' => 'Check your inbox. If you have not received it, resend the verification link.',
+        'submit' => 'Resend verification email',
+    ],
 
 ];

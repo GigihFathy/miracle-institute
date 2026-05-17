@@ -2,17 +2,17 @@
     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h2 class="text-xl font-semibold tracking-tight text-slate-900">
-                Students
+                {{ __('mentor.topic_tabs.students.title') }}
             </h2>
 
             <p class="mt-1 text-sm text-slate-500">
-                Monitoring progress student pada topic ini.
+                {{ __('mentor.topic_tabs.students.subtitle') }}
             </p>
         </div>
 
         @if($canManageStudents)
-            <span class="inline-flex items-center rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">
-                Student Manager
+            <span class="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white">
+                {{ __('mentor.topic_tabs.students.manager_badge') }}
             </span>
         @endif
     </div>
@@ -42,15 +42,15 @@
                 <thead class="bg-slate-50">
                     <tr class="text-left">
                         <th class="px-5 py-4 font-medium text-slate-600">
-                            Student
+                            {{ __('mentor.topic_tabs.students.table.student') }}
                         </th>
 
                         <th class="px-5 py-4 font-medium text-slate-600">
-                            Progress
+                            {{ __('mentor.topic_tabs.students.table.progress') }}
                         </th>
 
                         <th class="px-5 py-4 font-medium text-slate-600">
-                            Status
+                            {{ __('mentor.topic_tabs.students.table.status') }}
                         </th>
                     </tr>
                 </thead>
@@ -99,11 +99,11 @@
                             <td colspan="3" class="px-6 py-14">
                                 <div class="text-center">
                                     <div class="text-sm font-medium text-slate-700">
-                                        Belum ada student
+                                        {{ __('mentor.topic_tabs.students.empty.title') }}
                                     </div>
 
                                     <p class="mt-2 text-sm text-slate-500">
-                                        Enrollment student pada topic ini masih kosong.
+                                        {{ __('mentor.topic_tabs.students.empty.description') }}
                                     </p>
                                 </div>
                             </td>

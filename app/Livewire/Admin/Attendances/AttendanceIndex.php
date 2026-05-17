@@ -156,6 +156,9 @@ class AttendanceIndex extends Component
             'topics' => Topic::with('course')->orderBy('name')->get(),
             'sessions' => VideoSession::with('topic.course')->orderByDesc('start_at')->get(),
             'users' => User::orderBy('name')->get(),
+            'selectedCourse' => $this->courseFilter ? Course::find($this->courseFilter) : null,
+            'selectedTopic' => $this->topicFilter ? Topic::with('course')->find($this->topicFilter) : null,
+            'selectedSession' => $this->sessionFilter ? VideoSession::with('topic.course')->find($this->sessionFilter) : null,
             'stats' => [
                 'total' => (clone $baseQuery)->count(),
                 'present' => (clone $baseQuery)->where('status', 'present')->count(),

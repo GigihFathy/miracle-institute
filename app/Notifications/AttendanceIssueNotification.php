@@ -13,7 +13,8 @@ class AttendanceIssueNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public Attendance $attendance
+        public Attendance $attendance,
+        public string $issueType
     ) {}
 
     public function via($notifiable): array
@@ -23,11 +24,27 @@ class AttendanceIssueNotification extends Notification implements ShouldQueue
 
     public function toMail($notifiable): MailMessage
     {
+        $subject = $this->issueType === 'late_join'
+            ? 'Reminder: Anda Bergabung Terlambat di Sesi'
+            : 'Peringatan: Absen dari Sesi';
+
         return (new MailMessage)
-            ->subject('Kendala Kehadiran')
+            ->subject($subject)
             ->view('emails.attendances.issue', [
                 'notifiable' => $notifiable,
                 'attendance' => $this->attendance,
+                'issueType' => $this->issueType,
             ]);
+    }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'attendance_id' => $this->attendance->id,
+             // 'issue_type' => $this->issueType,
+            'message' => $this->issueType === 'late_join' 
+                ? 'Anda tercatat terlambat bergabung ke dalam sesi.' 
+                : 'Anda tercatat absen dari sesi yang telah dijadwalkan.',
+        ];
     }
 }

@@ -29,6 +29,7 @@ class CourseShow extends Component
     public array $topicStatusMap = [];
 
     public ?Assessment $assessment = null;
+    public bool $hasStudentFinishedAssessment = false;
     public ?array $assessmentMeta = null;
 
     public bool $showAssessmentModal = false;
@@ -69,6 +70,15 @@ class CourseShow extends Component
         $this->assessment = $this->course->assessment && $this->course->assessment->status === 'active'
             ? $this->course->assessment
             : null;
+        
+        $this->hasStudentFinishedAssessment = $this->assessment
+            ? AssessmentAttempt::query()
+                ->where('assessment_id', $this->assessment->id)
+                ->where('user_id', auth()->id())
+                ->whereNotNull('submitted_at')
+                ->where('passed', true)
+                ->exists()
+            : false;
 
         $this->buildAssessmentMeta();
 

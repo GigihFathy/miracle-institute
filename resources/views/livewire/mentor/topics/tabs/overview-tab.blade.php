@@ -3,30 +3,30 @@
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
                 <h2 class="text-xl font-semibold tracking-tight text-slate-900">
-                    Topic Overview
+                    {{ __('mentor.topic_tabs.overview.title') }}
                 </h2>
 
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-                    {{ $topic->description ?: 'Belum ada deskripsi topic.' }}
+                    {{ $topic->description ?: __('mentor.topic_tabs.overview.no_description') }}
                 </p>
             </div>
 
             <div class="flex flex-wrap gap-2">
                 @if($canManageMaterials)
                     <span class="inline-flex items-center rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white">
-                        Materials Access
+                        {{ __('mentor.topic_tabs.overview.access.materials') }}
                     </span>
                 @endif
 
                 @if($canManageSessions)
                     <span class="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-medium text-white">
-                        Sessions Access
+                        {{ __('mentor.topic_tabs.overview.access.sessions') }}
                     </span>
                 @endif
 
                 @if($canManageStudents)
                     <span class="inline-flex items-center rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white">
-                        Students Access
+                        {{ __('mentor.topic_tabs.overview.access.students') }}
                     </span>
                 @endif
             </div>
@@ -35,7 +35,7 @@
         <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Category
+                    {{ __('mentor.topic_tabs.overview.cards.category') }}
                 </div>
 
                 <div class="mt-2 text-sm font-semibold text-slate-900">
@@ -45,7 +45,7 @@
 
             <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Visibility
+                    {{ __('mentor.topic_tabs.overview.cards.visibility') }}
                 </div>
 
                 <div class="mt-2 text-sm font-semibold text-slate-900">
@@ -55,7 +55,7 @@
 
             <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Materials
+                    {{ __('mentor.topic_tabs.overview.cards.materials') }}
                 </div>
 
                 <div class="mt-2 text-sm font-semibold text-slate-900">
@@ -65,7 +65,7 @@
 
             <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
-                    Session Status
+                    {{ __('mentor.topic_tabs.overview.cards.session_status') }}
                 </div>
 
                 <div class="mt-2">

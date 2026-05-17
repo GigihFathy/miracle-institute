@@ -1,15 +1,18 @@
-<div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
-    <section class="rounded-3xl bg-white border p-8 text-center shadow-sm">
+<div class="mx-auto max-w-4xl space-y-6 p-4 sm:p-6">
+    <section class="rounded-3xl border bg-white p-8 text-center shadow-sm">
         <div class="text-xs uppercase tracking-wide text-slate-400">
-            Assessment Result
+            {{ __('general.assessment_result.title') }}
         </div>
 
-        <h1 class="text-3xl font-bold mt-3">
-            {{ $assessment?->title ?? 'Assessment' }}
+        <h1 class="mt-3 text-3xl font-bold">
+            {{ $assessment?->title ?? __('general.assessment_result.default_title') }}
         </h1>
 
         <p class="mt-3 text-sm text-slate-500">
-            Course: {{ $assessment?->course?->title ?? '-' }} · Attempt #{{ $attempt->attempt_no }}
+            {{ __('general.assessment_result.course_attempt', [
+                'course' => $assessment?->course?->title ?? '-',
+                'no' => $attempt->attempt_no,
+            ]) }}
         </p>
 
         <div class="mt-8 text-6xl font-bold">
@@ -17,70 +20,70 @@
         </div>
 
         <div class="mt-3 text-lg font-semibold {{ $attempt->passed ? 'text-emerald-700' : 'text-rose-700' }}">
-            {{ $attempt->passed ? 'PASSED' : 'FAILED' }}
+            {{ $attempt->passed ? __('general.assessment_result.status.passed') : __('general.assessment_result.status.failed') }}
         </div>
 
-        <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm text-left">
+        <div class="mt-6 grid grid-cols-2 gap-3 text-left text-sm sm:grid-cols-4">
             <div class="rounded-2xl border bg-slate-50 p-4">
-                <div class="text-xs text-slate-500">Correct</div>
+                <div class="text-xs text-slate-500">{{ __('general.assessment_result.metrics.correct') }}</div>
                 <div class="mt-1 font-semibold">{{ $correctAnswers }}</div>
             </div>
 
             <div class="rounded-2xl border bg-slate-50 p-4">
-                <div class="text-xs text-slate-500">Wrong</div>
+                <div class="text-xs text-slate-500">{{ __('general.assessment_result.metrics.wrong') }}</div>
                 <div class="mt-1 font-semibold">{{ $wrongAnswers }}</div>
             </div>
 
             <div class="rounded-2xl border bg-slate-50 p-4">
-                <div class="text-xs text-slate-500">Unanswered</div>
+                <div class="text-xs text-slate-500">{{ __('general.assessment_result.metrics.unanswered') }}</div>
                 <div class="mt-1 font-semibold">{{ $unansweredQuestions }}</div>
             </div>
 
             <div class="rounded-2xl border bg-slate-50 p-4">
-                <div class="text-xs text-slate-500">Passing Grade</div>
+                <div class="text-xs text-slate-500">{{ __('general.assessment_result.metrics.passing_grade') }}</div>
                 <div class="mt-1 font-semibold">{{ $assessment?->passing_grade ?? '-' }}%</div>
             </div>
         </div>
 
-        <div class="mt-6 rounded-2xl border p-4 text-left {{ $attempt->passed ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200' }}">
+        <div class="mt-6 rounded-2xl border p-4 text-left {{ $attempt->passed ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50' }}">
             <div class="font-semibold {{ $attempt->passed ? 'text-emerald-800' : 'text-rose-800' }}">
-                {{ $attempt->passed ? 'Kelulusan assessment tercapai.' : 'Assessment belum lulus.' }}
+                {{ $attempt->passed ? __('general.assessment_result.notice.passed') : __('general.assessment_result.notice.failed') }}
             </div>
-            <div class="mt-1 text-sm text-slate-700 leading-6">
+            <div class="mt-1 text-sm leading-6 text-slate-700">
                 {{ $attempt->passed
-                    ? 'Jika seluruh topik course sudah selesai, certificate akan disinkronkan otomatis oleh backend.'
-                    : 'Anda dapat mengulang assessment sampai lulus. Remedial attempt tersedia tanpa batas selama course masih aktif.' }}
+                    ? __('general.assessment_result.notice.passed_description')
+                    : __('general.assessment_result.notice.failed_description') }}
             </div>
         </div>
 
         @if($certificate)
             <div class="mt-6 rounded-2xl border bg-slate-50 p-4 text-left">
-                <div class="text-xs uppercase tracking-wide text-slate-400">Certificate</div>
+                <div class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.assessment_result.certificate.title') }}</div>
                 <div class="mt-1 font-semibold">
                     {{ $certificate->certificate_number }}
                 </div>
-                <div class="text-sm text-slate-600 mt-1">
-                    Status: {{ strtoupper($certificate->status) }}
+                <div class="mt-1 text-sm text-slate-600">
+                    {{ __('general.assessment_result.certificate.status', ['status' => strtoupper($certificate->status)]) }}
                 </div>
             </div>
         @endif
 
         <div class="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="{{ route('learning.dashboard') }}"
-               class="px-5 py-3 rounded-xl bg-slate-900 text-white text-sm">
-                Back to Dashboard
+            <a href="{{ localized_route('learning.dashboard') }}"
+               class="rounded-xl bg-slate-900 px-5 py-3 text-sm text-white">
+                {{ __('general.assessment_result.actions.back_to_dashboard') }}
             </a>
 
             @unless($attempt->passed)
-                <a href="{{ route('assessments.take', $assessment->id) }}"
-                   class="px-5 py-3 rounded-xl border text-sm">
-                    Retry Assessment
+                <a href="{{ localized_route('assessments.take', $assessment->id) }}"
+                   class="rounded-xl border px-5 py-3 text-sm">
+                    {{ __('general.assessment_result.actions.retry') }}
                 </a>
             @endunless
 
-            <a href="{{ route('certificates.index') }}"
-               class="px-5 py-3 rounded-xl border text-sm">
-                View Certificates
+            <a href="{{ localized_route('certificates.index') }}"
+               class="rounded-xl border px-5 py-3 text-sm">
+                {{ __('general.assessment_result.actions.view_certificates') }}
             </a>
         </div>
     </section>

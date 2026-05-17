@@ -34,11 +34,6 @@
             'value' => optional($enrollment->completed_at)->format('d M Y H:i')
         ])
 
-        @include('emails.partials.meta-row', [
-            'label' => 'Total Kredit',
-            'value' => $enrollment->course->credit . ' SKS'
-        ])
-
     </table>
 
     <table role="presentation"

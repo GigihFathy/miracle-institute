@@ -8,7 +8,7 @@
     <section class="overflow-hidden rounded-3xl bg-[#004777] text-white origin-top">
         @if($isGuest || $isMentor)
             <div x-data="slider()" x-init="init()" class="relative">
-                <div class="relative h-[340px] sm:h-[380px] overflow-hidden">
+                <div class="relative h-[340px] overflow-hidden sm:h-[380px]">
                     <template x-for="(slide, index) in slides" :key="index">
                         <img
                             x-show="active === index"
@@ -22,24 +22,24 @@
 
                     <div class="relative z-10 flex h-full items-center px-6 sm:px-8 lg:px-10">
                         <div class="max-w-xl space-y-3">
-                            <h1 class="text-3xl sm:text-4xl font-bold leading-tight">
-                                Walking in Miracles, Growing as Disciples
+                            <h1 class="text-3xl font-bold leading-tight sm:text-4xl">
+                                {{ __('general.explore_dashboard.hero.guest.title') }}
                             </h1>
 
-                            <p class="text-sm sm:text-base leading-relaxed text-slate-300">
-                                Temukan perjalanan iman yang membawa Anda semakin dekat dengan Yesus melalui pemuridan, pembelajaran Alkitab, dan komunitas yang membangun kehidupan rohani.
+                            <p class="text-sm leading-relaxed text-slate-300 sm:text-base">
+                                {{ __('general.explore_dashboard.hero.guest.description') }}
                             </p>
 
                             <div class="flex flex-wrap gap-2.5 pt-1">
-                                <a href="{{ route('courses.index') }}"
-                                class="rounded-xl bg-[#35A7FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#35A7FF]/90">
-                                    Explore Journey
+                                <a href="{{ localized_route('courses.index') }}"
+                                   class="rounded-xl bg-[#35A7FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#35A7FF]/90">
+                                    {{ __('general.explore_dashboard.hero.guest.explore_journey') }}
                                 </a>
 
                                 @guest
-                                    <a href="{{ route('login') }}"
+                                    <a href="{{ localized_route('login') }}"
                                        class="rounded-xl border border-white/30 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10">
-                                        Login
+                                        {{ __('general.explore_dashboard.hero.guest.login') }}
                                     </a>
                                 @endguest
                             </div>
@@ -53,50 +53,50 @@
                     <div class="flex flex-col justify-center space-y-5 p-6 sm:p-8 xl:p-10">
                         <div class="space-y-2">
                             <div class="text-[11px] uppercase tracking-[0.2em] text-white/70">
-                                Welcome back to your spiritual journey
+                                {{ __('general.explore_dashboard.hero.member.welcome_back') }}
                             </div>
 
-                            <h1 class="text-3xl sm:text-4xl xl:text-5xl font-bold leading-tight">
-                                {{ auth()->user()->name ?? 'Learner' }},
-                                keep growing in faith
+                            <h1 class="text-3xl font-bold leading-tight sm:text-4xl xl:text-5xl">
+                                {{ auth()->user()->name ?? __('general.explore_dashboard.defaults.learner') }},
+                                {{ __('general.explore_dashboard.hero.member.keep_growing') }}
                             </h1>
 
-                            <p class="max-w-xl text-sm sm:text-base leading-relaxed text-slate-300">
-                                Lanjutkan perjalanan pemuridan Anda, pelajari kebenaran Firman Tuhan, dan alami pertumbuhan rohani yang nyata setiap hari.
+                            <p class="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                                {{ __('general.explore_dashboard.hero.member.description') }}
                             </p>
                         </div>
 
                         <div class="grid grid-cols-3 gap-2.5 pt-1">
                             <div class="rounded-xl bg-white/10 p-3.5">
-                                <div class="text-[11px] text-white/70">Courses</div>
-                                <div class="text-lg sm:text-xl font-bold">{{ $stats['courses'] ?? 0 }}</div>
+                                <div class="text-[11px] text-white/70">{{ __('general.explore_dashboard.hero.member.courses') }}</div>
+                                <div class="text-lg font-bold sm:text-xl">{{ $stats['courses'] ?? 0 }}</div>
                             </div>
 
                             <div class="rounded-xl bg-white/10 p-3.5">
-                                <div class="text-[11px] text-white/70">Completed</div>
-                                <div class="text-lg sm:text-xl font-bold">{{ $stats['completed_topics'] ?? 0 }}</div>
+                                <div class="text-[11px] text-white/70">{{ __('general.explore_dashboard.hero.member.completed') }}</div>
+                                <div class="text-lg font-bold sm:text-xl">{{ $stats['completed_topics'] ?? 0 }}</div>
                             </div>
 
                             <div class="rounded-xl bg-white/10 p-3.5">
-                                <div class="text-[11px] text-white/70">Progress</div>
-                                <div class="text-lg sm:text-xl font-bold">{{ $stats['in_progress'] ?? 0 }}</div>
+                                <div class="text-[11px] text-white/70">{{ __('general.explore_dashboard.hero.member.progress') }}</div>
+                                <div class="text-lg font-bold sm:text-xl">{{ $stats['in_progress'] ?? 0 }}</div>
                             </div>
                         </div>
 
                         <div class="flex flex-wrap gap-2.5 pt-1">
-                            <a href="{{ route('courses.index') }}"
-                                class="rounded-xl bg-[#35A7FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#35A7FF]/90">
-                                Explore Classes
+                            <a href="{{ localized_route('courses.index') }}"
+                               class="rounded-xl bg-[#35A7FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#35A7FF]/90">
+                                {{ __('general.explore_dashboard.hero.member.explore_classes') }}
                             </a>
 
-                            <a href="{{ route('learning.dashboard') }}"
-                                class="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10">
-                                My Journey
+                            <a href="{{ localized_route('learning.dashboard') }}"
+                               class="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/10">
+                                {{ __('general.explore_dashboard.hero.member.my_journey') }}
                             </a>
                         </div>
                     </div>
 
-                    <div class="relative h-[280px] sm:h-[340px] xl:h-full overflow-hidden">
+                    <div class="relative h-[280px] overflow-hidden sm:h-[340px] xl:h-full">
                         <template x-for="(slide, index) in slides" :key="index">
                             <img
                                 x-show="active === index"
@@ -109,9 +109,9 @@
                         <div class="absolute inset-0 bg-black/30"></div>
 
                         <div class="absolute bottom-5 left-5 right-5 text-white">
-                            <div class="text-xs text-white/70">Featured Program</div>
-                            <div class="mt-1 text-base sm:text-lg font-semibold leading-snug">
-                                Grow deeper in Christ through transformative biblical learning
+                            <div class="text-xs text-white/70">{{ __('general.explore_dashboard.hero.member.featured_program') }}</div>
+                            <div class="mt-1 text-base font-semibold leading-snug sm:text-lg">
+                                {{ __('general.explore_dashboard.hero.member.featured_program_description') }}
                             </div>
                         </div>
                     </div>
@@ -124,8 +124,8 @@
     @if(!$isGuest && !$isMentor && count($continueCourses))
         <section class="space-y-3">
             <div>
-                <h2 class="text-lg sm:text-xl font-semibold">Continue Your Journey</h2>
-                {{-- <p class="text-sm text-[#004777]/70">Continue where you left off in your discipleship journey.</p> --}}
+                <h2 class="text-lg font-semibold sm:text-xl">{{ __('general.explore_dashboard.continue.title') }}</h2>
+                <p class="text-sm text-[#004777]/70">{{ __('general.explore_dashboard.continue.description') }}</p>
             </div>
 
             <div class="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-5 sm:px-5 lg:mx-0 lg:px-0">
@@ -140,19 +140,17 @@
                             if (\Illuminate\Support\Str::startsWith($courseImage, ['http://', 'https://'])) {
                                 $courseImageSrc = $courseImage;
                             } else {
-                                // Try with images/thumbnail/ prefix if not already there
                                 if (\Illuminate\Support\Str::startsWith($courseImage, 'images/')) {
                                     $courseImageSrc = asset($courseImage);
                                 } else {
-                                    // Assume it's just a filename, prefix with images/thumbnail/
                                     $courseImageSrc = asset('images/thumbnail/' . $courseImage);
                                 }
                             }
                         }
                     @endphp
 
-                    <a href="{{ route('courses.show', $item->course->slug) }}"
-                            class="group w-[220px] shrink-0 overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]">
+                    <a href="{{ localized_route('courses.show', $item->course->slug) }}"
+                       class="group w-[220px] shrink-0 overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]">
                         <div class="p-2.5">
                             <div class="overflow-hidden rounded-lg thumb">
                                 @if($courseImageSrc)
@@ -175,11 +173,11 @@
                                 <div class="mt-1 text-sm font-semibold leading-tight">
                                     {{ \Illuminate\Support\Str::limit($item->course->title, 70) }}
                                 </div>
-                                <div class="mt-1 text-xs text-[#004777]/70">Continue where you left off</div>
+                                <div class="mt-1 text-xs text-[#004777]/70">{{ __('general.explore_dashboard.continue.continue_where_left_off') }}</div>
 
                                 <div class="mt-3">
                                     <div class="mb-1 flex items-center justify-between text-[11px] text-[#004777]/70">
-                                        <span>Progress</span>
+                                        <span>{{ __('general.explore_dashboard.continue.progress') }}</span>
                                         <span class="font-semibold text-[#004777]">{{ $progress }}%</span>
                                     </div>
                                     <div class="h-1.5 overflow-hidden rounded-full bg-[#35A7FF]/20">
@@ -199,11 +197,11 @@
             <div class="flex flex-col gap-6 xl:flex-row xl:items-start">
                 <div class="space-y-2.5 xl:basis-[30%] xl:self-stretch flex flex-col justify-center items-center">
                     <h3 class="text-2xl font-bold leading-tight text-[#004777] sm:text-3xl">
-                        Grow in <em class="italic text-[#35A7FF]">faith and discover God's</em> for your life
+                        {{ __('general.explore_dashboard.study_programs.title') }}
                     </h3>
-                    {{-- <p class="text-sm leading-6 text-[#004777]/70">
-                        Explore discipleship programs, biblical teachings, and spiritual growth paths designed to strengthen your relationship with God.
-                    </p> --}}
+                    <p class="text-sm leading-6 text-[#004777]/70">
+                        {{ __('general.explore_dashboard.study_programs.description') }}
+                    </p>
                 </div>
 
                 <div class="min-w-0 flex-1 xl:basis-[70%]">
@@ -211,20 +209,20 @@
                         <div class="mb-3 hidden items-center justify-end gap-2 xl:flex">
                             <button type="button" id="study-program-prev"
                                     class="nav-btn h-8 w-8 rounded-full border border-[#004777]/15 bg-white text-[#004777] transition hover:bg-[#35A7FF]/10"
-                                    aria-label="Scroll categories left">
+                                    aria-label="{{ __('general.explore_dashboard.study_programs.scroll_left') }}">
                                 ←
                             </button>
 
                             <button type="button" id="study-program-next"
                                     class="nav-btn h-8 w-8 rounded-full border border-[#004777]/15 bg-white text-[#004777] transition hover:bg-[#35A7FF]/10"
-                                    aria-label="Scroll categories right">
+                                    aria-label="{{ __('general.explore_dashboard.study_programs.scroll_right') }}">
                                 →
                             </button>
                         </div>
 
                         <div id="study-program-carousel" class="grid grid-cols-1 gap-4 pb-3 md:grid-cols-2 xl:flex xl:snap-x xl:snap-mandatory xl:overflow-x-auto xl:scroll-smooth">
                             @foreach($studyPrograms as $sp)
-                                <a href="{{ route('courses.index', ['studyProgram' => $sp->slug]) }}"
+                                <a href="{{ localized_route('courses.index', ['studyProgram' => $sp->slug]) }}"
                                    data-study-program-card
                                    class="group flex h-40 w-full flex-col justify-center rounded-2xl border border-[#004777]/10 bg-[#35A7FF]/5 p-4 transition hover:-translate-y-0.5 hover:border-[#35A7FF] hover:shadow-md xl:w-[260px] xl:shrink-0 xl:snap-start sm:h-44">
                                     <div class="flex items-center gap-3">
@@ -247,7 +245,7 @@
                     @else
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach($studyPrograms as $sp)
-                                <a href="{{ route('courses.index', ['studyProgram' => $sp->slug]) }}"
+                                <a href="{{ localized_route('courses.index', ['studyProgram' => $sp->slug]) }}"
                                    class="flex min-h-40 items-center gap-4 rounded-2xl border border-[#004777]/10 bg-white p-5 transition hover:border-[#35A7FF] hover:shadow-sm">
                                     <div class="min-w-0">
                                         <div class="text-base font-semibold text-[#004777]">{{ $sp->title }}</div>
@@ -266,8 +264,8 @@
 
     <section class="space-y-3">
         <div>
-            <h2 class="text-lg sm:text-xl font-semibold">Featured Teachings</h2>
-            {{-- <p class="text-sm text-[#004777]/70">Discover impactful teachings and discipleship classes prepared to strengthen your faith journey.</p> --}}
+            <h2 class="text-lg font-semibold sm:text-xl">{{ __('general.explore_dashboard.featured_teachings.title') }}</h2>
+            <p class="text-sm text-[#004777]/70">{{ __('general.explore_dashboard.featured_teachings.description') }}</p>
         </div>
 
         <div class="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:-mx-5 sm:px-5 lg:mx-0 lg:px-0">
@@ -279,20 +277,19 @@
                         if (\Illuminate\Support\Str::startsWith($courseImage, ['http://', 'https://'])) {
                             $courseImageSrc = $courseImage;
                         } else {
-                            // Try with images/thumbnail/ prefix if not already there
                             if (\Illuminate\Support\Str::startsWith($courseImage, 'images/')) {
                                 $courseImageSrc = asset($courseImage);
                             } else {
-                                // Assume it's just a filename, prefix with images/thumbnail/
                                 $courseImageSrc = asset('images/thumbnail/' . $courseImage);
                             }
                         }
                     }
                 @endphp
+
                  <div class="w-[220px] shrink-0 cursor-pointer overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]"
                      role="link" tabindex="0"
-                     onclick="window.location='{{ route('courses.show', $course->slug) }}'"
-                     onkeydown="if(event.key==='Enter'){ window.location='{{ route('courses.show', $course->slug) }}' }">
+                     onclick="window.location='{{ localized_route('courses.show', $course->slug) }}'"
+                     onkeydown="if(event.key==='Enter'){ window.location='{{ localized_route('courses.show', $course->slug) }}' }">
                     <div class="p-2.5">
                         <div class="overflow-hidden rounded-lg thumb">
                             @if($courseImageSrc)
@@ -309,33 +306,33 @@
                         </div>
 
                         <div class="mt-3">
-                                <div class="text-[11px] uppercase tracking-wide text-[#35A7FF]/70">
+                            <div class="text-[11px] uppercase tracking-wide text-[#35A7FF]/70">
                                 {{ $course->studyProgram?->title }}
                             </div>
                             <div class="card-title mt-1 text-sm font-semibold leading-tight">
                                 {{ \Illuminate\Support\Str::limit($course->title, 70) }}
                             </div>
                             <div class="card-author mt-1 text-xs text-[#004777]/70">
-                                {{ $course->instructor?->name ?? $course->author ?? 'Instructor' }}
+                                {{ $course->instructor?->name ?? $course->author ?? __('general.explore_dashboard.defaults.instructor') }}
                             </div>
 
                             <div class="badges mt-2 flex flex-wrap gap-1.5">
                                 @if(!empty($course->is_premium))
                                     <span class="badge badge-premium rounded px-2 py-0.5 text-[11px] bg-[#35A7FF]/10 text-[#004777]">
-                                        ⊙ Premium
+                                        ⊙ {{ __('general.explore_dashboard.featured_teachings.premium') }}
                                     </span>
                                 @endif
                                 @if(!empty($course->is_bestseller))
                                     <span class="badge badge-bestseller rounded px-2 py-0.5 text-[11px] bg-[#004777]/10 text-[#004777]">
-                                        Bestseller
+                                        {{ __('general.explore_dashboard.featured_teachings.bestseller') }}
                                     </span>
                                 @endif
                             </div>
 
                             <div class="mt-3">
-                                <a href="{{ route('courses.show', $course->slug) }}"
+                                <a href="{{ localized_route('courses.show', $course->slug) }}"
                                    class="inline-flex rounded-lg bg-[#004777] px-3 py-1.5 text-xs font-medium text-white">
-                                    Open
+                                    {{ __('general.explore_dashboard.featured_teachings.open') }}
                                 </a>
                             </div>
                         </div>
@@ -348,11 +345,11 @@
     <section class="!mt-8 overflow-hidden rounded-3xl bg-[#004777] px-4 py-6 text-white sm:px-6 lg:px-10">
         <div class="grid grid-cols-1 items-center gap-6 lg:grid-cols-2 lg:gap-8">
             <div>
-                <h2 class="text-xl sm:text-2xl font-semibold leading-tight">
-                    Experience God's Presence Through Authentic Discipleship
+                <h2 class="text-xl font-semibold leading-tight sm:text-2xl">
+                    {{ __('general.explore_dashboard.cta.title') }}
                 </h2>
-                <p class="mt-2 max-w-xl text-sm sm:text-base leading-relaxed text-white/75">
-                    Miracle Institute hadir untuk membantu setiap orang bertumbuh dalam iman, mengenal Yesus lebih dalam, dan hidup dalam kuasa serta kasih Tuhan setiap hari.
+                <p class="mt-2 max-w-xl text-sm leading-relaxed text-white/75 sm:text-base">
+                    {{ __('general.explore_dashboard.cta.description') }}
                 </p>
 
                 <div class="mt-4 grid grid-cols-1 gap-3">
@@ -363,8 +360,8 @@
                             </svg>
                         </div>
                         <div class="text-sm">
-                            <div class="font-semibold">Learn</div>
-                            <div class="mt-0.5 text-white/75">Biblical truths and spiritual principles</div>
+                            <div class="font-semibold">{{ __('general.explore_dashboard.cta.learn.title') }}</div>
+                            <div class="mt-0.5 text-white/75">{{ __('general.explore_dashboard.cta.learn.description') }}</div>
                         </div>
                     </div>
 
@@ -375,8 +372,8 @@
                             </svg>
                         </div>
                         <div class="text-sm">
-                            <div class="font-semibold">Disciple</div>
-                            <div class="mt-0.5 text-white/75">Grow deeper in biblical truth</div>
+                            <div class="font-semibold">{{ __('general.explore_dashboard.cta.disciple.title') }}</div>
+                            <div class="mt-0.5 text-white/75">{{ __('general.explore_dashboard.cta.disciple.description') }}</div>
                         </div>
                     </div>
 
@@ -387,8 +384,8 @@
                             </svg>
                         </div>
                         <div class="text-sm">
-                            <div class="font-semibold">Community</div>
-                            <div class="mt-0.5 text-white/75">Walk together in faith</div>
+                            <div class="font-semibold">{{ __('general.explore_dashboard.cta.community.title') }}</div>
+                            <div class="mt-0.5 text-white/75">{{ __('general.explore_dashboard.cta.community.description') }}</div>
                         </div>
                     </div>
 
@@ -399,23 +396,25 @@
                             </svg>
                         </div>
                         <div class="text-sm">
-                            <div class="font-semibold">Impact</div>
-                            <div class="mt-0.5 text-white/75">Become a light for others</div>
+                            <div class="font-semibold">{{ __('general.explore_dashboard.cta.impact.title') }}</div>
+                            <div class="mt-0.5 text-white/75">{{ __('general.explore_dashboard.cta.impact.description') }}</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4">
-                    <a href="{{ route('courses.index') }}"
+                    <a href="{{ localized_route('courses.index') }}"
                        class="inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-[#004777] hover:bg-white/90">
-                        Start Your Journey
+                        {{ __('general.explore_dashboard.cta.start_your_journey') }}
                     </a>
                 </div>
             </div>
             
             <div class="flex justify-center lg:justify-end">
                 <div class="w-full max-w-xl rounded-2xl p-1.5 sm:p-2.5">
-                    <img src="{{ asset('images/decor/church_1.jpeg') }}" alt="Church illustration" class="h-48 w-full rounded-lg object-cover sm:h-64 lg:h-72">
+                    <img src="{{ asset('images/decor/church_1.jpeg') }}"
+                         alt="{{ __('general.explore_dashboard.defaults.church_illustration') }}"
+                         class="h-48 w-full rounded-lg object-cover sm:h-64 lg:h-72">
                 </div>
             </div>
         </div>

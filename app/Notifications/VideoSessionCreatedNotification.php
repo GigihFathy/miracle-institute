@@ -33,4 +33,12 @@ class VideoSessionCreatedNotification extends Notification implements ShouldQueu
                 'session' => $this->session,
             ]);
     }
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'video_session_id' => $this->session->id,
+            'message' => 'Sesi video baru telah dijadwalkan.',
+        ];
+    }
 }
