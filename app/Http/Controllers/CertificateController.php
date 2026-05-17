@@ -9,14 +9,14 @@ use Illuminate\Support\Str;
 
 class CertificateController extends Controller
 {
-    public function claimCourse(Course $course, CertificateService $service)
+    public function claimCourse(string $locale, Course $course, CertificateService $service)
     {
         abort_unless(auth()->check(), 401);
 
         try {
             $certificate = $service->issueCourseCertificate($course, auth()->user());
 
-            return redirect()->route('certificates.download', $certificate->id);
+            return redirect()->to(localized_route('certificates.download', $certificate->id));
             
         } catch (\RuntimeException $e) {
 
@@ -24,7 +24,7 @@ class CertificateController extends Controller
         }
     }
 
-    public function download(Certificate $certificate, CertificateService $service)
+    public function download(string $locale, Certificate $certificate, CertificateService $service)
     {
         abort_unless(auth()->check(), 401);
 

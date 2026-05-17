@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
+use App\Email\Events\CertificateIssued;
 use App\Models\Certificate;
-use App\Events\CertificateIssued;
 
 class CertificateObserver
 {

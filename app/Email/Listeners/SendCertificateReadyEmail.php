@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Listeners;
+namespace App\Email\Listeners;
 
-use App\Events\CertificateIssued;
+use App\Email\Events\CertificateIssued;
 use App\Models\Certificate;
 use App\Notifications\CertificateReadyNotification;
 

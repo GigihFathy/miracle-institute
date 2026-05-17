@@ -70,7 +70,6 @@ class CertificateService
                 'certificate_number' => $certificateNumber,
                 'user_id' => $user->id,
                 'course_id' => $course->id,
-                'topic_id' => null,
                 'issued_at' => $issuedAt,
                 'status' => 'issued',
             ])->save();
