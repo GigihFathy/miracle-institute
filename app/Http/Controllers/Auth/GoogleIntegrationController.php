@@ -36,7 +36,7 @@ class GoogleIntegrationController extends Controller
         $token = $client->fetchAccessTokenWithAuthCode($request->code);
 
         if (isset($token['error'])) {
-            return redirect()->route('home')->with('error', 'Gagal menghubungkan Google: ' . $token['error']);
+            return redirect()->route('admin.settings.index')->with('error', 'Gagal menghubungkan Google: ' . $token['error']);
         }
 
         if (isset($token['refresh_token'])) {
@@ -45,9 +45,9 @@ class GoogleIntegrationController extends Controller
                 ['value' => encrypt($token['refresh_token'])] 
             );
 
-            return redirect()->route('home')->with('success', 'Google Drive berhasil dihubungkan sebagai pusat sistem!');
+            return redirect()->route('admin.settings.index')->with('success', 'Google Drive berhasil dihubungkan sebagai pusat sistem!');
         }
 
-        return redirect()->route('home')->with('error', 'Gagal mendapatkan hak akses offline.');
+        return redirect()->route('admin.settings.index')->with('error', 'Gagal mendapatkan hak akses offline.');
     }
 }

@@ -189,8 +189,14 @@ return [
     'settings' => [
         'page_title' => 'Settings',
         'page_subtitle' => 'Branding, vision-mission, and social links.',
+        'profile' => [
+            'title' => 'Company Profile',
+            'subtitle' => 'Set basic platform information and contact details.',
+        ],
         'actions' => [
             'save' => 'Save Settings',
+            'connect_google' => 'Authorize with Google Account',
+            'disconnect_google' => 'Disconnect Sync Access',
         ],
         'form' => [
             'company_name' => 'Company name',
@@ -203,6 +209,19 @@ return [
             'instagram' => 'Instagram URL',
             'youtube' => 'YouTube URL',
             'whatsapp' => 'WhatsApp URL',
+        ],
+        'drive' => [
+            'title' => 'Cloud Storage Integration (Google Drive)',
+            'description' => 'Connect a single admin Google Workspace/Drive account to act as the primary storage vault. Other users will automatically save files to this account without needing to log in.',
+            'status' => [
+                'connected' => 'Synced',
+                'disconnected' => 'Not Connected',
+            ],
+            'notes' => [
+                'active' => 'Master credentials active. The system is ready to manage document and video uploads.',
+                'warning' => 'Warning: The system cannot accept uploaded materials until this integration is completed.',
+            ],
+            'confirm_disconnect' => 'Are you sure you want to disconnect Google Drive access? Uploaded files will not be lost, but the system will not be able to accept new file uploads until reconnected.',
         ],
     ],
 

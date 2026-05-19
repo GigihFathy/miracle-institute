@@ -6,9 +6,6 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.google.connect') }}" class="btn btn-primary">
-                    Hubungkan Akun Google Pusat
-                </a>
                 @livewire('shared.language-switcher')
                 <form method="POST" action="{{ localized_route('logout') }}">
                     @csrf
