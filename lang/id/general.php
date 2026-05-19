@@ -53,7 +53,7 @@ return [
         ],
 
         'cta' => [
-            'title' => 'Alami Kehadiran Tuhan Melalui Pemuridan yang Autentik',
+            'title' => 'Menemukan Makna Iman Melalui Pemuridan',
             'description' => 'Miracle Institute hadir untuk membantu setiap orang bertumbuh dalam iman, mengenal Yesus lebih dalam, dan hidup dalam kuasa serta kasih Tuhan setiap hari.',
             'learn' => [
                 'title' => 'Belajar',
@@ -168,6 +168,8 @@ return [
         ],
 
         'sort' => [
+            'newest' => 'Terbaru',
+            'oldest' => 'Terlama',
             'latest' => 'Terbaru',
             'title' => 'Judul',
             'topics' => 'Topik Terbanyak',

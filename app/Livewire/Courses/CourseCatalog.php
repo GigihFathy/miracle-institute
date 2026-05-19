@@ -15,7 +15,7 @@ class CourseCatalog extends Component
     use WithTableState, AuthorizesRequests;
 
     public string $studyProgram = '';
-    public string $sort = 'latest';
+    public string $sort = 'newest';
 
     // protected $queryString = [
     //     'search' => ['except' => ''],
@@ -67,14 +67,23 @@ class CourseCatalog extends Component
         $query = Course::with('studyProgram')
             ->withCount('topics')
             ->where('status', 'active')
-            ->when($this->search, fn ($q) => $q->where('title', 'like', '%' . $this->search . '%'))
+            ->when($this->search, function ($q) {
+                $search = '%' . $this->search . '%';
+
+                $q->where(function ($searchQuery) use ($search) {
+                    $searchQuery->where('title', 'like', $search)
+                        ->orWhere('description', 'like', $search)
+                        ->orWhereHas('studyProgram', function ($studyProgramQuery) use ($search) {
+                            $studyProgramQuery->where('title', 'like', $search);
+                        });
+                });
+            })
             ->when($this->studyProgram, fn ($q) =>
                 $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram))
             );
 
         match ($this->sort) {
-            'title' => $query->orderBy('title'),
-            'topics' => $query->orderByDesc('topics_count'),
+            'oldest' => $query->oldest(),
             default => $query->latest(),
         };
 

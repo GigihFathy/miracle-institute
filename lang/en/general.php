@@ -53,7 +53,7 @@ return [
         ],
 
         'cta' => [
-            'title' => 'Experience God’s Presence Through Authentic Discipleship',
+            'title' => 'Discover the Meaning of Faith Through Discipleship',
             'description' => 'Miracle Institute exists to help every person grow in faith, know Jesus more deeply, and live daily in God’s power and love.',
             'learn' => [
                 'title' => 'Learn',
@@ -168,6 +168,8 @@ return [
         ],
 
         'sort' => [
+            'newest' => 'Newest',
+            'oldest' => 'Oldest',
             'latest' => 'Newest',
             'title' => 'Title',
             'topics' => 'Most Topics',

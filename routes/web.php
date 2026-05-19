@@ -106,6 +106,7 @@ Route::prefix('{locale}')
             ->name('courses.index');
 
         Route::get('/courses/{slug}', CourseShow::class)
+            ->middleware('auth')
             ->name('courses.show');
 
         Route::get('/articles', ArticleIndex::class)

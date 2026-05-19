@@ -6,111 +6,19 @@
 
 <div class="space-y-6 origin-top lg:px-20 2xl:px-28">
 
-    {{-- HEADER --}}
-    <section class="overflow-hidden rounded-[2rem] border border-[#004777]/10 bg-white">
-        <div class="grid gap-6 p-7 xl:grid-cols-[1.15fr_0.85fr] xl:p-8">
-
-            {{-- LEFT --}}
-            <div class="space-y-5">
-
-                <div class="space-y-3">
-
-                    <h1 class="max-w-3xl text-3xl font-bold tracking-tight leading-tight text-[#004777] xl:text-4xl">
-                        {{ $isMentor
-                            ? __('general.course_catalog.hero.mentor.title')
-                            : __('general.course_catalog.hero.student.title') }}
-                    </h1>
-
-                    <p class="max-w-2xl text-sm leading-7 text-[#004777]/70">
-                        {{ $isMentor
-                            ? __('general.course_catalog.hero.mentor.description')
-                            : __('general.course_catalog.hero.student.description') }}
-                    </p>
-
-                </div>
-
-                {{-- STATS --}}
-                <div class="flex flex-wrap gap-3 text-sm">
-
-                    <div class="rounded-2xl border border-[#004777]/10 bg-[#35A7FF]/8 px-5 py-3">
-                        <div class="text-[11px] uppercase tracking-wide text-[#004777]/70">
-                            {{ __('general.course_catalog.stats.available_courses') }}
-                        </div>
-
-                        <div class="mt-1 text-xl font-bold text-[#004777]">
-                            {{ $courses->total() }}
-                        </div>
-                    </div>
-
-                    <div class="rounded-2xl border border-[#004777]/10 bg-[#35A7FF]/8 px-5 py-3">
-                        <div class="text-[11px] uppercase tracking-wide text-[#004777]/70">
-                            {{ __('general.course_catalog.stats.study_programs') }}
-                        </div>
-
-                        <div class="mt-1 text-xl font-bold text-[#004777]">
-                            {{ $studyPrograms->count() }}
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            {{-- RIGHT --}}
-            <div class="flex flex-col justify-between rounded-[2rem] border border-[#004777]/10 bg-gradient-to-br from-[#004777] via-[#00365E] to-[#003050] p-6 text-white">
-
-                <div>
-                    <h2 class="mt-3 text-2xl font-bold leading-tight">
-                        {{ __('general.course_catalog.feature_panel.title') }}
-                    </h2>
-
-                    <p class="mt-3 text-sm leading-6 text-white/75">
-                        {{ __('general.course_catalog.feature_panel.description') }}
-                    </p>
-                </div>
-
-                <div class="mt-7 grid grid-cols-2 gap-3">
-
-                    <div class="rounded-2xl border border-white/10 bg-[#35A7FF]/20 p-4">
-                        <div class="text-[11px] text-white/70">
-                            {{ __('general.course_catalog.feature_panel.structured.label') }}
-                        </div>
-
-                        <div class="mt-1 text-lg font-bold">
-                            {{ __('general.course_catalog.feature_panel.structured.value') }}
-                        </div>
-                    </div>
-
-                    <div class="rounded-2xl border border-white/10 bg-[#35A7FF]/20 p-4">
-                        <div class="text-[11px] text-white/70">
-                            {{ __('general.course_catalog.feature_panel.guided.label') }}
-                        </div>
-
-                        <div class="mt-1 text-lg font-bold">
-                            {{ __('general.course_catalog.feature_panel.guided.value') }}
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-    </section>
-
     {{-- FILTER --}}
     <section class="rounded-[2rem] border border-[#004777]/10 bg-white p-5">
-        <div class="grid gap-4 lg:grid-cols-4">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-center">
 
-            <div class="lg:col-span-2">
+            <div class="flex-1 min-w-0">
                 <input type="search"
-                       wire:model.debounce.300ms="search"
+                       wire:model.live.debounce.500ms="search"
                        placeholder="{{ __('general.course_catalog.filters.search_placeholder') }}"
                        class="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 text-sm outline-none transition focus:border-slate-400 focus:bg-white">
             </div>
 
-            <select wire:model="studyProgram"
-                    class="h-12 rounded-2xl border border-[#004777]/15 bg-[#f4faff] px-4 text-sm outline-none focus:border-[#35A7FF] focus:bg-white">
+            <select wire:model.live="studyProgram"
+                    class="h-12 rounded-2xl border border-[#004777]/15 bg-[#f4faff] px-4 text-sm outline-none focus:border-[#35A7FF] focus:bg-white xl:w-64">
                 <option value="">{{ __('general.course_catalog.filters.all_study_programs') }}</option>
 
                 @foreach($studyPrograms as $sp)
@@ -120,23 +28,11 @@
                 @endforeach
             </select>
 
-            <div class="grid grid-cols-2 gap-3">
-
-                <select wire:model="sort"
-                        class="h-12 rounded-2xl border border-[#004777]/15 bg-[#f4faff] px-4 text-sm outline-none focus:border-[#35A7FF] focus:bg-white">
-                    <option value="latest">{{ __('general.course_catalog.sort.latest') }}</option>
-                    <option value="title">{{ __('general.course_catalog.sort.title') }}</option>
-                    <option value="topics">{{ __('general.course_catalog.sort.topics') }}</option>
-                </select>
-
-                <select wire:model="perPage"
-                        class="h-12 rounded-2xl border border-[#004777]/15 bg-[#f4faff] px-4 text-sm outline-none focus:border-[#35A7FF] focus:bg-white">
-                    <option value="8">8</option>
-                    <option value="12">12</option>
-                    <option value="24">24</option>
-                </select>
-
-            </div>
+            <select wire:model.live="sort"
+                    class="h-12 rounded-2xl border border-[#004777]/15 bg-[#f4faff] px-4 text-sm outline-none focus:border-[#35A7FF] focus:bg-white xl:w-44">
+                <option value="newest">{{ app()->getLocale() === 'id' ? 'Terbaru' : 'Newest' }}</option>
+                <option value="oldest">{{ app()->getLocale() === 'id' ? 'Terlama' : 'Oldest' }}</option>
+            </select>
 
         </div>
     </section>
@@ -156,11 +52,23 @@
                 <div class="p-2.5">
                     <div class="relative overflow-hidden rounded-lg thumb">
                         @php
-                            $poster = $course->poster ?? null;
+                            $courseImage = $course->poster ?? null;
+                            $courseImageSrc = null;
+                            if ($courseImage) {
+                                if (Str::startsWith($courseImage, ['http://', 'https://'])) {
+                                    $courseImageSrc = $courseImage;
+                                } else {
+                                    if (Str::startsWith($courseImage, 'images/')) {
+                                        $courseImageSrc = asset($courseImage);
+                                    } else {
+                                        $courseImageSrc = asset('images/thumbnail/' . $courseImage);
+                                    }
+                                }
+                            }
                         @endphp
 
-                        @if(!empty($poster))
-                            <img src="{{ $poster }}"
+                        @if($courseImageSrc)
+                            <img src="{{ $courseImageSrc }}"
                                  alt="{{ $course->title }}"
                                  class="h-32 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36">
                         @elseif(!empty($course->image))
@@ -206,9 +114,11 @@
                                 {{ trans_choice('general.course_catalog.badges.topics', $course->topics_count, ['count' => $course->topics_count]) }}
                             </span>
 
-                            <span class="rounded-full border border-[#004777]/15 bg-[#35A7FF]/10 px-2.5 py-1 text-[#004777]">
-                                {{ ucfirst($course->status) }}
-                            </span>
+                            @if($isMentor)
+                                <span class="rounded-full border border-[#004777]/15 bg-[#35A7FF]/10 px-2.5 py-1 text-[#004777]">
+                                    {{ ucfirst($course->status) }}
+                                </span>
+                            @endif
 
                             @if($enrolled)
                                 <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-emerald-700">
@@ -242,13 +152,6 @@
                                     </button>
 
                                 @endunless
-
-                            @else
-
-                                <a href="{{ localized_route('login') }}"
-                                   class="inline-flex items-center justify-center rounded-xl border border-[#004777]/15 px-4 py-2.5 text-xs font-medium text-[#004777] transition hover:bg-[#35A7FF]/10">
-                                    {{ __('general.course_catalog.actions.login') }}
-                                </a>
 
                             @endauth
 

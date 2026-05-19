@@ -9,7 +9,7 @@ trait WithTableState
     use WithPagination;
 
     public string $search = '';
-    public int $perPage = 9;
+    public int $perPage = 12;
 
     protected $paginationTheme = 'tailwind';
 

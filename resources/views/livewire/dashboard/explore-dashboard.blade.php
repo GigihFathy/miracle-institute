@@ -150,7 +150,7 @@
                     @endphp
 
                     <a href="{{ localized_route('courses.show', $item->course->slug) }}"
-                       class="group w-[220px] shrink-0 overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]">
+                              class="group w-[280px] shrink-0 overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[300px] lg:w-[320px]">
                         <div class="p-2.5">
                             <div class="overflow-hidden rounded-lg thumb">
                                 @if($courseImageSrc)
@@ -222,9 +222,9 @@
 
                         <div id="study-program-carousel" class="grid grid-cols-1 gap-4 pb-3 md:grid-cols-2 xl:flex xl:snap-x xl:snap-mandatory xl:overflow-x-auto xl:scroll-smooth">
                             @foreach($studyPrograms as $sp)
-                                <a href="{{ localized_route('courses.index', ['studyProgram' => $sp->slug]) }}"
-                                   data-study-program-card
-                                   class="group flex h-40 w-full flex-col justify-center rounded-2xl border border-[#004777]/10 bg-[#35A7FF]/5 p-4 transition hover:-translate-y-0.5 hover:border-[#35A7FF] hover:shadow-md xl:w-[260px] xl:shrink-0 xl:snap-start sm:h-44">
+                                          <a href="{{ localized_route('courses.index', ['studyProgram' => $sp->slug]) }}"
+                                              data-study-program-card
+                                              class="group flex h-40 w-full flex-col justify-center rounded-2xl border border-[#004777]/10 bg-[#35A7FF]/5 p-4 transition hover:-translate-y-0.5 hover:border-[#35A7FF] hover:shadow-md xl:w-[320px] xl:shrink-0 xl:snap-start sm:h-44">
                                     <div class="flex items-center gap-3">
                                         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#004777] text-base font-semibold text-white shadow-md sm:h-12 sm:w-12 sm:text-lg">
                                             {{ strtoupper(mb_substr($sp->title, 0, 1)) }}
@@ -286,7 +286,7 @@
                     }
                 @endphp
 
-                 <div class="w-[220px] shrink-0 cursor-pointer overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[240px] md:w-[250px]"
+                 <div class="w-[280px] shrink-0 cursor-pointer overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[300px] lg:w-[320px]"
                      role="link" tabindex="0"
                      onclick="window.location='{{ localized_route('courses.show', $course->slug) }}'"
                      onkeydown="if(event.key==='Enter'){ window.location='{{ localized_route('courses.show', $course->slug) }}' }">
