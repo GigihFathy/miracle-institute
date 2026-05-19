@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'LMS') }}</title>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-[radial-gradient(circle_at_top,#d9eeff_0%,#f4faff_40%,#eef7ff_100%)] text-[#004777]">
     <div class="min-h-screen px-4 py-6 sm:px-6 lg:px-8">

@@ -149,9 +149,9 @@
                         }
                     @endphp
 
-                    <a href="{{ localized_route('courses.show', $item->course->slug) }}"
-                              class="group w-[280px] shrink-0 overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[300px] lg:w-[320px]">
-                        <div class="p-2.5">
+                                                    <a href="{{ localized_route('courses.show', $item->course->slug) }}"
+                                                        class="group w-[280px] shrink-0 overflow-hidden rounded-2xl transition-colors hover:bg-gray-200 sm:w-[300px] lg:w-[320px]">
+                                                    <div class="p-2.5 transition-colors group-hover:bg-gray-200">
                             <div class="overflow-hidden rounded-lg thumb">
                                 @if($courseImageSrc)
                                     <img src="{{ $courseImageSrc }}"
@@ -286,11 +286,11 @@
                     }
                 @endphp
 
-                 <div class="w-[280px] shrink-0 cursor-pointer overflow-hidden rounded-2xl transition hover:bg-slate-100 sm:w-[300px] lg:w-[320px]"
+                      <div class="group w-[280px] shrink-0 cursor-pointer overflow-hidden rounded-2xl transition-colors hover:bg-gray-200 sm:w-[300px] lg:w-[320px]"
                      role="link" tabindex="0"
                      onclick="window.location='{{ localized_route('courses.show', $course->slug) }}'"
-                     onkeydown="if(event.key==='Enter'){ window.location='{{ localized_route('courses.show', $course->slug) }}' }">
-                    <div class="p-2.5">
+                     onkeydown="if(event.key==='Enter'){ window.location='{{ localized_route('courses.show', $course->slug) }}' }"> 
+                          <div class="p-2.5 transition-colors group-hover:bg-gray-200">
                         <div class="overflow-hidden rounded-lg thumb">
                             @if($courseImageSrc)
                                 <img src="{{ $courseImageSrc }}"
