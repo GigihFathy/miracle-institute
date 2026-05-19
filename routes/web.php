@@ -72,6 +72,23 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| Non-localized Google OAuth callbacks
+|--------------------------------------------------------------------------
+|
+| These routes keep OAuth callbacks working regardless of locale.
+|
+*/
+
+Route::middleware('auth')->group(function (): void {
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
+        ->name('google.redirect.fallback');
+
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
+        ->name('google.callback.fallback');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Localized Routes
 |--------------------------------------------------------------------------
 */
