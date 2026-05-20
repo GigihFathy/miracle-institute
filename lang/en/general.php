@@ -185,8 +185,8 @@ return [
         ],
 
         'actions' => [
-            'open' => 'Open',
-            'enroll' => 'Enroll',
+            'open' => 'View Details',
+            'enroll' => 'Enroll Now',
             'login' => 'Login',
         ],
 
@@ -197,28 +197,44 @@ return [
     ],
 
     'course_show' => [
-        'login_to_track' => 'Login to Track',
+        'login_to_track' => 'Sign In to Start Learning',
         'enrolled' => 'Enrolled',
-        'enroll' => 'Enroll',
+        'enroll' => 'Enroll in Course',
         'processing' => 'Processing...',
         'mentor_mode' => 'Mentor Mode',
-        'guest_notice' => 'Sign in to track progress, assessments, and certificate eligibility.',
+        'guest_notice' => 'Sign in to save your learning progress, take the assessment, and access your certificate when it becomes available.',
 
-        'course_access' => 'Course Access',
-        'course_access_description' => 'Assessment and certificate status.',
+        'course_access' => 'Course Progress',
+        'course_access_description' => 'Track your assessment and certificate readiness here.',
 
         'assessment_label' => 'Assessment',
         'certificate_label' => 'Certificate',
         'issued' => 'Issued',
-        'eligible' => 'Eligible',
-        'locked' => 'Locked',
+        'eligible' => 'Ready to Claim',
+        'locked' => 'Not Available Yet',
         'not_published' => 'Not Published',
-        'unlocked' => 'Unlocked',
+        'unlocked' => 'Ready to Start',
+        'complete_topics_first' => 'Complete all topics first',
+        'assessment_unavailable' => 'No assessment is available for this course yet.',
+        'certificate_unavailable' => 'Your certificate will appear after all requirements are completed.',
+        'certificate_ready' => 'Your course certificate is ready to be claimed.',
+        'certificate_issued_description' => 'Your certificate is available and ready to download.',
+        'assessment_ready_description' => 'All topics are complete. You can now take the assessment.',
+        'assessment_pending_description' => 'Complete all topics to unlock the assessment.',
 
-        'resume_test' => 'Resume Test',
-        'start_test' => 'Start Test',
+        'resume_test' => 'Resume Assessment',
+        'start_test' => 'Start Assessment',
         'download_certificate' => 'Download Certificate',
         'claim_certificate' => 'Claim Certificate',
+        'continue_learning' => 'Continue Learning',
+        'course_overview' => 'Course overview',
+        'course_overview_description' => 'Follow the topics in order, continue to the assessment, then claim your certificate once all requirements are complete.',
+        'topics_stat' => 'Topics',
+        'progress_stat' => 'Progress',
+        'assessment_stat' => 'Assessment',
+        'completed_progress' => ':percent% complete',
+        'assessment_available' => 'Available',
+        'assessment_pending' => 'Waiting for progress',
 
         'course_topics' => 'Course Topics',
         'topics_count' => '{0} No Topics|{1} :count Topic|[2,*] :count Topics',
@@ -243,7 +259,10 @@ return [
         ],
 
         'login_to_access_topic' => 'Login to access topic',
-        'open_topic' => 'Open Topic',
+        'open_topic' => 'Study Topic',
+        'topic_description_fallback' => 'The topic description will appear here once the course material is completed.',
+        'topic_cta_guest' => 'Sign In to Learn',
+        'topic_cta_enrolled' => 'Open Topic',
 
         'mentored_topics' => [
             'title' => 'Mentored Topics',
@@ -267,7 +286,7 @@ return [
             'instructions' => 'Instructions',
         ],
 
-        'locked_until_complete' => 'Locked until all topics completed',
+        'locked_until_complete' => 'The assessment will be available after all topics are completed',
         'close' => 'Close',
     ],
 

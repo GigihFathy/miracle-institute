@@ -11,7 +11,7 @@
                 </p>
             </div>
 
-            <div class="flex flex-wrap gap-2">
+            {{-- <div class="flex flex-wrap gap-2">
                 @if($canManageMaterials)
                     <span class="inline-flex items-center rounded-full bg-[var(--mentor-primary)] px-3 py-1 text-xs font-medium text-white">
                         {{ __('mentor.topic_tabs.overview.access.materials') }}
@@ -29,7 +29,7 @@
                         {{ __('mentor.topic_tabs.overview.access.students') }}
                     </span>
                 @endif
-            </div>
+            </div> --}}
         </div>
 
         <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

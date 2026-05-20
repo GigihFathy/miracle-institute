@@ -1,3 +1,15 @@
+@php
+    $roleNames = collect($user?->roles ?? [])
+        ->pluck('name')
+        ->filter()
+        ->values();
+
+    $hasDualRoles = $roleNames->count() > 1;
+    $roleSummaryText = $hasDualRoles
+        ? 'Anda dapat menjadi ' . $roleNames->join(' dan ')
+        : null;
+@endphp
+
 <div class="space-y-6 px-4 pb-6 pt-6 sm:px-6 lg:px-12 xl:px-36">
     <x-ui.page-header title="{{ __('general.profile.hero.title') }}" />
 
@@ -8,12 +20,7 @@
                 <p class="mt-1 text-sm leading-6 text-[#5f6785]">{{ __('general.profile.form.subtitle') }}</p>
             </div>
 
-            <div class="grid gap-3 sm:grid-cols-3 lg:min-w-[420px] lg:flex-1">
-                <div class="rounded-2xl border border-[#d7dcef] bg-[#f4faff] px-4 py-4">
-                    <p class="text-xs font-medium tracking-wide text-[#5f6785]">{{ __('general.profile.stats.roles') }}</p>
-                    <p class="mt-2 text-2xl font-bold text-[#004777]">{{ $user?->roles?->count() ?? 0 }}</p>
-                </div>
-
+            <div class="grid gap-3 sm:grid-cols-2 lg:min-w-[420px] lg:flex-1">
                 <div class="rounded-2xl border border-[#d7dcef] bg-[#f4faff] px-4 py-4">
                     <p class="text-xs font-medium tracking-wide text-[#5f6785]">{{ __('general.profile.stats.status') }}</p>
                     <p class="mt-2 text-sm font-semibold text-[#004777]">
@@ -24,6 +31,9 @@
                 <div class="rounded-2xl border border-[#d7dcef] bg-[#f4faff] px-4 py-4">
                     <p class="text-xs font-medium tracking-wide text-[#5f6785]">{{ __('general.profile.hero.active_role') }}</p>
                     <p class="mt-2 text-sm font-semibold text-[#004777]">{{ ucfirst((string) $activeRole) }}</p>
+                    @if($hasDualRoles)
+                        <p class="mt-2 text-xs leading-5 text-[#5f6785]">{{ $roleSummaryText }}</p>
+                    @endif
                 </div>
             </div>
         </div>

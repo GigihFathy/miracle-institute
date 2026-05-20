@@ -10,11 +10,11 @@
             </p>
         </div>
 
-        @if($canManageAttendance)
+        {{-- @if($canManageAttendance)
             <span class="inline-flex items-center rounded-full border border-slate-200 bg-[var(--mentor-primary-soft)] px-3 py-1 text-xs font-medium text-[var(--mentor-primary)]">
                 {{ __('mentor.topic_tabs.attendances.manager_badge') }}
             </span>
-        @endif
+        @endif --}}
     </div>
 
     <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

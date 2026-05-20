@@ -8,13 +8,13 @@
         @if($session)
             <button type="button"
                     wire:click="editSession"
-                    class="rounded-xl border border-slate-200 px-4 py-2 text-sm text-[var(--mentor-primary)] hover:bg-[var(--mentor-primary-soft-2)]">
+                    class="admin-edit-button rounded-xl px-4 py-2 text-sm">
                 {{ __('mentor.topic_tabs.sessions.actions.edit') }}
             </button>
         @else
             <button type="button"
                     wire:click="editSession"
-                    class="rounded-xl bg-[var(--mentor-primary)] px-4 py-2 text-sm text-white transition hover:brightness-110">
+                    class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                 {{ __('mentor.topic_tabs.sessions.actions.add') }}
             </button>
         @endif
@@ -98,10 +98,10 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-4">
-                <button type="button" wire:click="closeSessionModal" class="rounded-xl border border-slate-200 px-4 py-2 text-sm text-[var(--mentor-primary)]">
+                <button type="button" wire:click="closeSessionModal" class="admin-neutral-button rounded-xl px-4 py-2 text-sm">
                     {{ __('mentor.topic_tabs.sessions.form.cancel') }}
                 </button>
-                <button type="submit" class="rounded-xl bg-[var(--mentor-primary)] px-4 py-2 text-sm font-medium text-white transition hover:brightness-110">
+                <button type="submit" class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                     {{ $session ? __('mentor.topic_tabs.sessions.form.update') : __('mentor.topic_tabs.sessions.form.save') }}
                 </button>
             </div>

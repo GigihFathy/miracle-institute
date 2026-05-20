@@ -14,7 +14,7 @@
                 @if($selectedMaterial)
                     <button type="button"
                             wire:click="editMaterial('{{ $selectedMaterial->id }}')"
-                            class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-[var(--mentor-primary-soft-2)] px-4 py-2 text-sm font-medium text-[var(--mentor-primary)] shadow-sm transition-all duration-200 hover:bg-[var(--mentor-secondary)] hover:shadow active:scale-95">
+                            class="admin-edit-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-sm transition-all duration-200 hover:shadow active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
                             <path d="m15 5 4 4"/>
@@ -24,7 +24,7 @@
 
                     <button type="button"
                             wire:click="deleteMaterial('{{ $selectedMaterial->id }}')"
-                            class="inline-flex items-center gap-2 rounded-lg border border-rose-200 bg-white px-4 py-2 text-sm font-medium text-rose-600 shadow-sm transition-all duration-200 hover:bg-rose-50 hover:text-rose-700 hover:shadow active:scale-95">
+                            class="admin-delete-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm shadow-sm transition-all duration-200 hover:shadow active:scale-95">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 6h18"/>
                             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
@@ -157,7 +157,7 @@
             @if($canAddMaterial)
                 <button type="button"
                         wire:click="openMaterialModal"
-                        class="rounded-xl bg-[var(--mentor-primary)] px-4 py-2 text-sm text-white transition hover:brightness-110">
+                        class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                     {{ __('mentor.topic_tabs.materials.list.actions.add') }}
                 </button>
             @else
@@ -282,12 +282,12 @@
 
             <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-4">
                 <button type="button" wire:click="closeMaterialModal"
-                        class="rounded-xl border border-slate-200 px-4 py-2 text-sm text-[var(--mentor-primary)]">
+                        class="admin-neutral-button rounded-xl px-4 py-2 text-sm">
                     {{ __('mentor.topic_tabs.materials.form.cancel') }}
                 </button>
                 <button type="submit"
                         wire:loading.attr="disabled"
-                        class="rounded-xl bg-[var(--mentor-primary)] px-4 py-2 text-sm font-medium text-white transition hover:brightness-110">
+                        class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                     {{ $editingMaterialId ? __('mentor.topic_tabs.materials.form.update') : __('mentor.topic_tabs.materials.form.save') }}
                 </button>
             </div>

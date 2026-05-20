@@ -7,7 +7,7 @@
 
         <button type="button"
                 wire:click="openCollaboratorModal"
-                class="rounded-xl bg-[var(--mentor-primary)] px-4 py-2 text-sm text-white transition hover:brightness-110">
+                class="admin-primary-button rounded-xl px-4 py-2 text-sm">
             {{ __('mentor.topic_tabs.collaborators.actions.invite') }}
         </button>
     </div>
@@ -53,13 +53,13 @@
 
                         <button type="button"
                                 wire:click="editCollaborator('{{ $collaborator->id }}')"
-                                class="rounded-xl border border-slate-200 px-3 py-2 text-xs text-[var(--mentor-primary)] hover:bg-[var(--mentor-primary-soft-2)]">
+                                class="admin-edit-button rounded-xl px-3 py-2 text-xs">
                             {{ __('mentor.topic_tabs.collaborators.actions.edit') }}
                         </button>
 
                         <button type="button"
                                 wire:click="removeCollaborator('{{ $collaborator->id }}')"
-                                class="rounded-xl border border-rose-200 px-3 py-2 text-xs text-rose-600 hover:bg-rose-50">
+                                class="admin-delete-button rounded-xl px-3 py-2 text-xs">
                             {{ __('mentor.topic_tabs.collaborators.actions.remove') }}
                         </button>
                     </div>
@@ -133,10 +133,10 @@
             </div>
 
             <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-4">
-                <button type="button" wire:click="closeCollaboratorModal" class="rounded-xl border border-slate-200 px-4 py-2 text-sm text-[var(--mentor-primary)]">
+                <button type="button" wire:click="closeCollaboratorModal" class="admin-neutral-button rounded-xl px-4 py-2 text-sm">
                     {{ __('mentor.topic_tabs.collaborators.form.cancel') }}
                 </button>
-                <button type="submit" class="rounded-xl bg-[var(--mentor-primary)] px-4 py-2 text-sm font-medium text-white transition hover:brightness-110">
+                <button type="submit" class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                     {{ $editingCollaboratorId ? __('mentor.topic_tabs.collaborators.form.update') : __('mentor.topic_tabs.collaborators.form.save') }}
                 </button>
             </div>

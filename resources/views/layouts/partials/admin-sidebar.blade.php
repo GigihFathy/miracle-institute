@@ -1,25 +1,52 @@
 @php
     $mainMenus = [
-        ['label' => __('admin.sidebar.dashboard'), 'route' => 'admin.dashboard'],
-        ['label' => __('admin.sidebar.study_programs'), 'route' => 'admin.study-programs.index'],
+        [
+            'label' => __('admin.sidebar.dashboard'),
+            'route' => 'admin.dashboard',
+            'active_routes' => ['admin.dashboard'],
+        ],
+        [
+            'label' => __('admin.sidebar.study_programs'),
+            'route' => 'admin.study-programs.index',
+            'active_routes' => ['admin.study-programs.*'],
+        ],
         [
             'label' => __('admin.sidebar.courses'),
             'route' => 'admin.courses.index',
             'active_routes' => [
-                'admin.courses.index',
-                'admin.topics.index',
-                'admin.materials.index',
-                'admin.sessions.index',
-                'admin.assessments.index',
-                'admin.certificates.index',
+                'admin.courses.*',
+                'admin.topics.*',
+                'admin.materials.*',
+                'admin.sessions.*',
+                'admin.assessments.*',
+                'admin.certificates.*',
             ],
         ],
-
-        ['label' => __('admin.sidebar.users'), 'route' => 'admin.users.index'],
-        ['label' => __('admin.sidebar.roles'), 'route' => 'admin.roles.index'],
-        ['label' => __('admin.sidebar.permissions'), 'route' => 'admin.permissions.index'],
-        ['label' => __('admin.sidebar.articles'), 'route' => 'admin.articles.index'],
-        ['label' => __('admin.sidebar.settings'), 'route' => 'admin.settings.index'],
+        [
+            'label' => __('admin.sidebar.users'),
+            'route' => 'admin.users.index',
+            'active_routes' => ['admin.users.*'],
+        ],
+        [
+            'label' => __('admin.sidebar.roles'),
+            'route' => 'admin.roles.index',
+            'active_routes' => ['admin.roles.*'],
+        ],
+        [
+            'label' => __('admin.sidebar.permissions'),
+            'route' => 'admin.permissions.index',
+            'active_routes' => ['admin.permissions.*'],
+        ],
+        [
+            'label' => __('admin.sidebar.articles'),
+            'route' => 'admin.articles.index',
+            'active_routes' => ['admin.articles.*'],
+        ],
+        [
+            'label' => __('admin.sidebar.settings'),
+            'route' => 'admin.settings.index',
+            'active_routes' => ['admin.settings.*'],
+        ],
     ];
 
     $canMap = [

@@ -41,10 +41,10 @@
                 @foreach($tabs as $key => $label)
                     <button type="button"
                             wire:click="setTab('{{ $key }}')"
-                            class="whitespace-nowrap rounded-t-xl border-b-2 px-4 py-3 text-sm font-medium transition
+                            class="mentor-tab-button whitespace-nowrap
                                 {{ $tab === $key
-                                    ? 'border-mentor-primary bg-mentor-primary text-white shadow-sm'
-                                    : 'border-transparent text-[color:color-mix(in_oklab,#004777_55%,white)] hover:border-mentor-secondary hover:bg-mentor-primary-soft-2 hover:text-mentor-primary' }}">
+                                    ? 'mentor-tab-button-active'
+                                    : '' }}">
                         {{ $label }}
                     </button>
                 @endforeach

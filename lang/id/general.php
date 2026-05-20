@@ -185,8 +185,8 @@ return [
         ],
 
         'actions' => [
-            'open' => 'Buka',
-            'enroll' => 'Daftar',
+            'open' => 'Lihat Detail',
+            'enroll' => 'Daftar Sekarang',
             'login' => 'Masuk',
         ],
 
@@ -197,28 +197,44 @@ return [
     ],
 
     'course_show' => [
-        'login_to_track' => 'Login untuk Melacak',
+        'login_to_track' => 'Masuk untuk Mulai Belajar',
         'enrolled' => 'Terdaftar',
-        'enroll' => 'Daftar',
+        'enroll' => 'Daftar Course',
         'processing' => 'Memproses...',
         'mentor_mode' => 'Mode Mentor',
-        'guest_notice' => 'Masuk untuk melacak progres, assessment, dan kelayakan sertifikat.',
+        'guest_notice' => 'Masuk untuk menyimpan progres belajar, mengerjakan assessment, dan mengakses sertifikat saat sudah tersedia.',
 
-        'course_access' => 'Akses Course',
-        'course_access_description' => 'Status assessment dan sertifikat.',
+        'course_access' => 'Progres Course',
+        'course_access_description' => 'Pantau kesiapan assessment dan sertifikat dari sini.',
 
         'assessment_label' => 'Assessment',
         'certificate_label' => 'Sertifikat',
         'issued' => 'Diterbitkan',
-        'eligible' => 'Layak',
-        'locked' => 'Terkunci',
+        'eligible' => 'Siap Diklaim',
+        'locked' => 'Belum Tersedia',
         'not_published' => 'Belum Dipublikasikan',
-        'unlocked' => 'Terbuka',
+        'unlocked' => 'Siap Dikerjakan',
+        'complete_topics_first' => 'Selesaikan semua topik terlebih dahulu',
+        'assessment_unavailable' => 'Assessment belum tersedia untuk course ini.',
+        'certificate_unavailable' => 'Sertifikat akan muncul setelah seluruh syarat terpenuhi.',
+        'certificate_ready' => 'Sertifikat course Anda siap diklaim.',
+        'certificate_issued_description' => 'Sertifikat sudah tersedia dan bisa langsung diunduh.',
+        'assessment_ready_description' => 'Semua topik selesai. Kamu sudah bisa mengerjakan assessment.',
+        'assessment_pending_description' => 'Selesaikan semua topik agar assessment bisa dibuka.',
 
-        'resume_test' => 'Lanjutkan Tes',
-        'start_test' => 'Mulai Tes',
+        'resume_test' => 'Lanjutkan Assessment',
+        'start_test' => 'Mulai Assessment',
         'download_certificate' => 'Unduh Sertifikat',
-        'claim_certificate' => 'Ambil Sertifikat',
+        'claim_certificate' => 'Klaim Sertifikat',
+        'continue_learning' => 'Lanjut Belajar',
+        'course_overview' => 'Ringkasan course',
+        'course_overview_description' => 'Ikuti topik pembelajaran secara berurutan, lanjutkan ke assessment, lalu klaim sertifikat saat semua syarat terpenuhi.',
+        'topics_stat' => 'Topik',
+        'progress_stat' => 'Progres',
+        'assessment_stat' => 'Assessment',
+        'completed_progress' => ':percent% selesai',
+        'assessment_available' => 'Tersedia',
+        'assessment_pending' => 'Menunggu progres',
 
         'course_topics' => 'Topik Course',
         'topics_count' => '{0} Tidak Ada Topik|{1} :count Topik|[2,*] :count Topik',
@@ -243,7 +259,10 @@ return [
         ],
 
         'login_to_access_topic' => 'Login untuk membuka topik',
-        'open_topic' => 'Buka Topik',
+        'open_topic' => 'Pelajari Topik',
+        'topic_description_fallback' => 'Deskripsi topik akan tampil di sini setelah materi course dilengkapi.',
+        'topic_cta_guest' => 'Masuk untuk Belajar',
+        'topic_cta_enrolled' => 'Buka Topik',
 
         'mentored_topics' => [
             'title' => 'Topik yang Dimentori',
@@ -267,7 +286,7 @@ return [
             'instructions' => 'Instruksi',
         ],
 
-        'locked_until_complete' => 'Terkunci sampai semua topik selesai',
+        'locked_until_complete' => 'Assessment akan tersedia setelah semua topik selesai',
         'close' => 'Tutup',
     ],
 

@@ -82,6 +82,24 @@
         outline-offset: 2px;
     }
 
+    .admin-neutral-button {
+        border: 1px solid var(--color-slate-200);
+        background-color: white;
+        color: var(--color-mentor-primary);
+        font-weight: 600;
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .admin-neutral-button:hover {
+        background-color: var(--color-mentor-primary-soft-2);
+        border-color: color-mix(in oklab, var(--color-mentor-primary) 20%, white);
+    }
+
+    .admin-neutral-button:focus-visible {
+        outline: 2px solid var(--color-mentor-secondary-solid);
+        outline-offset: 2px;
+    }
+
     .admin-edit-button {
         background-color: #2563eb !important;
         color: white !important;
@@ -112,5 +130,37 @@
     .admin-delete-button:focus-visible {
         outline: 2px solid color-mix(in oklab, #dc2626 35%, white);
         outline-offset: 2px;
+    }
+
+    .mentor-tab-button {
+        border: 1px solid transparent;
+        border-bottom-width: 0;
+        border-top-left-radius: 0.9rem;
+        border-top-right-radius: 0.9rem;
+        padding: 0.8rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: color-mix(in oklab, var(--color-mentor-primary) 60%, white);
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    }
+
+    .mentor-tab-button:hover {
+        background-color: var(--color-mentor-primary-soft-2);
+        border-color: color-mix(in oklab, var(--color-mentor-primary) 16%, white);
+        color: var(--color-mentor-primary);
+    }
+
+    .mentor-tab-button-active {
+        background-color: var(--color-mentor-primary);
+        border-color: var(--color-mentor-primary);
+        color: white;
+        box-shadow: 0 10px 24px color-mix(in oklab, var(--color-mentor-primary) 16%, transparent);
+    }
+
+    .mentor-tab-button-active:hover {
+        background-color: var(--color-mentor-primary);
+        border-color: var(--color-mentor-primary);
+        color: white;
+        opacity: 0.92;
     }
 }

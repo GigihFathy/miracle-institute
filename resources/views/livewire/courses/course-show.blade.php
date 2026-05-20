@@ -4,6 +4,12 @@
     $canTrack = auth()->check() && $enrolled;
 
     $topicsToRender = $isMentor ? $mentoredTopics : $filteredTopics;
+    $totalTopicsCount = $course->topics->count();
+    $completedTopicsCount = $this->completedTopicsCount ?? 0;
+    $progressPercent = $totalTopicsCount > 0 ? (int) round(($completedTopicsCount / $totalTopicsCount) * 100) : 0;
+    $continueTopic = $filteredTopics->firstWhere('progress_status', 'in_progress')
+        ?? $filteredTopics->firstWhere('progress_status', 'available')
+        ?? $filteredTopics->first();
 @endphp
 
 <div>
@@ -13,37 +19,78 @@
                 {{ session('success') }}
             </div>
         @endif
-        
+
         @if(session('error'))
             <div class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
                 {{ session('error') }}
             </div>
         @endif
-        
-        <section class="overflow-hidden rounded-2xl border bg-white shadow-sm">
+
+        @php
+            $poster = $course->poster ?? $course->image ?? null;
+            $posterSrc = null;
+            if ($poster) {
+                if (\Illuminate\Support\Str::startsWith($poster, ['http://', 'https://'])) {
+                    $posterSrc = $poster;
+                } elseif (file_exists(public_path($poster))) {
+                    $posterSrc = asset($poster);
+                } elseif (file_exists(public_path('storage/' . $poster))) {
+                    $posterSrc = asset('storage/' . $poster);
+                }
+            }
+        @endphp
+
+        <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_18px_40px_color-mix(in_oklab,#004777_10%,transparent)]">
             <div class="grid lg:grid-cols-[1.1fr_0.9fr]">
-                <div class="space-y-5 p-4 sm:p-6 lg:p-7">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                        <div class="min-w-0">
-                            <div class="truncate text-[10px] uppercase tracking-[0.22em] text-slate-400 sm:text-xs">
-                                {{ $course->studyProgram?->title }}
+                <div class="space-y-6 p-5 sm:p-6 lg:p-8">
+                    <div class="min-w-0">
+                        <div class="truncate text-[10px] uppercase tracking-[0.22em] text-[color:color-mix(in_oklab,#004777_48%,white)] sm:text-xs">
+                            {{ $course->studyProgram?->title }}
+                        </div>
+
+                        <h1 class="mt-2 text-2xl font-bold leading-tight tracking-tight text-mentor-primary sm:text-3xl">
+                            {{ $course->title }}
+                        </h1>
+
+                        <p class="mt-3 text-sm leading-6 text-[color:color-mix(in_oklab,#004777_72%,white)]">
+                            {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
+                        </p>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-3">
+                        <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">
+                            <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">
+                                {{ __('general.course_show.topics_stat') }}
                             </div>
-        
-                            <h1 class="mt-2 text-2xl font-bold leading-tight tracking-tight text-slate-900 sm:text-3xl">
-                                {{ $course->title }}
-                            </h1>
-        
-                            <p class="mt-3 line-clamp-4 text-sm leading-6 text-slate-600">
-                                {{ $course->description }}
-                            </p>
+                            <div class="mt-2 text-lg font-semibold text-mentor-primary">
+                                {{ $totalTopicsCount }}
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">
+                            <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">
+                                {{ __('general.course_show.progress_stat') }}
+                            </div>
+                            <div class="mt-2 text-lg font-semibold text-mentor-primary">
+                                {{ __('general.course_show.completed_progress', ['percent' => $progressPercent]) }}
+                            </div>
+                        </div>
+
+                        <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">
+                            <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">
+                                {{ __('general.course_show.assessment_stat') }}
+                            </div>
+                            <div class="mt-2 text-lg font-semibold text-mentor-primary">
+                                {{ $assessmentMeta ? ($this->assessmentUnlocked ? __('general.course_show.assessment_available') : __('general.course_show.assessment_pending')) : __('general.course_show.not_published') }}
+                            </div>
                         </div>
                     </div>
-        
+
                     <div class="flex flex-wrap gap-2">
                         @if(!$isMentor)
                             @if(!auth()->check())
                                 <a href="{{ localized_route('login') }}"
-                                   class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#003560] sm:text-sm">
+                                   class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs sm:text-sm">
                                     {{ __('general.course_show.login_to_track') }}
                                 </a>
                             @else
@@ -51,14 +98,21 @@
                                     <span class="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-medium text-emerald-700 sm:text-sm">
                                         {{ __('general.course_show.enrolled') }}
                                     </span>
+
+                                    @if($continueTopic)
+                                        <a href="{{ localized_route('topics.show', $continueTopic->slug) }}"
+                                           class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs sm:text-sm">
+                                            {{ __('general.course_show.continue_learning') }}
+                                        </a>
+                                    @endif
                                 @else
                                     <button
                                         wire:click="enroll"
                                         wire:loading.attr="disabled"
                                         wire:target="enroll"
-                                        class="inline-flex cursor-pointer items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#003560] disabled:cursor-not-allowed disabled:opacity-70 sm:text-sm">
+                                        class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs disabled:opacity-70 sm:text-sm">
                                         <span wire:loading.remove wire:target="enroll">{{ __('general.course_show.enroll') }}</span>
-        
+
                                         <span wire:loading.flex wire:target="enroll" class="items-center gap-2">
                                             <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -70,96 +124,124 @@
                                 @endif
                             @endif
                         @else
-                            <span class="inline-flex items-center rounded-xl border bg-slate-100 px-4 py-2 text-xs text-slate-600 sm:text-sm">
+                            <span class="inline-flex items-center rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-xs text-slate-600 sm:text-sm">
                                 {{ __('general.course_show.mentor_mode') }}
                             </span>
                         @endif
                     </div>
-        
+
                     @guest
-                        <div class="rounded-xl border bg-slate-50 p-3 text-xs leading-6 text-slate-600 sm:text-sm">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-600 sm:text-sm">
                             {{ __('general.course_show.guest_notice') }}
                         </div>
                     @endguest
 
                     @if($isStudent)
-                        <div class="border-t pt-4">
-                            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div class="border-t border-slate-200 pt-5">
+                            <div class="flex flex-col gap-5">
                                 <div>
-                                    <h2 class="text-sm font-semibold uppercase tracking-wide text-[#004777]">{{ __('general.course_show.course_access') }}</h2>
-                                    <p class="mt-1 text-xs text-slate-500">{{ __('general.course_show.course_access_description') }}</p>
+                                    <h2 class="text-sm font-semibold uppercase tracking-wide text-mentor-primary">{{ __('general.course_show.course_access') }}</h2>
+                                    <p class="mt-1 text-sm text-slate-500">{{ __('general.course_show.course_access_description') }}</p>
                                 </div>
 
-                                <div class="flex flex-col gap-3 text-sm text-slate-700 sm:flex-row sm:items-center sm:gap-6">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.course_show.assessment_label') }}</span>
+                                <div class="grid gap-4 lg:grid-cols-2">
+                                    <div class="rounded-2xl bg-slate-50/90 p-5 ring-1 ring-slate-200/80">
+                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                            <div>
+                                                <div class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.course_show.assessment_label') }}</div>
+                                                <h3 class="mt-2 text-lg font-semibold text-mentor-primary">
+                                                    {{ $assessmentMeta['title'] ?? __('general.course_show.assessment_label') }}
+                                                </h3>
+                                            </div>
 
-                                        @if($assessmentMeta)
-                                            @if($this->assessmentUnlocked)
-                                                <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-700">{{ __('general.course_show.unlocked') }}</span>
+                                            @if($assessmentMeta)
+                                                @if($this->assessmentUnlocked)
+                                                    <span class="inline-flex self-start whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700 sm:text-[11px]">{{ __('general.course_show.unlocked') }}</span>
+                                                @else
+                                                    <span class="inline-flex self-start whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-medium text-amber-700 sm:text-[11px]">{{ __('general.course_show.locked') }}</span>
+                                                @endif
                                             @else
-                                                <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] text-amber-700">{{ __('general.course_show.locked') }}</span>
+                                                <span class="inline-flex self-start whitespace-nowrap rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[10px] font-medium text-slate-600 sm:text-[11px]">{{ __('general.course_show.not_published') }}</span>
                                             @endif
-                                        @else
-                                            <span class="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-[11px] text-slate-600">{{ __('general.course_show.not_published') }}</span>
-                                        @endif
-                                    </div>
+                                        </div>
 
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.course_show.certificate_label') }}</span>
+                                        <p class="mt-3 text-sm leading-6 text-slate-500">
+                                            @if(! $assessmentMeta)
+                                                {{ __('general.course_show.assessment_unavailable') }}
+                                            @elseif($this->assessmentUnlocked)
+                                                {{ __('general.course_show.assessment_ready_description') }}
+                                            @else
+                                                {{ __('general.course_show.assessment_pending_description') }}
+                                            @endif
+                                        </p>
 
-                                        @if($courseCertificate)
-                                            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-700">{{ __('general.course_show.issued') }}</span>
-                                        @elseif($certificateEligibility['eligible'])
-                                            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-700">{{ __('general.course_show.eligible') }}</span>
-                                        @else
-                                            <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] text-amber-700">{{ __('general.course_show.locked') }}</span>
-                                        @endif
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-2">
-                                        @if($assessmentMeta)
-                                            @if($this->assessmentUnlocked)
+                                        <div class="mt-4 flex flex-wrap gap-2">
+                                            @if($assessmentMeta && $this->assessmentUnlocked)
                                                 <a href="{{ localized_route('assessments.take', $assessment->id) }}"
-                                                   class="inline-flex items-center rounded-xl bg-[#004777] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#003560]">
+                                                   class="admin-primary-button inline-flex items-center rounded-xl px-4 py-2 text-sm">
                                                     {{ $this->activeAttempt ? __('general.course_show.resume_test') : __('general.course_show.start_test') }}
                                                 </a>
+                                            @elseif($assessmentMeta)
+                                                <span class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                                                    {{ __('general.course_show.complete_topics_first') }}
+                                                </span>
                                             @endif
-                                        @endif
+                                        </div>
+                                    </div>
 
-                                        @if($courseCertificate && $isStudent && $enrolled)
-                                            <a href="{{ localized_route('certificates.download', $courseCertificate->id) }}"
-                                               class="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100">
-                                                {{ __('general.course_show.download_certificate') }}
-                                            </a>
-                                        @elseif($certificateEligibility['eligible'])
-                                            <a href="{{ localized_route('certificates.course.claim', $course->id) }}"
-                                               class="inline-flex items-center rounded-xl bg-[#004777] px-3 py-2 text-xs font-medium text-white transition hover:bg-[#003560]">
-                                                {{ __('general.course_show.claim_certificate') }}
-                                            </a>
-                                        @endif
+                                    <div class="rounded-2xl bg-slate-50/90 p-5 ring-1 ring-slate-200/80">
+                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                            <div>
+                                                <div class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.course_show.certificate_label') }}</div>
+                                                <h3 class="mt-2 text-lg font-semibold text-mentor-primary">
+                                                    {{ __('general.course_show.certificate_label') }}
+                                                </h3>
+                                            </div>
+
+                                            @if($courseCertificate)
+                                                <span class="inline-flex self-start whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700 sm:text-[11px]">{{ __('general.course_show.issued') }}</span>
+                                            @elseif($certificateEligibility['eligible'])
+                                                <span class="inline-flex self-start whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700 sm:text-[11px]">{{ __('general.course_show.eligible') }}</span>
+                                            @else
+                                                <span class="inline-flex self-start whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-medium text-amber-700 sm:text-[11px]">{{ __('general.course_show.locked') }}</span>
+                                            @endif
+                                        </div>
+
+                                        <p class="mt-3 text-sm leading-6 text-slate-500">
+                                            @if($courseCertificate)
+                                                {{ __('general.course_show.certificate_issued_description') }}
+                                            @elseif($certificateEligibility['eligible'])
+                                                {{ __('general.course_show.certificate_ready') }}
+                                            @else
+                                                {{ __('general.course_show.certificate_unavailable') }}
+                                            @endif
+                                        </p>
+
+                                        <div class="mt-4 flex flex-wrap gap-2">
+                                            @if($courseCertificate && $enrolled)
+                                                <a href="{{ localized_route('certificates.download', $courseCertificate->id) }}"
+                                                   class="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100">
+                                                    {{ __('general.course_show.download_certificate') }}
+                                                </a>
+                                            @elseif($certificateEligibility['eligible'])
+                                                <a href="{{ localized_route('certificates.course.claim', $course->id) }}"
+                                                   class="admin-primary-button inline-flex items-center rounded-xl px-4 py-2 text-sm">
+                                                    {{ __('general.course_show.claim_certificate') }}
+                                                </a>
+                                            @else
+                                                <span class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                                                    {{ __('general.course_show.complete_topics_first') }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     @endif
                 </div>
-        
-                @php
-                    $poster = $course->poster ?? $course->image ?? null;
-                    $posterSrc = null;
-                    if ($poster) {
-                        if (\Illuminate\Support\Str::startsWith($poster, ['http://', 'https://'])) {
-                            $posterSrc = $poster;
-                        } elseif (file_exists(public_path($poster))) {
-                            $posterSrc = asset($poster);
-                        } elseif (file_exists(public_path('storage/' . $poster))) {
-                            $posterSrc = asset('storage/' . $poster);
-                        }
-                    }
-                @endphp
 
-                <div class="relative min-h-[220px] bg-slate-100 sm:min-h-[280px]">
+                <div class="relative min-h-[240px] bg-slate-100 sm:min-h-[320px]">
                     <img src="{{ $posterSrc ?? asset('images/thumbnail/thumbnail_candle.png') }}"
                         alt="{{ $course->title }}"
                         class="h-full w-full object-cover">
@@ -171,27 +253,32 @@
 
         @if($isStudent)
             <section class="space-y-5">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h2 class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+                        <div class="text-xs uppercase tracking-[0.18em] text-[color:color-mix(in_oklab,#004777_48%,white)]">
+                            {{ __('general.course_show.course_overview') }}
+                        </div>
+                        <h2 class="mt-2 text-xl font-bold tracking-tight text-mentor-primary sm:text-2xl">
                             {{ __('general.course_show.course_topics') }}
                         </h2>
+                        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+                            {{ __('general.course_show.course_overview_description') }}
+                        </p>
                     </div>
-        
-                    <div class="hidden items-center gap-2 text-xs text-slate-500 md:flex">
-                        <span>{{ trans_choice('general.course_show.topics_count', $course->topics->count(), ['count' => $course->topics->count()]) }}</span>
-                        <span>•</span>
-                        <span>{{ __('general.course_show.completed_count', ['count' => $this->completedTopicsCount]) }}</span>
+
+                    <div class="flex items-center gap-2 text-xs text-slate-500">
+                        <span>{{ trans_choice('general.course_show.topics_count', $totalTopicsCount, ['count' => $totalTopicsCount]) }}</span>
+                        <span>&bull;</span>
+                        <span>{{ __('general.course_show.completed_count', ['count' => $completedTopicsCount]) }}</span>
                     </div>
                 </div>
-        
-                <div class="overflow-hidden rounded-2xl border bg-white shadow-sm">
+
+                <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_14px_35px_color-mix(in_oklab,#004777_8%,transparent)]">
                     @foreach($topicsToRender as $index => $topic)
                         @php
                             $status = $topic->progress_status ?? 'not_started';
-        
                             $sessionStatus = $topic->videoSessions->first()->status ?? null;
-        
+
                             $badge = match ($status) {
                                 'completed' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                 'in_progress' => 'bg-amber-100 text-amber-700 border-amber-200',
@@ -199,7 +286,7 @@
                                 'mentor' => 'bg-slate-100 text-slate-700 border-slate-200',
                                 default => 'bg-slate-100 text-slate-600 border-slate-200',
                             };
-        
+
                             $sessionBadge = match ($sessionStatus) {
                                 'completed' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
                                 'ongoing' => 'bg-amber-100 text-amber-700 border-amber-200',
@@ -208,21 +295,21 @@
                                 default => 'bg-slate-100 text-slate-600 border-slate-200',
                             };
                         @endphp
-        
-                        <div class="{{ $index !== 0 ? 'border-t' : '' }} p-4 sm:p-5">
+
+                        <div class="{{ $index !== 0 ? 'border-t border-slate-200' : '' }} p-5 sm:p-6">
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                 <div class="flex min-w-0 items-start gap-3 sm:gap-4">
-                                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#004777] text-sm font-bold text-white sm:h-11 sm:w-11 sm:text-base">
+                                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-mentor-primary text-sm font-bold text-white">
                                         {{ $index + 1 }}
                                     </div>
 
                                     <div class="min-w-0">
-                                        <h3 class="text-base font-semibold leading-tight text-slate-900 sm:text-lg">
+                                        <h3 class="text-base font-semibold leading-tight text-mentor-primary sm:text-lg">
                                             {{ $topic->name }}
                                         </h3>
 
-                                        <p class="mt-1 line-clamp-2 text-xs leading-6 text-slate-500 sm:text-sm">
-                                            {{ $topic->description }}
+                                        <p class="mt-1 text-sm leading-6 text-slate-500">
+                                            {{ $topic->description ?: __('general.course_show.topic_description_fallback') }}
                                         </p>
 
                                         <div class="mt-3 flex flex-wrap gap-2 text-[11px] sm:text-xs">
@@ -240,7 +327,7 @@
                                                 @endif
                                             </span>
 
-                                            <span class="rounded-full px-2.5 py-1 {{ $sessionBadge }}">
+                                            <span class="rounded-full border px-2.5 py-1 {{ $sessionBadge }}">
                                                 {{ $topic->videoSessions->isNotEmpty()
                                                     ? __('general.course_show.session_label', ['status' => __('general.course_show.session_status.' . ($sessionStatus ?? 'none'))])
                                                     : __('general.course_show.no_session') }}
@@ -252,15 +339,15 @@
                                 <div class="flex shrink-0 flex-wrap gap-2 sm:justify-end">
                                     @guest
                                         <a href="{{ localized_route('login') }}"
-                                           class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#003560] sm:text-sm">
-                                            {{ __('general.course_show.login_to_access_topic') }}
+                                           class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs sm:text-sm">
+                                            {{ __('general.course_show.topic_cta_guest') }}
                                         </a>
                                     @endguest
 
                                     @auth
                                         <a href="{{ localized_route('topics.show', $topic->slug) }}"
-                                           class="inline-flex items-center rounded-xl bg-[#004777] px-6 py-2.5 text-xs font-medium text-white transition hover:bg-[#003560] sm:text-sm">
-                                            {{ __('general.course_show.open_topic') }}
+                                           class="admin-primary-button inline-flex items-center rounded-xl px-5 py-2.5 text-xs sm:text-sm">
+                                            {{ __('general.course_show.topic_cta_enrolled') }}
                                         </a>
                                     @endauth
                                 </div>
@@ -279,7 +366,7 @@
                         {{ __('general.course_show.mentored_topics.description') }}
                     </p>
                 </div>
-        
+
                 @if($hasMentoredTopics)
                     <div class="rounded-3xl border bg-white p-5 sm:p-6">
                         <div class="space-y-3">
@@ -289,12 +376,12 @@
                                     $roleBadge = $mentorRole === 'owner'
                                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                         : 'bg-indigo-50 text-indigo-700 border-indigo-200';
-        
+
                                     $roleLabel = $mentorRole === 'owner'
                                         ? __('general.course_show.role.owner')
                                         : __('general.course_show.role.collaborator');
                                 @endphp
-        
+
                                 <div class="rounded-2xl border p-4">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                         <div class="min-w-0">
@@ -305,14 +392,14 @@
                                                 {{ $topic->description }}
                                             </div>
                                         </div>
-        
+
                                         <div class="flex shrink-0 flex-wrap items-center gap-2">
                                             <span class="rounded-full border px-3 py-1 text-[11px] font-medium {{ $roleBadge }}">
                                                 {{ $roleLabel }}
                                             </span>
-        
+
                                             <a href="{{ localized_route('mentor.topics.show', $topic->slug) }}"
-                                               class="rounded-xl border border-[#004777] px-3 py-2 text-xs text-[#004777] transition hover:bg-[#004777] hover:text-white">
+                                               class="admin-neutral-button rounded-xl px-3 py-2 text-xs">
                                                 {{ __('general.course_show.workspace') }}
                                             </a>
                                         </div>
@@ -341,7 +428,7 @@
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div class="absolute inset-0" wire:click="closeAssessmentModal"></div>
 
-            <div class="relative z-10 w-full max-w-6xl overflow-y-auto rounded-2xl bg-white shadow-2xl max-h-[90vh]">
+            <div class="relative z-10 max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
                 <div class="flex items-center justify-between border-b p-6">
                     <div>
                         <h3 class="text-lg font-semibold">{{ __('general.course_show.assessment_modal.title') }}</h3>
@@ -351,7 +438,7 @@
                     <button type="button"
                             wire:click="closeAssessmentModal"
                             class="text-2xl leading-none text-slate-500 transition hover:text-black">
-                        ✕
+                        &times;
                     </button>
                 </div>
 
@@ -398,7 +485,7 @@
                                     </a>
                                 @else
                                     <a href="{{ localized_route('assessments.take', $assessment->id) }}"
-                                       class="rounded-xl bg-[#004777] px-4 py-2 text-sm text-white transition hover:bg-[#003560]">
+                                       class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                                         {{ __('general.course_show.start_test') }}
                                     </a>
                                 @endif
@@ -410,7 +497,7 @@
 
                             <button type="button"
                                     wire:click="closeAssessmentModal"
-                                    class="rounded-xl border px-4 py-2 text-sm">
+                                    class="admin-neutral-button rounded-xl px-4 py-2 text-sm">
                                 {{ __('general.course_show.close') }}
                             </button>
                         </div>

@@ -4,7 +4,37 @@
     $studyProgramCarousel = $studyProgramCount > 3;
 @endphp
 
-<div class="space-y-6 px-4 sm:px-5 lg:px-20 xl:px-28">
+<div class="relative isolate px-4 sm:px-5 lg:px-20 xl:px-28">
+    <div
+        class="pointer-events-none absolute -bottom-20 left-1/2 z-0 h-[560px] w-screen -translate-x-1/2 bg-cover bg-bottom bg-no-repeat"
+        style="
+            background-image: url('{{ asset('images/decor/background.png') }}');
+            transform: scaleY(-1);
+            -webkit-mask-image: linear-gradient(
+                to top,
+                transparent 0%,
+                rgba(0, 0, 0, 0.03) 12%,
+                rgba(0, 0, 0, 0.12) 22%,
+                rgba(0, 0, 0, 0.3) 36%,
+                rgba(0, 0, 0, 0.55) 52%,
+                rgba(0, 0, 0, 0.8) 70%,
+                black 100%
+            );
+            mask-image: linear-gradient(
+                to top,
+                transparent 0%,
+                rgba(0, 0, 0, 0.03) 12%,
+                rgba(0, 0, 0, 0.12) 22%,
+                rgba(0, 0, 0, 0.3) 36%,
+                rgba(0, 0, 0, 0.55) 52%,
+                rgba(0, 0, 0, 0.8) 70%,
+                black 100%
+            );
+        "
+        aria-hidden="true"
+    ></div>
+
+    <div class="relative z-10 space-y-6">
     <section class="overflow-hidden rounded-3xl bg-[#004777] text-white origin-top">
         @if($isGuest || $isMentor)
             <div x-data="slider()" x-init="init()" class="relative">
@@ -418,6 +448,7 @@
             </div>
         </div>
     </section>
+    </div>
 </div>
 
 <script>

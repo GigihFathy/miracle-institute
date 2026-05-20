@@ -498,8 +498,7 @@ class TopicPlayer extends Component
             $youtubeId = $youtubeId ?: $this->extractYoutubeVideoId((string) $material->external_url);
 
             if ($youtubeId) {
-                // Gunakan youtube-nocookie.com & tambahkan rel=0 untuk menghindari error restriksi
-                return "https://www.youtube-nocookie.com/embed/{$youtubeId}?rel=0";
+                return "https://www.youtube.com/embed/{$youtubeId}?rel=0&modestbranding=1";
             }
 
             // Fallback jika video ternyata bukan dari YouTube (contoh: Link Google Drive)

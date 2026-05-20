@@ -105,12 +105,12 @@
                     }}"
                 >
                     @if($isLocked)
-                        <svg xmlns="http://www.w3.org" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>{{ __('general.topic_player.actions.attend_to_complete') }}</span>
                     @else
-                        <svg xmlns="http://www.w3.org" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                         </svg>
                         <span>{{ __('general.topic_player.actions.complete_unit') }}</span>
@@ -127,11 +127,7 @@
     </section>
 
     @if($activeTab === 'materials')
-        <section
-            class="space-y-4"
-            x-data="{ openMaterialCompleteModal: false }"
-            x-on:material-complete-done.window="openMaterialCompleteModal = false"
-        >
+        <section class="space-y-4">
             <div class="space-y-4 rounded-2xl border bg-white p-5">
                 <div class="flex items-end justify-between gap-4">
                     <div>
@@ -236,7 +232,12 @@
                 @endforelse
             </div>
 
-            <div class="space-y-4 rounded-2xl border bg-white p-5">
+            <div
+                class="space-y-4 rounded-2xl border bg-white p-5"
+                @if($activeMaterial)
+                    wire:key="active-material-panel-{{ $activeMaterial->id }}"
+                @endif
+            >
                 @if($activeMaterial)
                     @php
                         $activeCardData = $materialCards[(string) $activeMaterial->id] ?? [];
@@ -265,7 +266,10 @@
                             @else
                                 <button
                                     type="button"
-                                    x-on:click="openMaterialCompleteModal = true"
+                                    wire:click="confirmMaterialCompletion"
+                                    wire:loading.attr="disabled"
+                                    wire:target="confirmMaterialCompletion"
+                                    wire:confirm="{{ __('general.topic_player.materials.complete_modal.description', ['name' => $activeMaterial->name]) }}"
                                     class="rounded-xl bg-[#004777] px-4 py-2 text-sm text-white transition hover:bg-[#003560]"
                                 >
                                     {{ __('general.topic_player.materials.mark_complete') }}
@@ -278,51 +282,31 @@
                         @if($materialUrl)
                             @if($activeMaterial->type === 'video')
                                 <div class="mx-auto max-w-3xl space-y-4">
-                                    <div class="group relative aspect-video overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-sm">
-                                        @if($finalThumbnailUrl)
-                                            <img
-                                                src="{{ $finalThumbnailUrl }}"
-                                                alt="{{ __('general.topic_player.materials.thumbnail_alt', ['name' => $activeMaterial->name]) }}"
+                                    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-sm">
+                                        @if($finalPreviewUrl)
+                                            <iframe
+                                                wire:key="material-video-frame-{{ $activeMaterial->id }}"
+                                                src="{{ $finalPreviewUrl }}"
+                                                title="{{ $activeMaterial->name }}"
+                                                class="aspect-video w-full"
                                                 loading="lazy"
-                                                class="h-full w-full object-cover opacity-80 transition duration-300 group-hover:scale-105 group-hover:opacity-100"
-                                            >
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                referrerpolicy="strict-origin-when-cross-origin"
+                                                allowfullscreen
+                                            ></iframe>
                                         @else
-                                            <div class="absolute inset-0 flex items-center justify-center bg-slate-100">
+                                            <div class="flex aspect-video items-center justify-center bg-slate-100">
                                                 <span class="text-sm text-slate-400">{{ __('general.topic_player.materials.thumbnail_not_available') }}</span>
                                             </div>
                                         @endif
-
-                                        @if($finalWatchUrl)
-                                            <a href="{{ $finalWatchUrl }}" target="_blank" rel="noopener noreferrer" class="absolute inset-0 flex items-center justify-center">
-                                                <div class="grid h-16 w-16 place-items-center rounded-full bg-white/90 text-[#004777] shadow-lg transition-transform group-hover:scale-110">
-                                                    <svg xmlns="http://www.w3.org" class="ml-1 h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                            </a>
-                                        @endif
                                     </div>
 
-                                    @if($finalWatchUrl)
-                                        <div class="flex flex-wrap items-center justify-center gap-2">
-                                            <a
-                                                href="{{ $finalWatchUrl }}"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="rounded-xl border bg-[#004777] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#003560]"
-                                            >
-                                                {{ __('general.topic_player.materials.watch_youtube') }}
-                                            </a>
-                                        </div>
-                                        <div class="text-center text-xs text-slate-500">
-                                            {{ __('general.topic_player.materials.youtube_hint') }}
-                                        </div>
-                                    @endif
                                 </div>
                             @else
                                 <div class="space-y-3">
                                     <div class="overflow-hidden rounded-2xl border bg-slate-100">
                                         <iframe
+                                            wire:key="material-document-frame-{{ $activeMaterial->id }}"
                                             src="{{ $finalPreviewUrl }}"
                                             title="{{ $activeMaterial->name }}"
                                             class="h-[520px] w-full"
@@ -375,55 +359,6 @@
                 @endif
             </div>
 
-            @if($canStudentInteract && $activeMaterial)
-                <div
-                    x-show="openMaterialCompleteModal"
-                    x-cloak
-                    x-transition.opacity
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-                    x-on:keydown.escape.window="openMaterialCompleteModal = false"
-                >
-                    <div
-                        x-show="openMaterialCompleteModal"
-                        x-transition
-                        x-on:click.outside="openMaterialCompleteModal = false"
-                        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
-                    >
-                        <h3 class="text-lg font-semibold text-slate-950">
-                            {{ __('general.topic_player.materials.complete_modal.title') }}
-                        </h3>
-
-                        <p class="mt-2 text-sm leading-6 text-slate-600">
-                            {!! __('general.topic_player.materials.complete_modal.description', ['name' => e($activeMaterial->name)]) !!}
-                        </p>
-
-                        <div class="mt-5 flex justify-end gap-2">
-                            <button
-                                type="button"
-                                x-on:click="openMaterialCompleteModal = false"
-                                class="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-                            >
-                                {{ __('general.topic_player.actions.cancel') }}
-                            </button>
-
-                            <button
-                                type="button"
-                                wire:click="confirmMaterialCompletion"
-                                wire:loading.attr="disabled"
-                                wire:target="confirmMaterialCompletion"
-                                class="rounded-xl bg-[#004777] px-4 py-2 text-sm font-medium text-white hover:bg-[#003560] disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                                <span wire:loading.remove wire:target="confirmMaterialCompletion">
-                                    {{ __('general.topic_player.actions.confirm') }}
-                                </span>
-                                <span wire:loading wire:target="confirmMaterialCompletion">
-                                    {{ __('general.topic_player.loading.processing') }}
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
         </section>
     @endif
 
@@ -535,97 +470,98 @@
                         @endif
                     </div>
 
-                    <div
-                        x-cloak
-                        x-show="open"
-                        x-transition.opacity
-                        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
-                        x-on:keydown.escape.window="closeModal()"
-                        x-on:click.self="closeModal()"
-                    >
-                        <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
-                            <div class="flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6 sm:py-5">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-slate-900">{{ __('general.topic_player.sessions.join_modal.title') }}</h3>
-                                    <p class="mt-1 text-sm text-slate-500">
-                                        {{ __('general.topic_player.sessions.join_modal.subtitle') }}
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    x-on:click="closeModal()"
-                                    class="rounded-xl border px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
-                                >
-                                    {{ __('general.topic_player.actions.close') }}
-                                </button>
-                            </div>
-
-                            <div class="space-y-4 px-5 py-5 sm:px-6 sm:py-6">
-                                <div class="grid gap-3 text-sm sm:grid-cols-2">
-                                    <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.title') }}</div>
-                                        <div class="mt-1 font-semibold text-slate-900">{{ $session->title }}</div>
+                    <template x-if="isOpen">
+                        <div
+                            x-cloak
+                            x-transition.opacity
+                            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4"
+                            x-on:keydown.escape.window="closeModal()"
+                            x-on:click.self="closeModal()"
+                        >
+                            <div class="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl" x-on:click.stop>
+                                <div class="flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6 sm:py-5">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-slate-900">{{ __('general.topic_player.sessions.join_modal.title') }}</h3>
+                                        <p class="mt-1 text-sm text-slate-500">
+                                            {{ __('general.topic_player.sessions.join_modal.subtitle') }}
+                                        </p>
                                     </div>
 
-                                    <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.status') }}</div>
-                                        <div class="mt-1">
-                                            <span
-                                                class="inline-flex rounded-full border px-3 py-1 text-xs font-semibold"
-                                                :class="badgeClass"
-                                                x-text="stateLabel"
-                                            ></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.start') }}</div>
-                                        <div class="mt-1 font-semibold text-slate-900">
-                                            {{ $session->start_at?->format('d M Y, H:i') ?? '-' }}
-                                        </div>
-                                    </div>
-
-                                    <div class="rounded-xl border bg-slate-50 p-4">
-                                        <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.end') }}</div>
-                                        <div class="mt-1 font-semibold text-slate-900">
-                                            {{ $session->end_at?->format('d M Y, H:i') ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="rounded-xl border border-slate-200 bg-white p-4">
-                                    <div class="text-xs uppercase tracking-wide text-slate-500">{{ __('general.topic_player.sessions.countdown') }}</div>
-                                    <div class="mt-1 text-base font-semibold text-slate-900" x-text="countdownLabel"></div>
-                                </div>
-
-                                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                                    {{ __('general.topic_player.sessions.clock_in_deadline', ['time' => $session->start_at?->copy()->addMinutes(45)?->format('d M Y, H:i') ?? '-']) }}
-                                </div>
-
-                                <div class="flex items-center justify-end gap-3 border-t pt-4">
                                     <button
                                         type="button"
                                         x-on:click="closeModal()"
-                                        class="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                                        class="rounded-xl border px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
                                     >
-                                        {{ __('general.topic_player.actions.cancel') }}
+                                        {{ __('general.topic_player.actions.close') }}
                                     </button>
+                                </div>
 
-                                    <button
-                                        type="button"
-                                        wire:click="joinSession('{{ $session->id }}')"
-                                        wire:loading.attr="disabled"
-                                        @disabled($phase !== 'live')
-                                        class="rounded-xl px-4 py-2 text-sm font-medium transition"
-                                        :class="buttonClass"
-                                    >
-                                        {{ __('general.topic_player.sessions.join_and_log') }}
-                                    </button>
+                                <div class="space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+                                    <div class="grid gap-3 text-sm sm:grid-cols-2">
+                                        <div class="rounded-xl border bg-slate-50 p-4">
+                                            <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.title') }}</div>
+                                            <div class="mt-1 font-semibold text-slate-900">{{ $session->title }}</div>
+                                        </div>
+
+                                        <div class="rounded-xl border bg-slate-50 p-4">
+                                            <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.status') }}</div>
+                                            <div class="mt-1">
+                                                <span
+                                                    class="inline-flex rounded-full border px-3 py-1 text-xs font-semibold"
+                                                    :class="badgeClass"
+                                                    x-text="stateLabel"
+                                                ></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="rounded-xl border bg-slate-50 p-4">
+                                            <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.start') }}</div>
+                                            <div class="mt-1 font-semibold text-slate-900">
+                                                {{ $session->start_at?->format('d M Y, H:i') ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="rounded-xl border bg-slate-50 p-4">
+                                            <div class="text-xs text-slate-500">{{ __('general.topic_player.sessions.meta.end') }}</div>
+                                            <div class="mt-1 font-semibold text-slate-900">
+                                                {{ $session->end_at?->format('d M Y, H:i') ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-xl border border-slate-200 bg-white p-4">
+                                        <div class="text-xs uppercase tracking-wide text-slate-500">{{ __('general.topic_player.sessions.countdown') }}</div>
+                                        <div class="mt-1 text-base font-semibold text-slate-900" x-text="countdownLabel"></div>
+                                    </div>
+
+                                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+                                        {{ __('general.topic_player.sessions.clock_in_deadline', ['time' => $session->start_at?->copy()->addMinutes(45)?->format('d M Y, H:i') ?? '-']) }}
+                                    </div>
+
+                                    <div class="flex items-center justify-end gap-3 border-t pt-4">
+                                        <button
+                                            type="button"
+                                            x-on:click="closeModal()"
+                                            class="rounded-xl border px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                                        >
+                                            {{ __('general.topic_player.actions.cancel') }}
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            wire:click="joinSession('{{ $session->id }}')"
+                                            wire:loading.attr="disabled"
+                                            @disabled($phase !== 'live')
+                                            class="rounded-xl px-4 py-2 text-sm font-medium transition"
+                                            :class="buttonClass"
+                                        >
+                                            {{ __('general.topic_player.sessions.join_and_log') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             @empty
                 <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
@@ -642,7 +578,7 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('sessionJoinCard', (cfg) => ({
-                open: false,
+                isOpen: false,
                 now: Date.now(),
                 timer: null,
 
@@ -749,12 +685,12 @@
 
                 openModal() {
                     if (this.canJoin) {
-                        this.open = true;
+                        this.isOpen = true;
                     }
                 },
 
                 closeModal() {
-                    this.open = false;
+                    this.isOpen = false;
                 },
             }));
         });

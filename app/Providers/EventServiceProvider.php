@@ -6,8 +6,10 @@ namespace App\Providers;
 // FOR CORE EVENTS & LISTENERS
 
 use App\Events\AssessmentPassed;
+use App\Events\AssessmentAvailable;
 
 use App\Listeners\HandleAssessmentPassed;
+use App\Listeners\SendAssessmentAvailableEmail;
 
 // FOR MAIL NOTIFICATIONS
 
@@ -16,7 +18,6 @@ use App\Email\Events\AttendanceIssueDetected;
 use App\Email\Events\ContentCompleted;
 use App\Email\Events\CourseEnrollmentCreated;
 use App\Email\Events\VideoSessionScheduled;
-use App\Email\Events\AssessmentAvailable;
 use App\Email\Events\CertificateIssued;
 
 use App\Email\Listeners\ScheduleVideoSessionReminder;
@@ -25,7 +26,6 @@ use App\Email\Listeners\SendAttendanceIssueNotification;
 use App\Email\Listeners\SendContentCompletionNotification;
 use App\Email\Listeners\SendCourseEnrollmentNotification;
 use App\Email\Listeners\SendVideoSessionScheduledNotification;
-use App\Email\Listeners\SendAssessmentAvailableEmail;
 use App\Email\Listeners\SendCertificateIssuedNotification;
 
 
