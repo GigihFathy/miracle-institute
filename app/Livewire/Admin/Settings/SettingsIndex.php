@@ -3,10 +3,14 @@
 namespace App\Livewire\Admin\Settings;
 
 use App\Models\Company;
+use App\Models\SystemSetting;
 use Livewire\Component;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsIndex extends Component
 {
+    public bool $isGoogleConnected = false;
+
     public string $name = '';
     public string $description = '';
     public string $address = '';
@@ -28,6 +32,30 @@ class SettingsIndex extends Component
                 'facebook','instagram','youtube','whatsapp',
             ]));
         }
+
+        $this->checkGoogleConnection();
+    }
+
+    public function checkGoogleConnection()
+    {
+        $setting = SystemSetting::where('key', 'google_master_refresh_token')->first();
+        $this->isGoogleConnected = $setting && !empty($setting->value);
+    }
+
+    public function connectGoogle()
+    {
+        return redirect()->route('admin.google.connect');
+    }
+
+    public function disconnectGoogle()
+    {
+        SystemSetting::where('key', 'google_master_refresh_token')->delete();
+        
+        Cache::forget('google_master_access_token');
+        
+        $this->isGoogleConnected = false;
+
+        $this->dispatch('toast', type: 'success', message: 'Koneksi Google Drive berhasil diputus.');
     }
 
     public function save(): void
@@ -61,7 +89,7 @@ class SettingsIndex extends Component
             ]
         );
 
-        session()->flash('success', 'Settings saved.');
+        $this->dispatch('toast', type: 'success', message: 'Pengaturan berhasil disimpan.');
     }
 
     public function render()

@@ -189,8 +189,14 @@ return [
     'settings' => [
         'page_title' => 'Pengaturan',
         'page_subtitle' => 'Branding, visi-misi, dan tautan sosial.',
+        'profile' => [
+            'title' => 'Profil Perusahaan',
+            'subtitle' => 'Atur informasi dasar dan kontak platform.',
+        ],
         'actions' => [
             'save' => 'Simpan Pengaturan',
+            'connect_google' => 'Otorisasi dengan Akun Google',
+            'disconnect_google' => 'Putuskan Akses Sinkronisasi',
         ],
         'form' => [
             'company_name' => 'Nama perusahaan',
@@ -203,6 +209,19 @@ return [
             'instagram' => 'URL Instagram',
             'youtube' => 'URL YouTube',
             'whatsapp' => 'URL WhatsApp',
+        ],
+        'drive' => [
+            'title' => 'Integrasi Cloud Storage (Google Drive)',
+            'description' => 'Hubungkan satu akun Google Workspace/Drive admin yang akan bertindak sebagai brankas penyimpanan utama sistem. Pengguna lain akan secara otomatis menyimpan file ke akun ini tanpa perlu melakukan login.',
+            'status' => [
+                'connected' => 'Tersinkronisasi',
+                'disconnected' => 'Belum Terhubung',
+            ],
+            'notes' => [
+                'active' => 'Kredensial master aktif. Sistem siap mengelola unggahan dokumen dan video.',
+                'warning' => 'Peringatan: Sistem tidak dapat menerima materi unggahan sebelum integrasi ini diselesaikan.',
+            ],
+            'confirm_disconnect' => 'Yakin ingin memutus akses Google Drive? File yang sudah diunggah tidak akan hilang, tetapi sistem tidak bisa menerima unggahan file baru hingga dihubungkan kembali.',
         ],
     ],
 

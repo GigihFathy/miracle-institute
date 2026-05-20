@@ -19,6 +19,7 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
         'drive_root_folder' => env('GOOGLE_DRIVE_ROOT_FOLDER'),
         'youtube_default_privacy' => env('GOOGLE_YOUTUBE_DEFAULT_PRIVACY', 'unlisted'),
+        'master_refresh_token' => env('GOOGLE_MASTER_REFRESH_TOKEN'),
     ],
 
     'postmark' => [

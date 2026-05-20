@@ -19,7 +19,7 @@ class YouTubeService
 
     public function uploadVideo(UploadedFile $file, string $title, ?string $description = null): string
     {
-        $client = $this->clientFactory->makeForCurrentUser();
+        $client = $this->clientFactory->makeForSystem();
         $youtube = new YouTube($client);
 
         $snippet = new VideoSnippet();
@@ -79,7 +79,7 @@ class YouTubeService
         }
 
         try {
-            $client = $this->clientFactory->makeForCurrentUser();
+            $client = $this->clientFactory->makeForSystem();
             $youtube = new YouTube($client);
             $youtube->videos->delete($id);
         } catch (\Throwable $e) {

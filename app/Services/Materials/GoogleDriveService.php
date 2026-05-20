@@ -23,11 +23,27 @@ class GoogleDriveService
             throw new RuntimeException('GOOGLE_DRIVE_ROOT_FOLDER belum diisi.');
         }
 
-        $client = $this->clientFactory->makeForCurrentUser();
+        $client = $this->clientFactory->makeForSystem();
         $drive = new Drive($client);
 
+        $sanitizedTitle = Str::of($title)->squish();
+
+        $cleanName = Str::of($sanitizedTitle)
+            ->replaceMatches('/[^a-zA-Z0-9\s_-]/', '')
+            ->replaceMatches('/\s+/', '_')           
+            ->lower()                                  
+            ->limit(80, '');                           
+
+        $fileName = sprintf(
+            '%s_%s_%s.%s',
+            now()->format('Ymd'),
+            $cleanName,
+            Str::upper(Str::random(5)),
+            $file->getClientOriginalExtension()
+        );
+
         $driveFile = new DriveFile([
-            'name' => Str::of($title)->slug('-')->limit(80, '') . '-' . Str::random(6) . '.' . $file->getClientOriginalExtension(),
+            'name' => $fileName,
             'parents' => [$folderId],
         ]);
 
@@ -48,7 +64,7 @@ class GoogleDriveService
         }
 
         try {
-            $client = $this->clientFactory->makeForCurrentUser();
+            $client = $this->clientFactory->makeForSystem();
             $drive = new Drive($client);
             $drive->files->delete($fileId);
         } catch (\Throwable $e) {

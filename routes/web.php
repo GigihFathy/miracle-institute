@@ -3,8 +3,12 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\GoogleIntegrationController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\VideoSessionJoinController;
+
+
+
 
 use App\Livewire\Admin\Assessments\AssessmentIndex as AdminAssessmentIndex;
 use App\Livewire\Admin\Certificates\CertificateIndex;
@@ -50,6 +54,9 @@ use App\Livewire\Profile\ProfilePage;
 
 use App\Livewire\Topics\TopicPlayer;
 use App\Services\RoleService;
+
+use Google\Client as GoogleClient;
+
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -57,6 +64,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('locale', 'en|id');
+
+
+Route::middleware(['auth', 'role.redirect:admin'])->group(function () {
+    Route::get('/admin/settings/google-connect', [GoogleIntegrationController::class, 'redirect'])->name('admin.google.connect');
+    Route::get('/admin/settings/google-callback', [GoogleIntegrationController::class, 'callback'])->name('admin.google.callback');
+});
 
 /*
 |--------------------------------------------------------------------------
