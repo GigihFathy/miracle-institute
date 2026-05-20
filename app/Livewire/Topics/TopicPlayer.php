@@ -29,6 +29,9 @@ class TopicPlayer extends Component
     public bool $canOpenMentorWorkspace = false;
     public bool $canStudentInteract = false;
 
+    public bool $showSessionModal = false;
+    public ?string $selectedSessionId = null;
+
     public function mount(string $slug): void
     {
         $this->topic = Topic::query()
@@ -46,7 +49,7 @@ class TopicPlayer extends Component
 
         $this->isMentor = $user ? $user->hasRole('disciples') : false;
         $this->canOpenMentorWorkspace = $this->isMentor && $this->canOpenMentorWorkspaceForTopic();
-        $this->canStudentInteract = auth()->check() &&!$this->canOpenMentorWorkspace;
+        $this->canStudentInteract = auth()->check() && ! $this->canOpenMentorWorkspace;
 
         $this->activeMaterialId = $this->materialsQuery()->value('id');
 
@@ -64,7 +67,7 @@ class TopicPlayer extends Component
     {
         $exists = $this->materialsQuery()->whereKey($materialId)->exists();
 
-        if (!$exists) {
+        if (! $exists) {
             return;
         }
 
@@ -72,11 +75,33 @@ class TopicPlayer extends Component
         $this->activeTab = 'materials';
     }
 
+    public function openSessionModal(string $sessionId): void
+    {
+        $session = $this->topic->videoSessions->firstWhere('id', $sessionId);
+
+        if (! $session) {
+            return;
+        }
+
+        if ($this->sessionPhase($session) === 'invalid') {
+            return;
+        }
+
+        $this->selectedSessionId = $sessionId;
+        $this->showSessionModal = true;
+    }
+
+    public function closeSessionModal(): void
+    {
+        $this->showSessionModal = false;
+        $this->selectedSessionId = null;
+    }
+
     public function markViewed(ProgressService $progressService): void
     {
         abort_unless($this->canStudentInteract, 403);
 
-        if (!$this->activeMaterialId) {
+        if (! $this->activeMaterialId) {
             return;
         }
 
@@ -84,7 +109,6 @@ class TopicPlayer extends Component
         $progressService->recalculateTopicCompletion(auth()->id(), $this->topic->id);
 
         $this->hydrateTopicCompletion();
-        $this->dispatch('$refresh');
 
         session()->flash('success', 'Material marked as viewed.');
     }
@@ -93,7 +117,7 @@ class TopicPlayer extends Component
     {
         abort_unless($this->canStudentInteract, 403);
 
-        if (!$this->activeMaterialId) {
+        if (! $this->activeMaterialId) {
             session()->flash('error', 'Tidak ada material aktif.');
             return;
         }
@@ -101,8 +125,6 @@ class TopicPlayer extends Component
         $result = $progressService->markMaterialCompleted(auth()->id(), $this->activeMaterialId);
 
         $this->hydrateTopicCompletion();
-
-        $this->dispatch('material-complete-done');
 
         session()->flash(
             'success',
@@ -119,7 +141,6 @@ class TopicPlayer extends Component
         $progressService->recalculateTopicCompletion(auth()->id(), $this->topic->id);
 
         $this->hydrateTopicCompletion();
-        $this->dispatch('$refresh');
 
         session()->flash('success', 'Topic progress diperbarui.');
     }
@@ -130,7 +151,7 @@ class TopicPlayer extends Component
 
         $snapshot = $progressService->topicCompletionSnapshot(auth()->id(), $this->topic->id);
 
-        if (!$snapshot['can_complete']) {
+        if (! $snapshot['can_complete']) {
             session()->flash('error', implode(' ', $snapshot['reasons']));
             return;
         }
@@ -141,6 +162,7 @@ class TopicPlayer extends Component
 
         session()->flash('success', 'Topik berhasil ditandai sebagai selesai.');
     }
+
     public function sessionPhase(VideoSession $session): string
     {
         if (! $session->start_at || ! $session->end_at) {
@@ -193,7 +215,6 @@ class TopicPlayer extends Component
         return __('general.topic_player.sessions.completed_label');
     }
 
-    
     public function sessionBadgeClass(VideoSession $session): string
     {
         return match ($this->sessionPhase($session)) {
@@ -203,7 +224,6 @@ class TopicPlayer extends Component
             default => 'bg-slate-100 text-slate-700 border-slate-200',
         };
     }
-    
 
     public function sessionButtonClass(VideoSession $session): string
     {
@@ -214,7 +234,6 @@ class TopicPlayer extends Component
             default => 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed',
         };
     }
-
 
     public function joinSession(string $sessionId)
     {
@@ -229,7 +248,7 @@ class TopicPlayer extends Component
         $user = auth()->user();
         $now = now();
 
-        if (!$user->hasRole('student') && session('active_role') !== 'student') {
+        if (! $user->hasRole('student') && session('active_role') !== 'student') {
             return redirect()->away($session->zoom_link);
         }
 
@@ -265,12 +284,12 @@ class TopicPlayer extends Component
             ? $materials->firstWhere('id', $this->activeMaterialId)
             : $materials->first();
 
-        if (!$activeMaterial && $materials->isNotEmpty()) {
+        if (! $activeMaterial && $materials->isNotEmpty()) {
             $activeMaterial = $materials->first();
             $this->activeMaterialId = $activeMaterial->id;
         }
 
-        if ($activeMaterial &&!$this->activeMaterialId) {
+        if ($activeMaterial && ! $this->activeMaterialId) {
             $this->activeMaterialId = $activeMaterial->id;
         }
 
@@ -280,7 +299,7 @@ class TopicPlayer extends Component
             ? ($materialCards[(string) $activeMaterial->id] ?? null)
             : null;
 
-        $materialUrl = $activeMaterialCard['preview_url'] ?? null;
+        $materialPreviewUrl = $activeMaterialCard['preview_url'] ?? null;
 
         $topicStatus = null;
         $topicCompleted = false;
@@ -313,6 +332,10 @@ class TopicPlayer extends Component
 
         $this->topicStatus = $topicStatus;
         $this->topicCompleted = $topicCompleted;
+
+        $selectedSession = $this->selectedSessionId
+            ? $this->topic->videoSessions->firstWhere('id', $this->selectedSessionId)
+            : null;
 
         $attendanceStats = [
             'present' => $sessionAttendances->where('status', 'present')->count(),
@@ -353,7 +376,7 @@ class TopicPlayer extends Component
                 $completionSnapshot = app(ProgressService::class)
                     ->topicCompletionSnapshot(auth()->id(), $this->topic->id);
 
-                $canMarkComplete =!($activeMaterialProgress?->status === 'completed');
+                $canMarkComplete = ! ($activeMaterialProgress?->status === 'completed');
             }
         }
 
@@ -366,7 +389,8 @@ class TopicPlayer extends Component
             'activeMaterial' => $activeMaterial,
             'activeMaterialCard' => $activeMaterialCard,
             'materialCards' => $materialCards,
-            'materialUrl' => $materialUrl,
+            'materialUrl' => $materialPreviewUrl,
+            'materialPreviewUrl' => $materialPreviewUrl,
             'topicStatus' => $topicStatus,
             'topicCompleted' => $topicCompleted,
             'sessionAttendances' => $sessionAttendances,
@@ -378,6 +402,8 @@ class TopicPlayer extends Component
             'canStudentInteract' => $this->canStudentInteract,
             'isMentor' => $this->isMentor,
             'materials' => $materials,
+            'selectedSession' => $selectedSession,
+            'showSessionModal' => $this->showSessionModal,
         ])->layout('layouts.learning');
     }
 
@@ -388,7 +414,7 @@ class TopicPlayer extends Component
             ->orderBy('sort_order')
             ->orderBy('created_at');
 
-        if (!$this->canOpenMentorWorkspace) {
+        if (! $this->canOpenMentorWorkspace) {
             $query->where('status', 'active')
                 ->where('visibility', 'public');
         }
@@ -403,7 +429,7 @@ class TopicPlayer extends Component
             ->where('course_id', $this->topic->course_id)
             ->first();
 
-        if (!$enrollment) {
+        if (! $enrollment) {
             $this->topicCompleted = false;
             $this->topicStatus = null;
             return;
@@ -424,7 +450,7 @@ class TopicPlayer extends Component
 
     private function canOpenMentorWorkspaceForTopic(): bool
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
 
@@ -449,15 +475,15 @@ class TopicPlayer extends Component
                     : null;
 
                 $previewUrl = $this->resolveMaterialPreviewUrl($material, $youtubeId);
-                
-                // Ambil URL sumber tergantung tipe material
-                $sourceValue = $material->type === 'video' ? $material->external_url : $material->path;
-                
-                // Coba ekstrak ID Google Drive (jika ada) untuk fallback thumbnail
+
+                $sourceValue = $material->type === 'video'
+                    ? $material->external_url
+                    : $material->path;
+
                 $driveId = $this->extractGoogleDriveFileId((string) $sourceValue);
 
-                // Set Thumbnail (Prioritas: YouTube -> Google Drive -> Null)
                 $thumbnailUrl = null;
+
                 if ($youtubeId) {
                     $thumbnailUrl = "https://img.youtube.com/vi/{$youtubeId}/hqdefault.jpg";
                 } elseif ($driveId) {
@@ -490,7 +516,7 @@ class TopicPlayer extends Component
 
     private function resolveMaterialPreviewUrl($material, ?string $youtubeId = null): ?string
     {
-        if (!$material) {
+        if (! $material) {
             return null;
         }
 
@@ -501,7 +527,6 @@ class TopicPlayer extends Component
                 return "https://www.youtube.com/embed/{$youtubeId}?rel=0&modestbranding=1";
             }
 
-            // Fallback jika video ternyata bukan dari YouTube (contoh: Link Google Drive)
             return $this->toGoogleDrivePreviewUrl((string) $material->external_url);
         }
 
@@ -572,10 +597,10 @@ class TopicPlayer extends Component
 
         $parts = parse_url($input);
 
-        if (!empty($parts['query'])) {
+        if (! empty($parts['query'])) {
             parse_str($parts['query'], $query);
 
-            if (!empty($query['v']) && preg_match('/^[A-Za-z0-9_-]{11}$/', $query['v'])) {
+            if (! empty($query['v']) && preg_match('/^[A-Za-z0-9_-]{11}$/', $query['v'])) {
                 return $query['v'];
             }
         }
@@ -648,5 +673,4 @@ class TopicPlayer extends Component
 
         return implode(' ', $parts);
     }
-
 }

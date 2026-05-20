@@ -278,9 +278,9 @@ class DatabaseSeeder extends Seeder
     private function seedMaterials(array $topicsByCourse, string $asset, $now): array
     {
         $rows = [];
-        $sampleVideoUrl = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygURTmV2ZXIgZ2l2ZSB5b3UgdXCgBwE%3D';
-        $samplePdfPath = 'https://drive.google.com/file/d/1r_UteQTPR3zCdBnryhEABjmhvIdmd-sR/view';
-        $samplePptPath = 'https://drive.google.com/file/d/1bcpUpuKY2plw1Pi8e8lC83TDZtPJ0h5O/view';
+        $sampleVideoUrl = 'https://www.youtube.com/watch?v=5zi2zI1tUww';
+        $samplePdfPath = 'https://drive.google.com/file/d/1HzBPBPWxDFFMzfKz-lelKSX_xJfqob3D/preview';
+        $samplePptPath = 'https://drive.google.com/file/d/11Y1yPyIUX-Aj_t6AmaSOuVri4q9D-wHa/preview';
 
         foreach ($topicsByCourse as $courseSlug => $topics) {
             foreach ($topics as $topic) {

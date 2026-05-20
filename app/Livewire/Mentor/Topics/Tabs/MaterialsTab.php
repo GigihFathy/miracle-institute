@@ -6,18 +6,22 @@ use App\Livewire\Concerns\InteractsWithMentorTopic;
 use App\Models\Material;
 use App\Models\Topic;
 use App\Services\Materials\MaterialAssetService;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
+use RuntimeException;
 
 class MaterialsTab extends Component
 {
     use InteractsWithMentorTopic;
     use WithFileUploads;
 
-    public Topic $topic;
+    public string $topicId;
 
     public ?string $selectedMaterialId = null;
     public ?string $editingMaterialId = null;
@@ -33,15 +37,24 @@ class MaterialsTab extends Component
 
     public function mount(string $topicId): void
     {
-        $this->topic = $this->loadTopic($topicId);
+        $this->topicId = $topicId;
 
-        abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
+        $topic = $this->topic();
+
+        abort_unless(
+            $this->canAccessTopic($topic, ['manage_materials', 'manage_topics']),
+            403
+        );
 
         $this->selectedMaterialId = $this->materialsQuery()->value('id');
-        $this->materialSortOrder = ($this->topic->materials()->max('sort_order') ?? 0) + 1;
+        $this->materialSortOrder = ($topic->materials()->max('sort_order') ?? 0) + 1;
     }
 
-    // Fungsi Lifecycle: Membersihkan input saat Type diubah
+    private function topic(): Topic
+    {
+        return $this->loadTopic($this->topicId);
+    }
+
     public function updatedMaterialType(): void
     {
         $this->materialFile = null;
@@ -51,9 +64,14 @@ class MaterialsTab extends Component
 
     public function openMaterialModal(): void
     {
-        abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
+        $topic = $this->topic();
 
-        if ($this->topic->materials()->count() >= 5) {
+        abort_unless(
+            $this->canAccessTopic($topic, ['manage_materials', 'manage_topics']),
+            403
+        );
+
+        if ($topic->materials()->count() >= 5) {
             session()->flash('error', 'Batas material per topic sudah penuh.');
             return;
         }
@@ -64,10 +82,15 @@ class MaterialsTab extends Component
 
     public function editMaterial(string $id): void
     {
-        abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
+        $topic = $this->topic();
+
+        abort_unless(
+            $this->canAccessTopic($topic, ['manage_materials', 'manage_topics']),
+            403
+        );
 
         $material = Material::query()
-            ->where('topic_id', $this->topic->id)
+            ->where('topic_id', $topic->id)
             ->findOrFail($id);
 
         $this->editingMaterialId = $material->id;
@@ -76,7 +99,7 @@ class MaterialsTab extends Component
         $this->materialStatus = $material->status;
         $this->materialExternalUrl = $material->external_url ?? '';
         $this->materialFile = null;
-        $this->materialSortOrder = $material->sort_order;
+        $this->materialSortOrder = (int) ($material->sort_order ?? 1);
 
         $this->showMaterialModal = true;
     }
@@ -97,19 +120,21 @@ class MaterialsTab extends Component
 
     private function availableMaterialTypes(): array
     {
-        // Allow any type to be added (user requested ability to add multiple of same type)
         return ['pdf', 'ppt', 'video'];
     }
 
     public function saveMaterial(): void
     {
-        abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
+        $topic = $this->topic();
 
-        $availableTypes = $this->availableMaterialTypes();
+        abort_unless(
+            $this->canAccessTopic($topic, ['manage_materials', 'manage_topics']),
+            403
+        );
 
         $this->validate([
             'materialName' => ['required', 'string', 'max:255'],
-            'materialType' => ['required', Rule::in($availableTypes)],
+            'materialType' => ['required', Rule::in($this->availableMaterialTypes())],
             'materialStatus' => ['required', Rule::in(Material::STATUSES)],
             'materialSortOrder' => ['required', 'integer', 'min:0'],
             'materialExternalUrl' => ['nullable', 'url', 'max:2048'],
@@ -117,99 +142,141 @@ class MaterialsTab extends Component
         ]);
 
         $existing = $this->editingMaterialId
-            ? Material::query()->where('topic_id', $this->topic->id)->findOrFail($this->editingMaterialId)
+            ? Material::query()
+                ->where('topic_id', $topic->id)
+                ->findOrFail($this->editingMaterialId)
             : null;
 
-        if ($this->materialType === 'video' &&!$this->materialExternalUrl &&!$this->materialFile &&!($existing?->external_url)) {
-            throw ValidationException::withMessages([
-                'materialExternalUrl' => 'Video wajib memakai URL YouTube.',
-            ]);
-        }
+        $hasUpload = $this->hasUpload($this->materialFile);
 
-        if (in_array($this->materialType, ['pdf', 'ppt'], true) &&!$this->materialFile &&!($existing?->path)) {
-            throw ValidationException::withMessages([
-                'materialFile' => 'File PDF/PPT wajib diunggah.',
-            ]);
-        }
-
-        $isEditing = (bool) $this->editingMaterialId;
-
-        DB::transaction(function () use ($existing, &$material) {
-            $asset = app(MaterialAssetService::class)->sync(
-                material: $existing,
-                type: $this->materialType,
-                file: $this->materialFile,
-                externalUrl: $this->materialExternalUrl ?: null,
-                title: $this->materialName
-            );
-
-            $payload = [
-                'topic_id' => $this->topic->id,
-                'uploader_id' => auth()->id(),
-                'name' => $this->materialName,
-                'type' => $this->materialType,
-                'path' => $asset['path'],
-                'external_url' => $asset['external_url'],
-                'visibility' => 'public',
-                'sort_order' => $this->materialSortOrder,
-                'status' => $this->materialStatus,
-            ];
-
-            if ($existing) {
-                $existing->update($payload);
-                $material = $existing;
-                return;
+        if ($this->materialType === 'video') {
+            if ($hasUpload) {
+                throw ValidationException::withMessages([
+                    'materialFile' => 'Video tidak menerima upload file. Gunakan URL video.',
+                ]);
             }
 
-            $material = Material::create($payload);
-        });
+            if (!$this->materialExternalUrl && !($existing?->external_url)) {
+                throw ValidationException::withMessages([
+                    'materialExternalUrl' => 'Video wajib memakai URL.',
+                ]);
+            }
+        }
 
-        $this->selectedMaterialId = $material->id;
-        $this->closeMaterialModal();
-        $this->resetMaterialForm();
+        if (in_array($this->materialType, ['pdf', 'ppt'], true)) {
+            if (!$hasUpload && !($existing?->path)) {
+                throw ValidationException::withMessages([
+                    'materialFile' => 'File PDF/PPT wajib diunggah.',
+                ]);
+            }
+        }
 
-        session()->flash('success', $isEditing ? 'Material berhasil diperbarui.' : 'Material berhasil ditambahkan.');
+        try {
+            DB::transaction(function () use ($existing, $topic): void {
+                $asset = app(MaterialAssetService::class)->sync(
+                    material: $existing,
+                    type: $this->materialType,
+                    file: $this->materialFile,
+                    externalUrl: $this->materialExternalUrl ?: null,
+                    title: $this->materialName
+                );
+
+                $payload = [
+                    'topic_id' => $topic->id,
+                    'uploader_id' => Auth::id(),
+                    'name' => $this->materialName,
+                    'type' => $this->materialType,
+                    'path' => $asset['path'],
+                    'external_url' => $asset['external_url'],
+                    'visibility' => 'public',
+                    'sort_order' => $this->materialSortOrder,
+                    'status' => $this->materialStatus,
+                ];
+
+                if ($existing) {
+                    $existing->update($payload);
+                } else {
+                    Material::create($payload);
+                }
+            });
+
+            $this->selectedMaterialId = Material::query()
+                ->where('topic_id', $topic->id)
+                ->orderBy('sort_order')
+                ->orderBy('created_at')
+                ->value('id');
+
+            $this->closeMaterialModal();
+            $this->resetMaterialForm();
+
+            session()->flash(
+                'success',
+                $this->editingMaterialId ? 'Material berhasil diperbarui.' : 'Material berhasil ditambahkan.'
+            );
+        } catch (RuntimeException $e) {
+            session()->flash('error', $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            session()->flash('error', 'Terjadi kesalahan sistem saat menyimpan material.');
+        }
     }
 
     public function deleteMaterial(string $id): void
     {
-        abort_unless($this->canAccessTopic($this->topic, ['manage_materials', 'manage_topics']), 403);
+        $topic = $this->topic();
+
+        abort_unless(
+            $this->canAccessTopic($topic, ['manage_materials', 'manage_topics']),
+            403
+        );
 
         $material = Material::query()
-            ->where('topic_id', $this->topic->id)
+            ->where('topic_id', $topic->id)
             ->findOrFail($id);
 
-        DB::transaction(function () use ($material) {
-            app(MaterialAssetService::class)->delete($material);
-            $material->delete();
+        try {
+            DB::transaction(function () use ($material, $topic): void {
+                if (in_array($material->type, ['pdf', 'ppt'], true)) {
+                    app(MaterialAssetService::class)->delete($material);
+                }
 
-            // Reorder remaining materials' sort_order sequentially starting from 1
-            $remaining = Material::query()
-                ->where('topic_id', $this->topic->id)
+                $material->delete();
+
+                $remaining = Material::query()
+                    ->where('topic_id', $topic->id)
+                    ->orderBy('sort_order')
+                    ->orderBy('created_at')
+                    ->get();
+
+                foreach ($remaining as $index => $row) {
+                    $newOrder = $index + 1;
+
+                    if ((int) $row->sort_order !== $newOrder) {
+                        $row->sort_order = $newOrder;
+                        $row->save();
+                    }
+                }
+            });
+
+            $this->selectedMaterialId = Material::query()
+                ->where('topic_id', $topic->id)
                 ->orderBy('sort_order')
                 ->orderBy('created_at')
-                ->get();
+                ->value('id');
 
-            foreach ($remaining as $index => $m) {
-                $newOrder = $index + 1;
-                if ($m->sort_order !== $newOrder) {
-                    $m->sort_order = $newOrder;
-                    $m->save();
-                }
-            }
-        });
-
-        $this->selectedMaterialId = Material::query()
-            ->where('topic_id', $this->topic->id)
-            ->orderBy('sort_order')
-            ->orderBy('created_at')
-            ->value('id');
-
-        session()->flash('success', 'Material berhasil dihapus.');
+            session()->flash('success', 'Material berhasil dihapus.');
+        } catch (RuntimeException $e) {
+            session()->flash('error', 'Gagal menghapus file dari cloud: ' . $e->getMessage());
+        } catch (Exception $e) {
+            report($e);
+            session()->flash('error', 'Terjadi kesalahan sistem saat menghapus material.');
+        }
     }
 
     private function resetMaterialForm(): void
     {
+        $topic = $this->topic();
+
         $this->reset([
             'editingMaterialId',
             'materialName',
@@ -222,11 +289,13 @@ class MaterialsTab extends Component
 
         $this->materialType = 'pdf';
         $this->materialStatus = 'active';
-        $this->materialSortOrder = ($this->topic->materials()->max('sort_order') ?? 0) + 1;
+        $this->materialSortOrder = ($topic->materials()->max('sort_order') ?? 0) + 1;
     }
 
     public function render()
     {
+        $topic = $this->topic();
+
         $materials = $this->materialsQuery()->get();
 
         $selectedMaterial = $this->selectedMaterialId
@@ -239,19 +308,70 @@ class MaterialsTab extends Component
         }
 
         return view('livewire.mentor.topics.tabs.materials-tab', [
+            'topic' => $topic,
             'materials' => $materials,
             'selectedMaterial' => $selectedMaterial,
             'materialPreviewUrl' => app(MaterialAssetService::class)->resolvePreviewUrl($selectedMaterial),
             'materialTypeOptions' => $this->availableMaterialTypes(),
             'canAddMaterial' => $materials->count() < 5,
+            'videoEmbedUrl' => $selectedMaterial?->external_url ? $this->getEmbedUrl($selectedMaterial->external_url) : null,
+            'videoThumbnailUrl' => $selectedMaterial?->external_url ? $this->getThumbnailUrl($selectedMaterial->external_url) : null,
         ]);
     }
 
     private function materialsQuery()
     {
-        return $this->topic->materials()
+        return $this->topic()->materials()
             ->with('uploader')
             ->orderBy('sort_order')
             ->orderBy('created_at');
+    }
+
+    public function getEmbedUrl(string $url): string
+    {
+        $id = $this->extractVideoId($url);
+
+        return $id ? 'https://www.youtube.com/embed/' . $id : '';
+    }
+
+    public function getThumbnailUrl(string $url): ?string
+    {
+        $id = $this->extractVideoId($url);
+
+        return $id ? 'https://img.youtube.com/vi/' . $id . '/hqdefault.jpg' : null;
+    }
+
+    private function extractVideoId(string $input): ?string
+    {
+        $input = trim($input);
+
+        if ($input === '') {
+            return null;
+        }
+
+        if (preg_match('/^[A-Za-z0-9_-]{11}$/', $input)) {
+            return $input;
+        }
+
+        $patterns = [
+            '/v=([A-Za-z0-9_-]{11})/',
+            '/youtu\.be\/([A-Za-z0-9_-]{11})/',
+            '/embed\/([A-Za-z0-9_-]{11})/',
+            '/shorts\/([A-Za-z0-9_-]{11})/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $input, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
+    }
+
+    private function hasUpload(mixed $file): bool
+    {
+        return $file instanceof \Illuminate\Http\UploadedFile
+            || $file instanceof TemporaryUploadedFile;
     }
 }

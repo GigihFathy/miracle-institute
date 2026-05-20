@@ -128,6 +128,7 @@
 
     @if($activeTab === 'materials')
         <section class="space-y-4">
+        <section class="space-y-4">
             <div class="space-y-4 rounded-2xl border bg-white p-5">
                 <div class="flex items-end justify-between gap-4">
                     <div>
@@ -157,7 +158,7 @@
                     <button
                         type="button"
                         wire:key="material-card-{{ $material->id }}"
-                        wire:click="selectMaterial('{{ $material->id }}')"
+                        wire:click="selectMaterial(@js($material->id))"
                         wire:loading.attr="disabled"
                         wire:target="selectMaterial"
                         class="w-[280px] shrink-0 snap-start overflow-hidden rounded-2xl border text-left transition disabled:opacity-70
@@ -241,7 +242,7 @@
                 @if($activeMaterial)
                     @php
                         $activeCardData = $materialCards[(string) $activeMaterial->id] ?? [];
-                        $finalPreviewUrl = $activeCardData['preview_url'] ?? $materialUrl;
+                        $finalPreviewUrl = $activeCardData['preview_url'] ?? $materialPreviewUrl;
                         $finalThumbnailUrl = $activeCardData['thumbnail_url'] ?? null;
                         $finalWatchUrl = $activeCardData['watch_url'] ?? null;
                         $finalSourceValue = $activeCardData['source_value'] ?? null;
@@ -381,8 +382,6 @@
                     $phase = $this->sessionPhase($session);
                     $buttonText = $this->sessionButtonText($session);
                     $countdownText = $this->sessionCountdownLabel($session);
-                    $startIso = $session->start_at?->toIso8601String();
-                    $endIso = $session->end_at?->toIso8601String();
 
                     $attendanceBadgeClass = match ($attendance?->status) {
                         'present' => 'border-emerald-200 bg-emerald-100 text-emerald-700',
@@ -390,48 +389,22 @@
                         'absent' => 'border-rose-200 bg-rose-100 text-rose-700',
                         default => 'border-slate-200 bg-slate-100 text-slate-700',
                     };
-
-                    $sessionLabels = [
-                        'scheduled' => __('general.topic_player.sessions.states.scheduled'),
-                        'live' => __('general.topic_player.sessions.states.live'),
-                        'completed' => __('general.topic_player.sessions.states.completed'),
-                        'unavailable' => __('general.topic_player.sessions.states.unavailable'),
-                        'not_started' => __('general.topic_player.sessions.actions.not_started'),
-                        'join_session' => __('general.topic_player.sessions.actions.join_session'),
-                        'completed_button' => __('general.topic_player.sessions.actions.completed'),
-                        'unavailable_button' => __('general.topic_player.sessions.actions.unavailable'),
-                        'countdown_invalid' => __('general.topic_player.sessions.countdown_invalid'),
-                        'completed_label' => __('general.topic_player.sessions.completed_label'),
-                        'starts_in' => __('general.topic_player.sessions.starts_in'),
-                        'ends_in' => __('general.topic_player.sessions.ends_in'),
-                    ];
                 @endphp
 
-                <div
-                    x-data="sessionJoinCard({
-                        startAt: @js($startIso),
-                        endAt: @js($endIso),
-                        initialPhase: @js($phase),
-                        title: @js($session->title),
-                        startLabel: @js($session->start_at?->format('d M Y, H:i') ?? '-'),
-                        endLabel: @js($session->end_at?->format('H:i') ?? '-'),
-                        labels: @js($sessionLabels),
-                    })"
-                    class="space-y-4 rounded-2xl border bg-white p-5 shadow-sm"
-                >
+                <div class="space-y-4 rounded-2xl border bg-white p-5 shadow-sm">
                     <div class="space-y-1">
                         <div class="font-semibold">{{ $session->title }}</div>
                         <div class="text-sm text-slate-500">
                             {{ $topic->course?->title }} · {{ $topic->name }}
                         </div>
                         <div class="text-xs text-slate-500">
-                            {{ $session->start_at?->format('d M Y, H:i') ?? '-' }} - {{ $session->end_at?->format('H:i') ?? '-' }}
+                            {{ $session->start_at?->format('d M Y, H:i') ?? '-' }} - {{ $session->end_at?->format('d M Y, H:i') ?? '-' }}
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between gap-3">
                         <div class="text-sm">
-                            {{ __('general.topic_player.sessions.status_label') }} <span class="font-medium" x-text="stateLabel"></span>
+                            {{ __('general.topic_player.sessions.status_label') }} <span class="font-medium">{{ ucfirst($phase) }}</span>
                         </div>
 
                         @if($attendance)
@@ -441,7 +414,7 @@
                         @endif
                     </div>
 
-                    <div class="text-xs text-slate-500" x-text="countdownLabel">
+                    <div class="text-xs text-slate-500">
                         {{ $countdownText }}
                     </div>
 
@@ -456,12 +429,10 @@
                         @if($isStudent)
                             <button
                                 type="button"
-                                x-on:click="openModal()"
-                                :disabled="!canJoin"
-                                class="rounded-xl border px-4 py-2 text-sm font-medium transition"
-                                :class="buttonClass"
+                                wire:click="openSessionModal(@js($session->id))"
+                                class="rounded-xl border px-4 py-2 text-sm font-medium transition {{ $this->sessionButtonClass($session) }}"
                             >
-                                <span x-text="buttonText">{{ $buttonText }}</span>
+                                {{ $buttonText }}
                             </button>
                         @else
                             <span class="rounded-xl border border-[#35A7FF]/30 bg-[#35A7FF]/10 px-4 py-2 text-xs text-[#004777]/80">
@@ -563,14 +534,7 @@
                         </div>
                     </template>
                 </div>
-            @empty
-                <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
-                    <div class="font-semibold text-slate-900">{{ __('general.topic_player.sessions.empty.title') }}</div>
-                    <p class="mt-1 text-sm leading-6 text-slate-600">
-                        {{ __('general.topic_player.sessions.empty.description') }}
-                    </p>
-                </div>
-            @endforelse
+            @endif
         </section>
     @endif
 </div>
