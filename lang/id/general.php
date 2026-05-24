@@ -221,6 +221,9 @@ return [
         'certificate_issued_description' => 'Sertifikat sudah tersedia dan bisa langsung diunduh.',
         'assessment_ready_description' => 'Semua topik selesai. Kamu sudah bisa mengerjakan assessment.',
         'assessment_pending_description' => 'Selesaikan semua topik agar assessment bisa dibuka.',
+        'assessment_passed_badge' => 'Lulus',
+        'assessment_passed_description' => 'Assessment sudah selesai dan kamu sudah memenuhi nilai kelulusan.',
+        'assessment_completed_cta' => 'Assessment Selesai',
 
         'resume_test' => 'Lanjutkan Assessment',
         'start_test' => 'Mulai Assessment',
@@ -235,6 +238,7 @@ return [
         'completed_progress' => ':percent% selesai',
         'assessment_available' => 'Tersedia',
         'assessment_pending' => 'Menunggu progres',
+        'assessment_completed' => 'Selesai',
 
         'course_topics' => 'Topik Course',
         'topics_count' => '{0} Tidak Ada Topik|{1} :count Topik|[2,*] :count Topik',
@@ -591,7 +595,7 @@ return [
         'actions' => [
             'back_to_dashboard' => 'Kembali ke Dashboard',
             'back_to_learning' => 'Kembali ke My Learning',
-            'back_to_course' => 'Kembali ke Halaman Course',
+            'back_to_course' => 'Kembali',
             'retry' => 'Ulangi Assessment',
             'view_certificates' => 'Lihat Sertifikat',
         ],

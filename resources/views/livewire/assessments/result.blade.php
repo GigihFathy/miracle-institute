@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="mt-8 grid grid-cols-2 gap-3 text-left text-sm sm:grid-cols-4">
+        <div class="mt-8 grid grid-cols-2 gap-3 text-left text-sm sm:grid-cols-3">
             <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">
                 <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_48%,white)]">{{ __('general.assessment_result.metrics.correct') }}</div>
                 <div class="mt-1 font-semibold text-mentor-primary">{{ $correctAnswers }}</div>
@@ -34,11 +34,6 @@
             <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">
                 <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_48%,white)]">{{ __('general.assessment_result.metrics.wrong') }}</div>
                 <div class="mt-1 font-semibold text-mentor-primary">{{ $wrongAnswers }}</div>
-            </div>
-
-            <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">
-                <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_48%,white)]">{{ __('general.assessment_result.metrics.unanswered') }}</div>
-                <div class="mt-1 font-semibold text-mentor-primary">{{ $unansweredQuestions }}</div>
             </div>
 
             <div class="rounded-2xl border border-slate-200 bg-mentor-primary-soft-2 p-4">

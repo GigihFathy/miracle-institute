@@ -221,6 +221,9 @@ return [
         'certificate_issued_description' => 'Your certificate is available and ready to download.',
         'assessment_ready_description' => 'All topics are complete. You can now take the assessment.',
         'assessment_pending_description' => 'Complete all topics to unlock the assessment.',
+        'assessment_passed_badge' => 'Passed',
+        'assessment_passed_description' => 'The assessment is complete and you have met the passing grade.',
+        'assessment_completed_cta' => 'Assessment Completed',
 
         'resume_test' => 'Resume Assessment',
         'start_test' => 'Start Assessment',
@@ -235,6 +238,7 @@ return [
         'completed_progress' => ':percent% complete',
         'assessment_available' => 'Available',
         'assessment_pending' => 'Waiting for progress',
+        'assessment_completed' => 'Completed',
 
         'course_topics' => 'Course Topics',
         'topics_count' => '{0} No Topics|{1} :count Topic|[2,*] :count Topics',
@@ -591,7 +595,7 @@ return [
         'actions' => [
             'back_to_dashboard' => 'Back to Dashboard',
             'back_to_learning' => 'Back to My Learning',
-            'back_to_course' => 'Back to Course Page',
+            'back_to_course' => 'Back',
             'retry' => 'Retry Assessment',
             'view_certificates' => 'View Certificates',
         ],

@@ -1,5 +1,5 @@
 <footer class="bg-[#004777] text-slate-300 pt-6">
-    <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 md:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-1 gap-10 px-4 py-12 sm:px-5 lg:px-20 xl:px-46 md:grid-cols-2 lg:grid-cols-4">
 
         <div class="space-y-4">
             @php $company = \App\Models\Company::first(); @endphp
@@ -14,7 +14,7 @@
                 {{ $company?->description ?? __('general.footer.default_description') }}
             </p>
 
-            @if($company?->vision)
+            @if(filled($company?->vision))
                 <p class="text-xs italic text-slate-500">
                     "{{ $company->vision }}"
                 </p>
@@ -37,11 +37,11 @@
         <div>
             <h3 class="mb-4 font-semibold text-white">{{ __('general.footer.contact.title') }}</h3>
             <ul class="space-y-2 text-sm text-slate-400">
-                @if($company?->address)
+                @if(filled($company?->address))
                     <li>{{ $company->address }}</li>
                 @endif
 
-                @if($company?->whatsapp)
+                {{-- @if($company?->whatsapp)
                     <li>
                         <a href="https://wa.me/{{ $company->whatsapp }}"
                            target="_blank"
@@ -59,7 +59,7 @@
                             {{ __('general.footer.contact.instagram') }}
                         </a>
                     </li>
-                @endif
+                @endif --}}
             </ul>
         </div>
 
@@ -67,7 +67,7 @@
             <h3 class="mb-4 font-semibold text-white">{{ __('general.footer.social.title') }}</h3>
 
             <div class="flex gap-3">
-                @if($company?->facebook)
+                @if(filled($company?->facebook))
                     <a href="{{ $company->facebook }}" target="_blank"
                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-lg transition hover:bg-white/20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@
                     </a>
                 @endif
 
-                @if($company?->instagram)
+                @if(filled($company?->instagram))
                     <a href="{{ $company->instagram }}" target="_blank"
                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-lg transition hover:bg-white/20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@
                     </a>
                 @endif
 
-                @if($company?->youtube)
+                @if(filled($company?->youtube))
                     <a href="{{ $company->youtube }}" target="_blank"
                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-lg transition hover:bg-white/20">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24">
@@ -94,11 +94,12 @@
                     </a>
                 @endif
 
-                @if($company?->whatsapp)
+                @if(filled($company?->whatsapp))
                     <a href="https://wa.me/{{ $company->whatsapp }}" target="_blank"
-                       class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-lg transition hover:bg-white/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                            <path d="M20.52 3.48A11.8 11.8 0 0012.01 0 11.94 11.94 0 001.5 17.72L0 24l6.44-1.68A11.92 11.92 0 0012 24h.01a11.94 11.94 0 008.51-20.52zM12 21.82a9.8 9.8 0 01-5-1.37l-.36-.21-3.83 1 1.02-3.74-.23-.38a9.8 9.8 0 1116.4 3.16A9.7 9.7 0 0112 21.82zm5.54-7.37c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.69.15s-.79.98-.97 1.18c-.18.2-.36.23-.66.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.68-2.08-.18-.3-.02-.46.13-.61.13-.13.3-.34.45-.51.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.69-1.66-.94-2.27-.24-.58-.48-.5-.66-.51h-.56c-.2 0-.53.08-.8.38s-1.05 1.03-1.05 2.5 1.08 2.9 1.23 3.1c.15.2 2.13 3.25 5.17 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.44.25-.71.25-1.32.18-1.44-.08-.13-.28-.2-.58-.35z"/>
+                    class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-lg transition hover:bg-white/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.057 23.535a.75.75 0 0 0 .916.932l5.853-1.53A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.713 9.713 0 0 1-4.953-1.355l-.355-.21-3.676.961.983-3.584-.229-.368A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
                         </svg>
                     </a>
                 @endif
@@ -108,8 +109,8 @@
 
     </div>
 
-    <div class="border-t border-white/10">
-        <div class="mx-auto flex max-w-7xl items-center justify-center px-6 py-4 text-xs text-slate-500">
+    <div class="border-t border-white/10 px-4 sm:px-5 lg:px-20 xl:px-28">
+        <div class="flex items-center justify-center py-4 text-xs text-slate-500">
             <span>{{ __('general.footer.copyright', ['year' => date('Y')]) }}</span>
         </div>
     </div>

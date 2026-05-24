@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 <div class="space-y-6 px-4 pb-6 pt-6 sm:px-6 sm:pt-6 lg:px-12 xl:px-36">
     <x-ui.page-header
         title="{{ __('general.my_learning.page_title') }}"
@@ -77,21 +81,29 @@
                     @forelse($enrollments as $row)
                         @php
                             $course = $row['enrollment']->course;
+                            $courseImage = $course?->poster ?? null;
+                            $courseImageSrc = null;
+
+                            if ($courseImage) {
+                                if (Str::startsWith($courseImage, ['http://', 'https://'])) {
+                                    $courseImageSrc = $courseImage;
+                                } else {
+                                    if (Str::startsWith($courseImage, 'images/')) {
+                                        $courseImageSrc = asset($courseImage);
+                                    } else {
+                                        $courseImageSrc = asset('images/thumbnail/' . $courseImage);
+                                    }
+                                }
+                            } elseif (!empty($course?->image)) {
+                                $courseImageSrc = asset('storage/' . $course->image);
+                            }
                         @endphp
 
                         <a href="{{ localized_route('courses.show', $course?->slug) }}" class="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#004777]/10 bg-white transition hover:bg-slate-100">
                             <div class="p-2.5">
                                 <div class="relative overflow-hidden rounded-lg thumb">
-                                    @php
-                                        $poster = $course?->poster ?? null;
-                                    @endphp
-
-                                    @if(!empty($poster))
-                                        <img src="{{ $poster }}"
-                                             alt="{{ $course?->title }}"
-                                             class="h-32 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36">
-                                    @elseif(!empty($course?->image))
-                                        <img src="{{ asset('storage/' . $course->image) }}"
+                                    @if($courseImageSrc)
+                                        <img src="{{ $courseImageSrc }}"
                                              alt="{{ $course?->title }}"
                                              class="h-32 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36">
                                     @else
@@ -194,18 +206,29 @@
                     @forelse($certificates as $certificate)
                         @php
                             $course = $certificate->course;
-                            $poster = $course?->poster ?? null;
+                            $courseImage = $course?->poster ?? null;
+                            $courseImageSrc = null;
+
+                            if ($courseImage) {
+                                if (Str::startsWith($courseImage, ['http://', 'https://'])) {
+                                    $courseImageSrc = $courseImage;
+                                } else {
+                                    if (Str::startsWith($courseImage, 'images/')) {
+                                        $courseImageSrc = asset($courseImage);
+                                    } else {
+                                        $courseImageSrc = asset('images/thumbnail/' . $courseImage);
+                                    }
+                                }
+                            } elseif (!empty($course?->image)) {
+                                $courseImageSrc = asset('storage/' . $course->image);
+                            }
                         @endphp
 
                         <article class="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#004777]/10 bg-white transition hover:bg-slate-100">
                             <div class="p-2.5">
                                 <div class="relative overflow-hidden rounded-lg thumb">
-                                    @if(!empty($poster))
-                                        <img src="{{ $poster }}"
-                                             alt="{{ $course?->title ?? __('general.my_learning.certificates.default_course_certificate') }}"
-                                             class="h-32 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36">
-                                    @elseif(!empty($course?->image))
-                                        <img src="{{ asset('storage/' . $course->image) }}"
+                                    @if($courseImageSrc)
+                                        <img src="{{ $courseImageSrc }}"
                                              alt="{{ $course?->title ?? __('general.my_learning.certificates.default_course_certificate') }}"
                                              class="h-32 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-36">
                                     @else
