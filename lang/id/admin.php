@@ -396,6 +396,10 @@ return [
         'form' => [
             'select_program' => 'Pilih program',
             'title_placeholder' => 'Judul',
+            'certificate_course_number_label' => 'Nomor urut sertifikat course',
+            'certificate_course_number_placeholder' => 'Contoh: 2',
+            'certificate_prefix_code_label' => 'Prefix code sertifikat',
+            'certificate_prefix_code_placeholder' => 'Contoh: CRSE',
             'poster_preview' => 'Pratinjau poster',
             'no_poster' => 'Belum ada poster',
             'choose_thumbnail' => 'Pilih dari thumbnail',

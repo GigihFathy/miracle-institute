@@ -97,6 +97,13 @@
                                 <div class="min-w-0">
                                     <div class="font-medium text-slate-900">{{ $row->title }}</div>
                                     <div class="text-xs text-slate-500">{{ $row->studyProgram?->title ?? '-' }}</div>
+                                    <div class="mt-1 text-[11px] text-slate-400">
+                                        {{ __('admin.courses.form.certificate_course_number_label') }}:
+                                        {{ $row->certificate_course_number ? str_pad((string) $row->certificate_course_number, 3, '0', STR_PAD_LEFT) : '-' }}
+                                        |
+                                        {{ __('admin.courses.form.certificate_prefix_code_label') }}:
+                                        {{ $row->certificate_prefix_code ?: '-' }}
+                                    </div>
                                 </div>
                             </div>
                         </td>
@@ -215,6 +222,29 @@
                     </select>
 
                     <input wire:model="title" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.courses.form.title_placeholder') }}">
+
+                    <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs text-slate-500">{{ __('admin.courses.form.certificate_course_number_label') }}</label>
+                            <input
+                                wire:model="certificate_course_number"
+                                type="number"
+                                min="1"
+                                max="999"
+                                class="w-full rounded-xl border px-4 py-2"
+                                placeholder="{{ __('admin.courses.form.certificate_course_number_placeholder') }}"
+                            >
+                        </div>
+
+                        <div>
+                            <label class="mb-1 block text-xs text-slate-500">{{ __('admin.courses.form.certificate_prefix_code_label') }}</label>
+                            <input
+                                wire:model="certificate_prefix_code"
+                                class="w-full rounded-xl border px-4 py-2"
+                                placeholder="{{ __('admin.courses.form.certificate_prefix_code_placeholder') }}"
+                            >
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                         <div>

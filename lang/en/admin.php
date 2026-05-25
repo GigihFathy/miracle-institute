@@ -395,6 +395,10 @@ return [
         'form' => [
             'select_program' => 'Select program',
             'title_placeholder' => 'Title',
+            'certificate_course_number_label' => 'Course certificate order',
+            'certificate_course_number_placeholder' => 'Example: 2',
+            'certificate_prefix_code_label' => 'Certificate prefix code',
+            'certificate_prefix_code_placeholder' => 'Example: CRSE',
             'poster_preview' => 'Poster preview',
             'no_poster' => 'No poster selected',
             'choose_thumbnail' => 'Choose from thumbnails',

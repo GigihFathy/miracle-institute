@@ -28,6 +28,8 @@ class CourseIndex extends Component
     public string $title = '';
     public string $slug = '';
     public string $poster = '';
+    public string $certificate_course_number = '';
+    public string $certificate_prefix_code = '';
     public string $description = '';
     public string $status = 'active';
 
@@ -48,6 +50,8 @@ class CourseIndex extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'poster' => 'nullable|string|max:255',
+            'certificate_course_number' => 'nullable|integer|min:1|max:999',
+            'certificate_prefix_code' => 'nullable|string|max:50',
             'description' => 'required|string',
             'status' => 'required|string|max:50',
         ];
@@ -75,6 +79,8 @@ class CourseIndex extends Component
         $this->title = $row->title;
         $this->slug = $row->slug;
         $this->poster = $row->poster;
+        $this->certificate_course_number = $row->certificate_course_number ? (string) $row->certificate_course_number : '';
+        $this->certificate_prefix_code = $row->certificate_prefix_code ?? '';
         $this->description = $row->description;
         $this->status = $row->status;
 
@@ -92,6 +98,8 @@ class CourseIndex extends Component
                 'title' => $this->title,
                 'slug' => Str::slug($this->title),
                 'poster' => $this->poster,
+                'certificate_course_number' => $this->certificate_course_number !== '' ? (int) $this->certificate_course_number : null,
+                'certificate_prefix_code' => $this->certificate_prefix_code !== '' ? Str::upper(trim($this->certificate_prefix_code)) : null,
                 'description' => $this->description,
                 'status' => $this->status,
             ]
@@ -151,6 +159,8 @@ class CourseIndex extends Component
             'title',
             'slug',
             'poster',
+            'certificate_course_number',
+            'certificate_prefix_code',
             'description',
             'status',
         ]);

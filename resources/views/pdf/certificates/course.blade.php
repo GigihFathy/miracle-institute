@@ -7,6 +7,13 @@
 
     $certificateNumber = $certificateNumber ?? ('CERT-CRS-' . now()->format('Ymd') . '-0001');
     $participantName = $user->full_name ?? $user->name ?? '-';
+    $participantNameLength = mb_strlen(trim($participantName));
+    $participantNameFontSize = match (true) {
+        $participantNameLength >= 40 => '48px',
+        $participantNameLength >= 34 => '54px',
+        $participantNameLength >= 28 => '60px',
+        default => '70px',
+    };
 
     $toDataUri = static function (?string $path): ?string {
         if (!$path || !file_exists($path)) {
@@ -162,10 +169,26 @@
             position: relative;
         }
 
+        .second-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -80%);
+            width: 150mm;
+            text-align: center;
+            opacity: 0.13;
+            z-index: 0;
+        }
+
+        .second-watermark img {
+            width: 100%;
+            height: auto;
+        }
+
         .second-title {
             text-align: center;
             font-size: 24px;
-            color: #0000c7;
+            color: #000;
             font-weight: bold;
             margin-bottom: 10px;
         }
@@ -274,6 +297,45 @@
             color: #000;
             margin: 0;
         }
+
+        .second-content > *:not(.second-watermark) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .assessment-label {
+            margin-top: 14px;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #4b5563;
+            letter-spacing: 0.6px;
+            text-align: left;
+        }
+
+        .assessment-value {
+            margin-top: 4px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #0d3b66;
+            line-height: 1.2;
+            text-align: left;
+        }
+
+        .assessment-note {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #374151;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .achievement-message {
+            margin-top: 14px;
+            font-size: 15px;
+            line-height: 1.6;
+            text-align: left;
+            color: #1f2937;
+        }
     </style>
 </head>
 <body>
@@ -296,7 +358,7 @@
                 <p style="font-size: 16px; color: #000; font-weight: bold; margin: 6px 0;">No. {{ $certificateNumber }}</p>
                 <p style="font-size: 16px; color: #000;">This certificate is proudly presented to</p>
                 <div class="participant-name">
-                    {{ $participantName }}
+                    <span style="font-size: {{ $participantNameFontSize }};">{{ $participantName }}</span>
                 </div>
                 <div style="font-size: 18px; color: #000; margin: 10px 0; max-width: 80%; margin-left: auto; margin-right: auto;">
                     Has attended and completed <strong>{{ $course->title ?? '-' }}</strong>
@@ -335,20 +397,26 @@
 
         <div class="wrapper">
             <div class="second-content">
+                @if($logo)
+                    <div class="second-watermark">
+                        <img src="{{ $logo }}" alt="">
+                    </div>
+                @endif
+
                 <h1 class="second-title">
-                    KSP <span style="color: #c20000;">CU</span> BEREROD GRATIA
+                    Summary of Learning Materials
                 </h1>
 
                 <p class="material-title">
-                    MATERI {{ strtoupper($course->title ?? '-') }} TAHUN {{ $issuedAt->format('Y') }}.
+                    Material For {{ ($course->title ?? '-') }}.
                 </p>
 
                 <table class="material-table">
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Judul Materi</th>
-                            <th>Durasi Waktu</th>
+                            <th>Topic</th>
+                            <th>Present/Online</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -356,15 +424,25 @@
                             <tr>
                                 <td class="no">{{ $index + 1 }}</td>
                                 <td class="topic">{{ $topic->name }}</td>
-                                <td class="duration">{{ (int) ($topic->duration ?? 0) }} Menit</td>
+                                <td class="duration">{{ $topic->topic_status ?? 'Absent' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" style="text-align:center;">Belum ada materi</td>
+                                <td colspan="3" style="text-align:center;">No materials available</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
+
+                <div class="achievement-message">
+                    Congratulations, <strong>{{ $participantName }}</strong>. You have successfully completed
+                    <strong>{{ $course->title ?? '-' }}</strong>
+                    @if($achievementSummary['assessment_score'] !== null)
+                        with an assessment score of <strong>{{ $achievementSummary['assessment_score'] }}</strong>.
+                    @else
+                        and fulfilled the course completion requirements.
+                    @endif
+                </div>
                 
                 <table class="signatures-grid bottom">
                     <tr>

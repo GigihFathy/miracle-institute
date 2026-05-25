@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Attendance;
+use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
@@ -18,6 +19,11 @@ class CertificateService
     public function issueCourseCertificate(Course $course, User $user): Certificate
     {
         return DB::transaction(function () use ($course, $user) {
+            $course = Course::query()
+                ->whereKey($course->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $enrollment = CourseEnrollment::query()
                 ->where('course_id', $course->id)
                 ->where('user_id', $user->id)
@@ -31,6 +37,7 @@ class CertificateService
                 ->first();
 
             if ($existing && $existing->status === 'issued') {
+                $this->ensureCourseCertificateNumberFormat($existing, $course);
                 return $existing;
             }
 
@@ -55,13 +62,13 @@ class CertificateService
                 throw new \RuntimeException('Course belum selesai, sertifikat belum bisa diterbitkan.');
             }
 
-            $sequence = Certificate::query()
+            $recipientSequence = Certificate::query()
                 ->where('course_id', $course->id)
-                ->where('user_id', $user->id)
+                ->where('status', 'issued')
                 ->lockForUpdate()
                 ->count() + 1;
 
-            $certificateNumber = $this->generateCertificateNumber($course, $sequence);
+            $certificateNumber = $this->generateCertificateNumber($course, $recipientSequence);
             $issuedAt = now();
 
             $certificate = $existing ?? new Certificate();
@@ -83,6 +90,24 @@ class CertificateService
         string $filename
     ) {
         $this->ensureDompdfFontDirectory();
+
+        if ($certificate->course_id && !$certificate->topic_id) {
+            $certificate = DB::transaction(function () use ($certificate) {
+                $lockedCertificate = Certificate::query()
+                    ->whereKey($certificate->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $course = Course::query()
+                    ->whereKey($lockedCertificate->course_id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $this->ensureCourseCertificateNumberFormat($lockedCertificate, $course);
+
+                return $lockedCertificate->fresh();
+            });
+        }
 
         $course = $certificate->course()->with([
             'topics.videoSessions'
@@ -180,28 +205,52 @@ class CertificateService
                 ->count()
             : 0;
 
-        $present = Attendance::query()
-            ->join('video_sessions', 'video_sessions.id', '=', 'attendances.video_session_id')
-            ->where('attendances.user_id', $user->id)
-            ->whereIn('attendances.status', ['present', 'late'])
-            ->count();
+        $sessionIds = DB::table('video_sessions')
+            ->join('topics', 'topics.id', '=', 'video_sessions.topic_id')
+            ->where('topics.course_id', $course->id)
+            ->pluck('video_sessions.id');
 
-        $late = Attendance::query()
-            ->join('video_sessions', 'video_sessions.id', '=', 'attendances.video_session_id')
-            ->where('attendances.user_id', $user->id)
-            ->where('attendances.status', 'late')
-            ->count();
+        $presentFull = $sessionIds->isEmpty()
+            ? 0
+            : Attendance::query()
+                ->where('attendances.user_id', $user->id)
+                ->whereIn('attendances.video_session_id', $sessionIds)
+                ->where('attendances.status', 'present')
+                ->count();
 
-        $absent = Attendance::query()
-            ->join('video_sessions', 'video_sessions.id', '=', 'attendances.video_session_id')
-            ->where('attendances.user_id', $user->id)
-            ->where('attendances.status', 'absent')
-            ->count();
+        $late = $sessionIds->isEmpty()
+            ? 0
+            : Attendance::query()
+                ->where('attendances.user_id', $user->id)
+                ->whereIn('attendances.video_session_id', $sessionIds)
+                ->where('attendances.status', 'late')
+                ->count();
+
+        $absent = $sessionIds->isEmpty()
+            ? 0
+            : Attendance::query()
+                ->where('attendances.user_id', $user->id)
+                ->whereIn('attendances.video_session_id', $sessionIds)
+                ->where('attendances.status', 'absent')
+                ->count();
+
+        $assessmentAttempt = AssessmentAttempt::query()
+            ->where('user_id', $user->id)
+            ->whereHas('assessment', fn ($query) => $query->where('course_id', $course->id))
+            ->whereNotNull('score')
+            ->orderByDesc('passed')
+            ->orderByDesc('submitted_at')
+            ->orderByDesc('created_at')
+            ->first();
 
         return [
             'topics_total' => $totalTopics,
             'topics_completed' => $completedTopics,
-            'attendance_present' => $present,
+            'assessment_score' => $assessmentAttempt?->score,
+            'assessment_passed' => (bool) ($assessmentAttempt?->passed ?? false),
+            'attendance_sessions_total' => $sessionIds->count(),
+            'attendance_present_full' => $presentFull,
+            'attendance_checked_in' => $presentFull + $late,
             'attendance_late' => $late,
             'attendance_absent' => $absent,
         ];
@@ -230,25 +279,28 @@ class CertificateService
         return $late ? 'Susulan' : 'Absent';
     }
 
-    private function generateCertificateNumber(Course $course, int $sequence): string
+    private function generateCertificateNumber(Course $course, int $recipientSequence): string
     {
+        $courseNumber = str_pad((string) ($course->certificate_course_number ?: 1), 3, '0', STR_PAD_LEFT);
+        $prefixCode = $course->certificate_prefix_code ?: $this->courseCode($course);
+
         return sprintf(
-            'CERT-%s-%s-%04d',
-            $this->courseCode($course),
-            now()->format('Ymd'),
-            $sequence
+            '%s-%s/%s/%s/%s',
+            str_pad((string) $recipientSequence, 5, '0', STR_PAD_LEFT),
+            $courseNumber,
+            Str::upper($prefixCode),
+            now()->format('m'),
+            now()->format('Y')
         );
     }
 
     private function extractSequenceLabel(?string $certificateNumber): string
     {
         if (!$certificateNumber) {
-            return '0000';
+            return '00000';
         }
 
-        $parts = explode('-', $certificateNumber);
-
-        return $parts[3] ?? '0000';
+        return Str::before($certificateNumber, '-') ?: '00000';
     }
 
     private function courseCode(Course $course): string
@@ -266,6 +318,40 @@ class CertificateService
         }
 
         return $code !== '' ? $code : 'CRS';
+    }
+
+    private function ensureCourseCertificateNumberFormat(Certificate $certificate, Course $course): void
+    {
+        if ($this->hasNewCourseCertificateNumberFormat($certificate->certificate_number)) {
+            return;
+        }
+
+        $recipientSequence = Certificate::query()
+            ->where('course_id', $course->id)
+            ->where('status', 'issued')
+            ->where(function ($query) use ($certificate) {
+                $issuedAt = $certificate->issued_at ?? $certificate->created_at ?? now();
+
+                $query->where('issued_at', '<', $issuedAt)
+                    ->orWhere(function ($inner) use ($issuedAt, $certificate) {
+                        $inner->where('issued_at', $issuedAt)
+                            ->where('id', '<=', $certificate->id);
+                    });
+            })
+            ->count();
+
+        $certificate->forceFill([
+            'certificate_number' => $this->generateCertificateNumber($course, max(1, $recipientSequence)),
+        ])->save();
+    }
+
+    private function hasNewCourseCertificateNumberFormat(?string $certificateNumber): bool
+    {
+        if (!$certificateNumber) {
+            return false;
+        }
+
+        return preg_match('/^\d{5}-\d{3}\/[A-Z0-9]+\/\d{2}\/\d{4}$/', $certificateNumber) === 1;
     }
 
     private function formatDateLong(Carbon $date): string
