@@ -48,8 +48,12 @@
                         <div class="mt-1 font-semibold">{{ $selectedAssessment->passing_grade }}</div>
                     </div>
                     <div class="rounded-2xl border bg-slate-50 p-4">
-                        <div class="text-xs text-slate-500">Questions</div>
+                        <div class="text-xs text-slate-500">Bank Questions</div>
                         <div class="mt-1 font-semibold">{{ $selectedAssessment->questions->count() }}</div>
+                        <div class="mt-1 text-xs text-slate-500">
+                            Will show {{ $selectedAssessment->question_limit ? min($selectedAssessment->question_limit, $selectedAssessment->questions->count()) : $selectedAssessment->questions->count() }}
+                            question{{ (($selectedAssessment->question_limit ? min($selectedAssessment->question_limit, $selectedAssessment->questions->count()) : $selectedAssessment->questions->count()) === 1) ? '' : 's' }}
+                        </div>
                     </div>
                     <div class="rounded-2xl border bg-slate-50 p-4">
                         <div class="text-xs text-slate-500">Attempts</div>
