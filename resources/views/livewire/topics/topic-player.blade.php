@@ -53,42 +53,6 @@
                 </button>
             </div>
 
-            @if($canStudentInteract && ! $topicCompleted && $activeMaterial && $isStudent)
-                @php
-                    $isLocked = ! $hasSessionEnded;
-                @endphp
-
-                <button
-                    type="button"
-                    wire:click="markViewed"
-                    wire:loading.attr="disabled"
-                    wire:target="markViewed"
-                    @disabled($isLocked)
-                    class="group relative flex items-center gap-2 rounded-xl border px-6 py-2 font-semibold transition-all duration-300
-                    {{ $isLocked
-                        ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400 opacity-80'
-                        : 'border-emerald-600 bg-emerald-600 text-white hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-200/50 active:translate-y-0'
-                    }}"
-                >
-                    @if($isLocked)
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>{{ __('general.topic_player.actions.attend_to_complete') }}</span>
-                    @else
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span>{{ __('general.topic_player.actions.complete_unit') }}</span>
-                    @endif
-
-                    @if($isLocked)
-                        <span class="absolute left-1/2 -top-10 -translate-x-1/2 scale-0 whitespace-nowrap rounded bg-gray-800 p-2 text-xs text-white transition-all group-hover:scale-100">
-                            {{ __('general.topic_player.actions.locked_tooltip') }}
-                        </span>
-                    @endif
-                </button>
-            @endif
         </div>
     </section>
 
