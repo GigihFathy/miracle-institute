@@ -36,6 +36,12 @@ class CourseCatalog extends Component
         $this->resetPage();
     }
 
+    public function updatedSearchInput(): void
+    {
+        $this->search = trim($this->searchInput);
+        $this->resetPage();
+    }
+
     public function updatedStudyProgram(): void
     {
         $this->resetPage();

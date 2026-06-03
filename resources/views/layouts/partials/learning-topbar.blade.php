@@ -15,7 +15,7 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between gap-4">
 
-            <div class="min-w-0 flex items-center gap-3">
+            <div class="min-w-0 flex flex-1 items-center gap-5">
                 <a href="{{ localized_route('dashboard') }}" class="flex shrink-0 items-center gap-3">
                     <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'LMS') }} logo" class="h-32 w-32 object-contain">
                     <span class="sr-only">{{ config('app.name', 'LMS') }}</span>
@@ -28,10 +28,10 @@
                         </a>
                     @endforeach
                 </div>
-            </div>
 
-            <div class="hidden flex-1 justify-center lg:flex">
-                @livewire('shared.topbar-course-search')
+                <div class="hidden w-full max-w-md lg:block">
+                    @livewire('shared.topbar-course-search')
+                </div>
             </div>
 
             <div class="flex items-center gap-3">

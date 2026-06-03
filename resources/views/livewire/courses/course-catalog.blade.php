@@ -20,7 +20,7 @@
             <div class="flex max-w-4xl flex-col gap-3 sm:flex-row">
                 <form wire:submit="submitSearch" class="relative w-full">
                     <input type="search"
-                           wire:model.defer="searchInput"
+                           wire:model.live.debounce.300ms="searchInput"
                            placeholder="{{ __('general.course_catalog.filters.search_placeholder') }}"
                            class="h-12 w-full rounded-full border border-slate-200 bg-white pl-5 pr-12 text-sm text-mentor-primary outline-none transition placeholder:text-slate-400 focus:border-mentor-primary focus:ring-2 focus:ring-mentor-secondary-solid">
 
@@ -76,7 +76,7 @@
             </div>
         </section>
 
-        <section class="grid grid-cols-1 gap-5 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <section class="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             @forelse($courses as $course)
                 @php
                     $enrolled = in_array($course->id, $enrolledCourseIds, true);
@@ -98,60 +98,77 @@
                     }
                 @endphp
 
-                <article class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 transition duration-300 hover:scale-[1.02]">
+                <article class="group relative h-full overflow-hidden rounded-2xl transition-colors hover:bg-gray-200">
                     <a href="{{ localized_route('courses.show', $course->slug) }}"
                        aria-label="{{ __('general.course_catalog.actions.open') }}: {{ $course->title }}"
                        class="absolute inset-0 z-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-mentor-secondary-solid focus:ring-offset-2 focus:ring-offset-white"></a>
 
-                    <div class="relative overflow-hidden">
-                        @if($courseImageSrc)
-                            <img src="{{ $courseImageSrc }}"
-                                 alt="{{ $course->title }}"
-                                 class="h-32 w-full object-cover transition duration-500 group-hover:scale-105">
-                        @else
-                            <div class="flex h-32 w-full items-center justify-center bg-slate-200">
-                                <svg width="100" height="56" viewBox="0 0 280 158" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect width="280" height="158" fill="#e6e9ee"/>
-                                </svg>
-                            </div>
-                        @endif
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-mentor-primary/45 via-mentor-primary/10 to-transparent"></div>
-                    </div>
-
-                    <div class="relative z-20 flex flex-1 flex-col px-4 py-4 pointer-events-none">
-                        <div class="flex-1 space-y-3">
-                            <span class="border border-mentor-primary/60 rounded-md bg-mentor-primary/10 text-sm p-1 text-mentor-primary font-semibold backdrop-blur">
-                                {{ $course->studyProgram?->title }}
-                            </span>
-                            <h3 class="line-clamp-3 text-lg font-semibold mt-3 text-mentor-primary">
-                                {{ $course->title }}
-                            </h3>
-
-                            <p class="line-clamp-2 text-sm leading-6 text-slate-600">
-                                {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
-                            </p>
+                    <div class="h-full p-2.5 transition-colors group-hover:bg-gray-200">
+                        <div class="overflow-hidden rounded-lg thumb">
+                            @if($courseImageSrc)
+                                <img src="{{ $courseImageSrc }}"
+                                     alt="{{ $course->title }}"
+                                     class="h-36 w-full object-cover sm:h-40">
+                            @else
+                                <div class="flex h-36 w-full items-center justify-center bg-slate-200 sm:h-40">
+                                    <svg width="120" height="68" viewBox="0 0 280 158" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="280" height="158" fill="#e6e9ee"/>
+                                    </svg>
+                                </div>
+                            @endif
                         </div>
 
-                        <div class="mt-5 flex items-center gap-2">
+                        <div class="relative z-20 mt-3 flex h-[calc(100%-9rem)] flex-col pointer-events-none sm:h-[calc(100%-10rem)]">
+                            <div class="flex-1">
+                                <div class="text-[11px] uppercase tracking-wide text-[#3B82F6]/70">
+                                    {{ $course->studyProgram?->title }}
+                                </div>
+
+                                <h3 class="mt-1 line-clamp-2 text-sm font-semibold leading-tight text-[#004777]">
+                                    {{ \Illuminate\Support\Str::limit($course->title, 72) }}
+                                </h3>
+
+                                <p class="mt-1 line-clamp-2 text-xs leading-5 text-[#004777]/70">
+                                    {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
+                                </p>
+
+                                <div class="mt-2 flex flex-wrap gap-1.5">
+                                    <span class="rounded px-2 py-0.5 text-[11px] bg-[#3B82F6]/10 text-[#004777]">
+                                        {{ trans_choice('general.course_catalog.badges.topics', $course->topics_count, ['count' => $course->topics_count]) }}
+                                    </span>
+
+                                    @if($enrolled)
+                                        <span class="rounded px-2 py-0.5 text-[11px] bg-emerald-50 text-emerald-700">
+                                            {{ __('general.course_catalog.badges.enrolled') }}
+                                        </span>
+                                    @elseif($isMentor)
+                                        <span class="rounded px-2 py-0.5 text-[11px] bg-slate-100 text-slate-600">
+                                            {{ ucfirst($course->status) }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="mt-3 flex items-center justify-between gap-3">
                             @if(!$isMentor)
                                 @auth
                                     @unless($enrolled)
                                         <button wire:click="enroll('{{ $course->id }}')"
-                                                class="admin-neutral-button pointer-events-auto relative z-20 inline-flex items-center justify-center rounded-full px-4 py-3 text-sm font-medium">
+                                                class="admin-neutral-button pointer-events-auto relative z-20 inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-medium">
                                             {{ __('general.course_catalog.actions.enroll') }}
                                         </button>
                                     @endunless
                                 @endauth
                             @endif
+                            </div>
                         </div>
                     </div>
                 </article>
             @empty
                 <div class="col-span-full">
-                    <div class="rounded-[2rem] border border-dashed border-slate-300 bg-white px-8 py-20 text-center shadow-sm">
-                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-mentor-primary-soft-2">
-                            <svg class="h-8 w-8 text-white"
+                    <div class="px-8 py-16 text-center">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mentor-primary-soft-2">
+                            <svg class="h-7 w-7 text-white"
                                  fill="none"
                                  stroke="currentColor"
                                  viewBox="0 0 24 24">

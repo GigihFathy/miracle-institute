@@ -1,36 +1,24 @@
 <div wire:key="assessment-{{ $attempt->id }}-{{ $currentIndex }}" class="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
 
     @if($showIntro)
-        <section class="space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_color-mix(in_oklab,#004777_10%,transparent)]">
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                    <div class="text-xs uppercase tracking-[0.18em] text-[color:color-mix(in_oklab,#004777_48%,white)]">
+        <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+            <div class="bg-mentor-primary px-6 py-6 text-white">
+                <div class="max-w-3xl">
+                    <div class="text-xs uppercase tracking-[0.18em]">
                         {{ $assessment->course?->title ?? __('general.assessment_taker.defaults.course_assessment') }}
                     </div>
 
-                    <h1 class="mt-1 text-2xl font-bold text-mentor-primary">
+                    <h1 class="mt-1 text-2xl font-bold">
                         {{ $assessment->title }}
                     </h1>
 
-                    <p class="mt-2 max-w-3xl text-sm leading-6 text-[color:color-mix(in_oklab,#004777_72%,white)]">
+                    <p class="mt-2 max-w-3xl text-sm leading-6">
                         {{ __('general.assessment_taker.intro.description') }}
                     </p>
                 </div>
-
-                <div class="flex flex-wrap justify-end gap-2">
-                    <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
-                        {{ __('general.assessment_taker.meta.attempt', ['no' => $attempt->attempt_no]) }}
-                    </span>
-                    <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
-                        {{ __('general.assessment_taker.meta.passing', ['grade' => $assessment->passing_grade]) }}
-                    </span>
-                    <span class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
-                        {{ $assessment->randomize_questions ? __('general.assessment_taker.meta.randomized') : __('general.assessment_taker.meta.fixed_order') }}
-                    </span>
-                </div>
             </div>
 
-            <div class="flex flex-col gap-4 border-t border-slate-200 pt-5 lg:flex-row lg:items-start lg:justify-between">
+            <div class="flex flex-col gap-4 p-6 lg:flex-row lg:items-start lg:justify-between">
                 <div class="space-y-3">
                     <div class="flex flex-wrap gap-3 text-sm text-slate-600">
                         <div>
@@ -40,6 +28,10 @@
                         <div>
                             <span class="text-slate-500">{{ __('general.assessment_taker.metrics.questions') }}:</span>
                             <span class="font-medium text-mentor-primary">{{ $attempt->total_questions }}</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-500">{{ __('general.assessment_taker.meta.passing_label') }}:</span>
+                            <span class="font-medium text-mentor-primary">{{ $assessment->passing_grade }}%</span>
                         </div>
                     </div>
 
@@ -69,36 +61,24 @@
         </section>
     @else
 
-        <section class="space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_color-mix(in_oklab,#004777_10%,transparent)]">
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                    <div class="text-xs uppercase tracking-[0.18em] text-[color:color-mix(in_oklab,#004777_48%,white)]">
+        <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+            <div class="bg-mentor-primary px-6 py-6 text-white">
+                <div class="max-w-3xl">
+                    <div class="text-xs uppercase tracking-[0.18em]">
                         {{ $assessment->course?->title ?? __('general.assessment_taker.defaults.course_assessment') }}
                     </div>
 
-                    <h1 class="mt-1 text-2xl font-bold text-mentor-primary">
+                    <h1 class="mt-1 text-2xl font-bold">
                         {{ $assessment->title }}
                     </h1>
 
-                    <p class="mt-2 max-w-3xl text-sm leading-6 text-[color:color-mix(in_oklab,#004777_72%,white)]">
+                    <p class="mt-2 max-w-3xl text-sm leading-6">
                         {{ __('general.assessment_taker.intro.description') }}
                     </p>
                 </div>
-
-                <div class="flex flex-wrap justify-end gap-2">
-                    <span class="rounded-full border bg-slate-50 px-3 py-1 text-xs text-slate-600">
-                        {{ __('general.assessment_taker.meta.attempt', ['no' => $attempt->attempt_no]) }}
-                    </span>
-                    <span class="rounded-full border bg-slate-50 px-3 py-1 text-xs text-slate-600">
-                        {{ __('general.assessment_taker.meta.passing', ['grade' => $assessment->passing_grade]) }}
-                    </span>
-                    <span class="rounded-full border bg-slate-50 px-3 py-1 text-xs text-slate-600">
-                        {{ $assessment->randomize_questions ? __('general.assessment_taker.meta.randomized') : __('general.assessment_taker.meta.fixed_order') }}
-                    </span>
-                </div>
             </div>
 
-            <div class="flex flex-wrap gap-x-5 gap-y-2 border-t border-slate-200 pt-4 text-sm text-slate-600">
+            <div class="flex flex-wrap gap-x-5 gap-y-2 p-6 text-sm text-slate-600">
                 <div>
                     <span class="text-slate-500">{{ __('general.assessment_taker.metrics.started') }}:</span>
                     <span class="font-medium text-mentor-primary">{{ $attempt->started_at?->format('d M Y, H:i') ?? '-' }}</span>
@@ -108,11 +88,16 @@
                     <span class="text-slate-500">{{ __('general.assessment_taker.metrics.questions') }}:</span>
                     <span class="font-medium text-mentor-primary">{{ count($questions) }}</span>
                 </div>
+
+                <div>
+                    <span class="text-slate-500">{{ __('general.assessment_taker.meta.passing_label') }}:</span>
+                    <span class="font-medium text-mentor-primary">{{ $assessment->passing_grade }}%</span>
+                </div>
             </div>
         </section>
 
         <section class="grid grid-cols-1 gap-6 xl:grid-cols-[260px_1fr]">
-            <aside class="sticky top-24 h-fit rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.04)]">
+            <aside class="sticky top-24 h-fit rounded-3xl border border-slate-200 bg-white p-5">
                 <div class="mb-3 flex items-center justify-between">
                     <h2 class="font-semibold">{{ __('general.assessment_taker.navigator.title') }}</h2>
                     <span class="text-xs text-slate-500">
@@ -150,21 +135,13 @@
                 @php $q = $questions[$currentIndex] ?? null; @endphp
 
                 @if($q)
-                    <section wire:key="question-{{ $q['id'] }}" class="space-y-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_10px_25px_rgba(15,23,42,0.04)]">
+                    <section wire:key="question-{{ $q['id'] }}" class="space-y-5 rounded-3xl border border-slate-200 bg-white p-6">
                         <div class="flex items-start justify-between gap-4">
                             <div>
-                                <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_48%,white)]">
-                                    {{ __('general.assessment_taker.question.label', ['current' => $currentIndex + 1, 'total' => count($questions)]) }}
-                                </div>
-
-                                <h2 class="mt-2 text-xl font-semibold text-mentor-primary">
-                                    {{ $q['question'] }}
+                                <h2 class="text-xl font-semibold text-mentor-primary">
+                                    {{ $currentIndex + 1 }}. {{ $q['question'] }}
                                 </h2>
                             </div>
-
-                            <span class="rounded-full border bg-slate-100 px-2 py-1 text-xs">
-                                {{ __('general.assessment_taker.question.type') }}
-                            </span>
                         </div>
 
                         <div class="space-y-3">
@@ -227,26 +204,12 @@
 
         @if($openSubmit)
             <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                <div class="w-full max-w-lg space-y-4 rounded-3xl bg-white p-6 shadow-2xl">
+                <div class="w-full max-w-lg space-y-4 rounded-3xl bg-white p-6">
                     <div class="space-y-2">
-                        <div class="text-xs uppercase tracking-wide text-slate-400">
-                            {{ __('general.assessment_taker.submit_modal.label') }}
-                        </div>
                         <h3 class="text-lg font-semibold">{{ __('general.assessment_taker.submit_modal.title') }}</h3>
                         <p class="text-sm leading-6 text-slate-600">
                             {{ __('general.assessment_taker.submit_modal.description') }}
                         </p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 text-sm">
-                        <div class="rounded-2xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">{{ __('general.assessment_taker.metrics.answered') }}</div>
-                            <div class="mt-1 font-semibold">{{ $this->answeredCount }} / {{ count($questions) }}</div>
-                        </div>
-                        <div class="rounded-2xl border bg-slate-50 p-4">
-                            <div class="text-xs text-slate-500">{{ __('general.assessment_taker.meta.passing_label') }}</div>
-                            <div class="mt-1 font-semibold">{{ $assessment->passing_grade }}%</div>
-                        </div>
                     </div>
 
                     <div class="flex justify-end gap-2 pt-2">

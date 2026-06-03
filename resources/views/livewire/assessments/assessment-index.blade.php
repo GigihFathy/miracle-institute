@@ -1,5 +1,5 @@
 <div class="space-y-6 lg:px-36">
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_color-mix(in_oklab,#004777_10%,transparent)] sm:p-8">
+    <section class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
                 <div class="text-xs uppercase tracking-[0.18em] text-[color:color-mix(in_oklab,#004777_48%,white)]">
@@ -30,7 +30,7 @@
                 $latest = $latestAttempts[$assessment->id] ?? null;
             @endphp
 
-            <article class="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_10px_25px_rgba(15,23,42,0.04)]">
+            <article class="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-5">
                 <div class="flex-1 space-y-4">
                     <div>
                         <div class="text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_48%,white)]">

@@ -573,7 +573,7 @@ return [
         ],
         'navigator' => [
             'title' => 'Navigator',
-            'note' => 'Semua jawaban disimpan otomatis. Jika attempt belum lulus, Anda bisa mengulang dari awal.',
+            'note' => 'Semua jawaban disimpan otomatis. Jika belum lulus, Anda bisa mengulang dari awal.',
         ],
         'question' => [
             'label' => 'Pertanyaan :current dari :total',
