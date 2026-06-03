@@ -196,6 +196,16 @@ return [
         ],
     ],
 
+    'topbar_search' => [
+        'placeholder' => 'Search courses...',
+        'submit' => 'Search',
+        'preview_title' => 'Matching courses',
+        'empty' => 'No matching courses found. Try a different keyword.',
+        'view_all_results' => 'See all results for ":query"',
+        'all_courses' => 'all courses',
+        'default_program' => 'Course',
+    ],
+
     'course_show' => [
         'login_to_track' => 'Sign In to Start Learning',
         'enrolled' => 'Enrolled',

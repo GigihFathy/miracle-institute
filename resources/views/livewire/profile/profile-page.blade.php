@@ -13,32 +13,6 @@
 <div class="space-y-6 px-4 pb-6 pt-6 sm:px-6 lg:px-12 xl:px-36">
     <x-ui.page-header title="{{ __('general.profile.hero.title') }}" />
 
-    <div class="rounded-[28px] border border-[#d7dcef] bg-white px-6 py-6 sm:px-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div class="max-w-2xl">
-                <p class="text-lg font-semibold tracking-tight text-[#2c314b]">{{ __('general.profile.form.title') }}</p>
-                <p class="mt-1 text-sm leading-6 text-[#5f6785]">{{ __('general.profile.form.subtitle') }}</p>
-            </div>
-
-            <div class="grid gap-3 sm:grid-cols-2 lg:min-w-[420px] lg:flex-1">
-                <div class="rounded-2xl border border-[#d7dcef] bg-[#f4faff] px-4 py-4">
-                    <p class="text-xs font-medium tracking-wide text-[#5f6785]">{{ __('general.profile.stats.status') }}</p>
-                    <p class="mt-2 text-sm font-semibold text-[#004777]">
-                        {{ $user?->hasVerifiedEmail() ? __('general.profile.status.verified') : __('general.profile.status.unverified') }}
-                    </p>
-                </div>
-
-                <div class="rounded-2xl border border-[#d7dcef] bg-[#f4faff] px-4 py-4">
-                    <p class="text-xs font-medium tracking-wide text-[#5f6785]">{{ __('general.profile.hero.active_role') }}</p>
-                    <p class="mt-2 text-sm font-semibold text-[#004777]">{{ ucfirst((string) $activeRole) }}</p>
-                    @if($hasDualRoles)
-                        <p class="mt-2 text-xs leading-5 text-[#5f6785]">{{ $roleSummaryText }}</p>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <section class="rounded-[28px] border border-[#d7dcef] bg-white px-6 py-6 sm:px-8">
             <h2 class="text-lg font-semibold text-[#2c314b]">{{ __('general.profile.summary.title') }}</h2>

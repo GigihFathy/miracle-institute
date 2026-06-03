@@ -30,6 +30,10 @@
                 </div>
             </div>
 
+            <div class="hidden flex-1 justify-center lg:flex">
+                @livewire('shared.topbar-course-search')
+            </div>
+
             <div class="flex items-center gap-3">
                 @auth
                     @livewire('shared.language-switcher')
@@ -43,6 +47,10 @@
                     </a>
                 @endguest
             </div>
+        </div>
+
+        <div class="pb-3 lg:hidden">
+            @livewire('shared.topbar-course-search')
         </div>
     </div>
 </header>

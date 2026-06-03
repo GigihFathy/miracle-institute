@@ -14,7 +14,7 @@
     </style>
 
 </head>
-<body class="bg-slate-50 text-[#004777]">
+<body class="bg-white text-[#004777]">
     <div class="flex min-h-screen flex-col">
         @include('layouts.partials.learning-topbar')
 

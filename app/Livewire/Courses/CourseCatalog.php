@@ -14,15 +14,27 @@ class CourseCatalog extends Component
 {
     use WithTableState, AuthorizesRequests;
 
+    public string $searchInput = '';
     public string $studyProgram = '';
     public string $sort = 'newest';
 
-    // protected $queryString = [
-    //     'search' => ['except' => ''],
-    //     'studyProgram' => ['except' => ''],
-    //     'sort' => ['except' => 'latest'],
-    //     'perPage' => ['except' => 9],
-    // ];
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'studyProgram' => ['except' => ''],
+        'sort' => ['except' => 'newest'],
+        'perPage' => ['except' => 12],
+    ];
+
+    public function mount(): void
+    {
+        $this->searchInput = $this->search;
+    }
+
+    public function submitSearch(): void
+    {
+        $this->search = trim($this->searchInput);
+        $this->resetPage();
+    }
 
     public function updatedStudyProgram(): void
     {

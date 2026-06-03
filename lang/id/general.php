@@ -163,7 +163,7 @@ return [
         ],
 
         'filters' => [
-            'search_placeholder' => 'Cari course, topik, atau kata kunci...',
+            'search_placeholder' => 'Cari course, atau kata kunci...',
             'all_study_programs' => 'Semua Program Studi',
         ],
 
@@ -194,6 +194,16 @@ return [
             'title' => 'Course tidak ditemukan',
             'description' => 'Coba ubah filter atau kata kunci.',
         ],
+    ],
+
+    'topbar_search' => [
+        'placeholder' => 'Cari course...',
+        'submit' => 'Cari',
+        'preview_title' => 'Hasil yang cocok',
+        'empty' => 'Tidak ada course yang cocok. Coba kata kunci lain.',
+        'view_all_results' => 'Lihat semua hasil untuk ":query"',
+        'all_courses' => 'semua course',
+        'default_program' => 'Course',
     ],
 
     'course_show' => [
