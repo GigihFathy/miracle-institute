@@ -100,6 +100,13 @@ return [
             ],
             'start_your_journey' => 'Start Your Journey',
         ],
+
+        'final_cta' => [
+            'title' => 'Take Your Next Step of Faith Today',
+            'description' => 'Do not let your desire to grow stop here. Start learning, deepen your faith, and walk closer with Jesus through a discipleship journey made for you.',
+            'button' => 'Start Growing Now',
+            'image_alt' => 'A hand holding a certificate',
+        ],
     ],
 
     'my_learning' => [
@@ -535,26 +542,36 @@ return [
             'empty' => 'Not set yet',
         ],
         'fields' => [
-            'image' => 'Profile photo',
             'name' => 'Full name',
             'email' => 'Email address',
             'phone' => 'Phone number',
             'gender' => 'Gender',
             'dob' => 'Date of birth',
+            'current_password' => 'Current password',
+            'new_password' => 'New password',
+            'password_confirmation' => 'Confirm new password',
         ],
         'gender' => [
             'male' => 'Male',
             'female' => 'Female',
         ],
         'form' => [
-            'title' => 'Edit information',
-            'subtitle' => 'Update your personal details and profile photo from one place.',
+            'title' => 'Account settings',
+            'subtitle' => 'Review and update your personal account information.',
+            'account_tab' => 'Account information',
+            'password_tab' => 'Password',
             'select_gender' => 'Select gender',
-            'image_help' => 'Upload a square photo for the best result.',
             'save' => 'Save changes',
+            'password_title' => 'Change password',
+            'password_subtitle' => 'Use a strong password that you do not use on other accounts.',
+            'password_help' => 'Use at least 8 characters with letters and numbers.',
+            'update_password' => 'Update password',
+            'validation_title' => 'Please review the highlighted fields.',
         ],
         'flash' => [
             'saved' => 'Profile updated successfully.',
+            'password_updated' => 'Password updated successfully.',
+            'password_updated_login_again' => 'Password updated successfully. Please sign in again.',
         ],
     ],
 

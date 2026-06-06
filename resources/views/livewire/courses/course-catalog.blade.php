@@ -2,58 +2,86 @@
     use Illuminate\Support\Str;
 
     $isMentor = session('active_role') === 'disciples';
+    $hero = $isMentor ? 'mentor' : 'student';
 @endphp
 
-<div class="px-4 py-10 text-mentor-primary sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
-    <div class="space-y-8">
-        <section class="space-y-6">
-            <div class="mx-auto space-y-3">
-                <h2 class="text-2xl font-semibold tracking-tight text-mentor-primary sm:text-3xl lg:text-[2.75rem]">
-                    {{ app()->getLocale() === 'id' ? 'Jelajahi Course Online yang Menginspirasi' : 'Explore Inspiring Online Courses' }}
-                </h2>
+<div class="min-h-screen bg-white text-[#0f172a]">
+    <section class="relative isolate overflow-x-clip px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8">
+        <div class="relative mx-auto grid max-w-6xl items-center gap-8 overflow-hidden rounded-[2rem] bg-[#eef8ff] px-7 py-10 sm:px-10 sm:py-14 lg:grid-cols-[1.1fr_0.9fr] lg:px-14 lg:py-16">
+            <div class="pointer-events-none absolute -left-24 -top-24 -z-10 h-72 w-72 rounded-full bg-[#7DD3FC]/50 blur-3xl" aria-hidden="true"></div>
+            <div class="pointer-events-none absolute -bottom-28 right-10 -z-10 h-80 w-80 rounded-full bg-violet-300/30 blur-3xl" aria-hidden="true"></div>
 
-                {{-- <p class="mx-auto text-sm leading-7 text-[color:color-mix(in_oklab,#004777_72%,white)] sm:text-[15px]">
-                    {{ app()->getLocale() === 'id' ? 'Temukan course yang tepat untuk langkah belajar berikutnya dan pilih program yang paling sesuai untuk perjalananmu.' : 'Find the right course for your next learning step and choose the program that best fits your journey.' }}
-                </p> --}}
+            <div class="relative z-10 order-2 text-center lg:order-1 lg:text-left">
+                <h1 class="text-3xl font-bold leading-tight text-[#004777] sm:text-5xl lg:text-6xl">
+                    {{ __("general.course_catalog.hero.{$hero}.title") }}
+                </h1>
+                <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg lg:mx-0">
+                    {{ __("general.course_catalog.hero.{$hero}.description") }}
+                </p>
+
+                <div class="mt-8 flex justify-center gap-8 lg:justify-start">
+                    <div>
+                        <p class="text-3xl font-bold text-[#004777]">{{ $courses->total() }}</p>
+                        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            {{ __('general.course_catalog.stats.available_courses') }}
+                        </p>
+                    </div>
+                    <div class="h-14 w-px bg-[#004777]/15" aria-hidden="true"></div>
+                    <div>
+                        <p class="text-3xl font-bold text-[#35A7FF]">{{ $studyPrograms->count() }}</p>
+                        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            {{ __('general.course_catalog.stats.study_programs') }}
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex max-w-4xl flex-col gap-3 sm:flex-row">
-                <form wire:submit="submitSearch" class="relative w-full">
+            <div class="relative order-1 flex min-h-64 items-center justify-center lg:order-2 lg:min-h-[24rem] lg:justify-end">
+                <span class="pointer-events-none absolute left-[8%] top-[12%] h-7 w-7 rotate-12 bg-[#FFE100]"
+                      style="-webkit-mask: url('{{ asset('images/decor/star.svg') }}') center / contain no-repeat; mask: url('{{ asset('images/decor/star.svg') }}') center / contain no-repeat;"
+                      aria-hidden="true"></span>
+                <span class="pointer-events-none absolute right-[8%] top-[18%] h-6 w-6 -rotate-12 bg-[#FF8FA3]"
+                      style="-webkit-mask: url('{{ asset('images/decor/star.svg') }}') center / contain no-repeat; mask: url('{{ asset('images/decor/star.svg') }}') center / contain no-repeat;"
+                      aria-hidden="true"></span>
+                <img src="{{ asset('images/decor/book_1.png') }}"
+                     alt="{{ __('general.course_catalog.stats.available_courses') }}"
+                     class="relative z-10 w-full max-w-xs drop-shadow-2xl sm:max-w-sm lg:max-w-md">
+            </div>
+        </div>
+    </section>
+
+    <section class="px-4 pb-8 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-6xl rounded-[2rem] border border-[#35A7FF]/15 bg-white p-5 sm:p-7">
+            <div class="flex flex-col gap-3 lg:flex-row">
+                <form wire:submit="submitSearch" class="relative flex-1">
                     <input type="search"
                            wire:model.live.debounce.300ms="searchInput"
                            placeholder="{{ __('general.course_catalog.filters.search_placeholder') }}"
-                           class="h-12 w-full rounded-full border border-slate-200 bg-white pl-5 pr-12 text-sm text-mentor-primary outline-none transition placeholder:text-slate-400 focus:border-mentor-primary focus:ring-2 focus:ring-mentor-secondary-solid">
+                           class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-5 pr-14 text-sm text-[#004777] outline-none transition placeholder:text-slate-400 focus:border-[#35A7FF] focus:bg-white focus:ring-4 focus:ring-[#35A7FF]/10">
 
                     <button type="submit"
-                            class="absolute right-1.5 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-mentor-primary text-white transition hover:opacity-90">
+                            class="absolute right-1.5 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg bg-[#004777] text-white transition hover:bg-[#00395f]">
                         <span class="sr-only">{{ __('general.topbar_search.submit') }}</span>
-                        <svg class="h-4 w-4"
-                             xmlns="http://www.w3.org/2000/svg"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor"
-                             stroke-width="1.5">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="m21 21-4.35-4.35m1.85-5.15a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="m21 21-4.35-4.35m1.85-5.15a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                         </svg>
                     </button>
                 </form>
 
                 <select wire:model.live="sort"
-                        class="h-12 rounded-full border border-slate-200 bg-white px-5 text-sm text-mentor-primary outline-none transition focus:border-mentor-primary focus:ring-2 focus:ring-mentor-secondary-solid sm:w-48">
-                    <option value="newest">{{ app()->getLocale() === 'id' ? 'Terbaru' : 'Newest' }}</option>
-                    <option value="oldest">{{ app()->getLocale() === 'id' ? 'Terlama' : 'Oldest' }}</option>
+                        class="h-12 rounded-xl border border-slate-200 bg-slate-50 px-5 text-sm font-semibold text-[#004777] outline-none transition focus:border-[#35A7FF] focus:bg-white focus:ring-4 focus:ring-[#35A7FF]/10 lg:w-52">
+                    <option value="newest">{{ __('general.course_catalog.sort.newest') }}</option>
+                    <option value="oldest">{{ __('general.course_catalog.sort.oldest') }}</option>
                 </select>
             </div>
 
-            <div class="flex flex-wrap gap-3">
+            <div class="mt-5 flex flex-wrap gap-2">
                 <button type="button"
                         wire:click="$set('studyProgram', '')"
                         @class([
-                            'inline-flex min-h-11 items-center rounded-full border px-5 py-2.5 text-sm font-semibold transition',
-                            'border-mentor-primary bg-mentor-primary text-white' => $studyProgram === '',
-                            'border-slate-300 bg-white text-mentor-primary hover:border-mentor-primary/40 hover:bg-mentor-primary-soft-2' => $studyProgram !== '',
+                            'inline-flex min-h-10 items-center rounded-full border px-4 py-2 text-sm font-semibold transition',
+                            'border-[#004777] bg-[#004777] text-white' => $studyProgram === '',
+                            'border-slate-200 bg-white text-[#004777] hover:border-[#35A7FF] hover:bg-[#eef8ff]' => $studyProgram !== '',
                         ])>
                     {{ __('general.course_catalog.filters.all_study_programs') }}
                 </button>
@@ -62,137 +90,127 @@
                     <button type="button"
                             wire:click="$set('studyProgram', '{{ $sp->slug }}')"
                             @class([
-                                'inline-flex min-h-11 items-center rounded-full border px-5 py-2.5 text-sm font-semibold transition',
-                                'border-mentor-primary bg-mentor-primary text-white' => $studyProgram === $sp->slug,
-                                'border-slate-300 bg-white text-mentor-primary hover:border-mentor-primary/40 hover:bg-mentor-primary-soft-2' => $studyProgram !== $sp->slug,
+                                'inline-flex min-h-10 items-center rounded-full border px-4 py-2 text-sm font-semibold transition',
+                                'border-[#004777] bg-[#004777] text-white' => $studyProgram === $sp->slug,
+                                'border-slate-200 bg-white text-[#004777] hover:border-[#35A7FF] hover:bg-[#eef8ff]' => $studyProgram !== $sp->slug,
                             ])>
                         {{ $sp->title }}
                     </button>
                 @endforeach
             </div>
+        </div>
+    </section>
 
-            <div class="text-sm text-slate-500">
-                {{ $courses->total() }} {{ Str::plural(app()->getLocale() === 'id' ? 'course' : 'course', $courses->total()) }}
+    <section class="px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+        <div class="mx-auto max-w-6xl">
+            <div class="mb-6 flex items-center justify-between gap-4">
+                <h2 class="text-2xl font-bold text-[#004777] sm:text-3xl">
+                    {{ __('general.course_catalog.stats.available_courses') }}
+                </h2>
+                <span class="rounded-full bg-[#eef8ff] px-4 py-2 text-sm font-semibold text-[#004777]">
+                    {{ $courses->total() }}
+                </span>
             </div>
-        </section>
 
-        <section class="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-            @forelse($courses as $course)
-                @php
-                    $enrolled = in_array($course->id, $enrolledCourseIds, true);
-                    $courseImage = $course->poster ?? null;
-                    $courseImageSrc = null;
+            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                @forelse($courses as $course)
+                    @php
+                        $enrolled = in_array($course->id, $enrolledCourseIds, true);
+                        $courseImage = $course->poster ?? null;
+                        $courseImageSrc = null;
 
-                    if ($courseImage) {
-                        if (Str::startsWith($courseImage, ['http://', 'https://'])) {
-                            $courseImageSrc = $courseImage;
-                        } else {
-                            if (Str::startsWith($courseImage, 'images/')) {
+                        if ($courseImage) {
+                            if (Str::startsWith($courseImage, ['http://', 'https://'])) {
+                                $courseImageSrc = $courseImage;
+                            } elseif (Str::startsWith($courseImage, 'images/')) {
                                 $courseImageSrc = asset($courseImage);
                             } else {
                                 $courseImageSrc = asset('images/thumbnail/' . $courseImage);
                             }
+                        } elseif (!empty($course->image)) {
+                            $courseImageSrc = asset('storage/' . $course->image);
                         }
-                    } elseif (!empty($course->image)) {
-                        $courseImageSrc = asset('storage/' . $course->image);
-                    }
-                @endphp
+                    @endphp
 
-                <article class="group relative h-full overflow-hidden rounded-2xl transition-colors hover:bg-gray-200">
-                    <a href="{{ localized_route('courses.show', $course->slug) }}"
-                       aria-label="{{ __('general.course_catalog.actions.open') }}: {{ $course->title }}"
-                       class="absolute inset-0 z-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-mentor-secondary-solid focus:ring-offset-2 focus:ring-offset-white"></a>
+                    <article class="group relative flex h-full flex-col rounded-[1.5rem] border border-slate-200 bg-white p-3 transition hover:-translate-y-1 hover:border-[#35A7FF]">
+                        <a href="{{ localized_route('courses.show', $course->slug) }}"
+                           aria-label="{{ __('general.course_catalog.actions.open') }}: {{ $course->title }}"
+                           class="absolute inset-0 z-10 rounded-[1.5rem] focus:outline-none focus:ring-2 focus:ring-[#35A7FF] focus:ring-offset-2"></a>
 
-                    <div class="h-full p-2.5 transition-colors group-hover:bg-gray-200">
-                        <div class="overflow-hidden rounded-lg thumb">
+                        <div class="relative overflow-hidden rounded-2xl">
                             @if($courseImageSrc)
                                 <img src="{{ $courseImageSrc }}"
                                      alt="{{ $course->title }}"
-                                     class="h-36 w-full object-cover sm:h-40">
+                                     class="h-52 w-full object-cover transition duration-500 group-hover:scale-105">
                             @else
-                                <div class="flex h-36 w-full items-center justify-center bg-slate-200 sm:h-40">
-                                    <svg width="120" height="68" viewBox="0 0 280 158" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect width="280" height="158" fill="#e6e9ee"/>
+                                <div class="flex h-52 w-full items-center justify-center bg-gradient-to-br from-[#004777]/10 to-[#35A7FF]/20 text-[#004777]">
+                                    <svg class="h-12 w-12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                                     </svg>
                                 </div>
                             @endif
-                        </div>
 
-                        <div class="relative z-20 mt-3 flex h-[calc(100%-9rem)] flex-col pointer-events-none sm:h-[calc(100%-10rem)]">
-                            <div class="flex-1">
-                                <div class="text-[11px] uppercase tracking-wide text-[#3B82F6]/70">
-                                    {{ $course->studyProgram?->title }}
-                                </div>
-
-                                <h3 class="mt-1 line-clamp-2 text-sm font-semibold leading-tight text-[#004777]">
-                                    {{ \Illuminate\Support\Str::limit($course->title, 72) }}
-                                </h3>
-
-                                <p class="mt-1 line-clamp-2 text-xs leading-5 text-[#004777]/70">
-                                    {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
-                                </p>
-
-                                <div class="mt-2 flex flex-wrap gap-1.5">
-                                    <span class="rounded px-2 py-0.5 text-[11px] bg-[#3B82F6]/10 text-[#004777]">
-                                        {{ trans_choice('general.course_catalog.badges.topics', $course->topics_count, ['count' => $course->topics_count]) }}
-                                    </span>
-
-                                    @if($enrolled)
-                                        <span class="rounded px-2 py-0.5 text-[11px] bg-emerald-50 text-emerald-700">
-                                            {{ __('general.course_catalog.badges.enrolled') }}
-                                        </span>
-                                    @elseif($isMentor)
-                                        <span class="rounded px-2 py-0.5 text-[11px] bg-slate-100 text-slate-600">
-                                            {{ ucfirst($course->status) }}
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="mt-3 flex items-center justify-between gap-3">
-                            @if(!$isMentor)
-                                @auth
-                                    @unless($enrolled)
-                                        <button wire:click="enroll('{{ $course->id }}')"
-                                                class="admin-neutral-button pointer-events-auto relative z-20 inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-medium">
-                                            {{ __('general.course_catalog.actions.enroll') }}
-                                        </button>
-                                    @endunless
-                                @endauth
+                            @if($enrolled)
+                                <span class="absolute left-3 top-3 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white">
+                                    {{ __('general.course_catalog.badges.enrolled') }}
+                                </span>
+                            @elseif($isMentor)
+                                <span class="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#004777] backdrop-blur">
+                                    {{ ucfirst($course->status) }}
+                                </span>
                             @endif
+                        </div>
+
+                        <div class="flex flex-1 flex-col px-3 pb-3 pt-5">
+                            <p class="text-xs font-bold uppercase tracking-[0.12em] text-[#35A7FF]">
+                                {{ $course->studyProgram?->title }}
+                            </p>
+                            <h3 class="mt-2 line-clamp-2 text-xl font-bold leading-snug text-[#0f172a]">
+                                {{ Str::limit($course->title, 80) }}
+                            </h3>
+                            <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
+                                {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
+                            </p>
+
+                            <div class="relative z-20 mt-auto flex items-center justify-between gap-3 pt-5 pointer-events-none">
+                                <span class="rounded-full bg-[#eef8ff] px-3 py-1.5 text-xs font-semibold text-[#004777]">
+                                    {{ trans_choice('general.course_catalog.badges.topics', $course->topics_count, ['count' => $course->topics_count]) }}
+                                </span>
+
+                                @if(!$isMentor)
+                                    @auth
+                                        @unless($enrolled)
+                                            <button wire:click="enroll('{{ $course->id }}')"
+                                                    class="pointer-events-auto relative z-20 inline-flex items-center justify-center rounded-full bg-[#004777] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#00395f]">
+                                                {{ __('general.course_catalog.actions.enroll') }}
+                                            </button>
+                                        @endunless
+                                    @endauth
+                                @endif
                             </div>
                         </div>
-                    </div>
-                </article>
-            @empty
-                <div class="col-span-full">
-                    <div class="px-8 py-16 text-center">
-                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mentor-primary-soft-2">
-                            <svg class="h-7 w-7 text-white"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-width="1.5"
-                                      d="M9.75 9.75h4.5m-4.5 4.5h4.5M6.75 3.75h10.5A2.25 2.25 0 0119.5 6v12a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 18V6a2.25 2.25 0 012.25-2.25z"/>
+                    </article>
+                @empty
+                    <div class="col-span-full rounded-[2rem] bg-[#eef8ff] px-8 py-16 text-center">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-[#004777]">
+                            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 9.75h4.5m-4.5 4.5h4.5M6.75 3.75h10.5A2.25 2.25 0 0119.5 6v12a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 18V6a2.25 2.25 0 012.25-2.25z"/>
                             </svg>
                         </div>
-
-                        <h3 class="mt-5 text-lg font-semibold text-mentor-primary">
+                        <h3 class="mt-5 text-xl font-bold text-[#004777]">
                             {{ __('general.course_catalog.empty.title') }}
                         </h3>
-
-                        <p class="mt-2 text-sm text-[color:color-mix(in_oklab,#004777_72%,white)]">
+                        <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
                             {{ __('general.course_catalog.empty.description') }}
                         </p>
                     </div>
-                </div>
-            @endforelse
-        </section>
+                @endforelse
+            </div>
 
-        <div class="course-catalog-pagination pt-2">
-            {{ $courses->links() }}
+            <div class="course-catalog-pagination pt-10">
+                {{ $courses->links() }}
+            </div>
         </div>
-    </div>
+    </section>
 </div>

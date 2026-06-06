@@ -26,8 +26,8 @@
     }
 @endphp
 
-<div class="pb-10">
-    <div class="mx-auto max-w-6xl space-y-5">
+<div class="min-h-screen bg-white px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
+    <div class="mx-auto max-w-6xl space-y-12">
         @if(session('success'))
             <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
                 {{ session('success') }}
@@ -41,8 +41,10 @@
         @endif
 
         <section>
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-                <div class="space-y-5">
+            <div class="relative isolate overflow-hidden rounded-[2rem] bg-[#eef8ff] p-6 sm:p-10 lg:p-12">
+                <div class="pointer-events-none absolute -left-24 -top-24 -z-10 h-72 w-72 rounded-full bg-[#7DD3FC]/45 blur-3xl" aria-hidden="true"></div>
+                <div class="pointer-events-none absolute -bottom-28 right-10 -z-10 h-80 w-80 rounded-full bg-violet-300/25 blur-3xl" aria-hidden="true"></div>
+                <div class="space-y-8">
                 <a
                     href="{{ localized_route('courses.index') }}"
                     class="inline-flex items-center gap-2 text-sm font-medium text-[#004777] transition hover:text-[#35A7FF]"
@@ -53,12 +55,12 @@
                     <span>{{ __('general.assessment_result.actions.back_to_course') }}</span>
                 </a>
 
-                <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-start">
-                    <div class="relative aspect-16/10 w-full max-w-52 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:w-52">
+                <div class="grid items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+                    <div class="relative aspect-[16/11] w-full overflow-hidden rounded-2xl bg-white p-2">
                         <img
                             src="{{ $posterSrc ?? asset('images/thumbnail/thumbnail_candle.png') }}"
                             alt="{{ $course->title }}"
-                            class="h-full w-full object-cover"
+                            class="h-full w-full rounded-xl object-cover"
                         >
                     </div>
 
@@ -67,11 +69,11 @@
                             {{ $course->studyProgram?->title }}
                         </div>
 
-                        <h1 class="mt-1 text-2xl font-bold leading-tight tracking-tight text-[#004777] sm:text-3xl">
+                        <h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight text-[#004777] sm:text-5xl">
                             {{ $course->title }}
                         </h1>
 
-                        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                        <p class="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
                             {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
                         </p>
 
@@ -80,7 +82,7 @@
                                 @if(!auth()->check())
                                     <a
                                         href="{{ localized_route('login') }}"
-                                        class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs sm:text-sm"
+                                    class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#00395f]"
                                     >
                                         {{ __('general.course_show.login_to_track') }}
                                     </a>
@@ -89,7 +91,7 @@
                                         @if($continueTopic)
                                             <a
                                                 href="{{ localized_route('topics.show', $continueTopic->slug) }}"
-                                                class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs leading-none sm:text-sm"
+                                                class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold leading-none text-white transition hover:bg-[#00395f]"
                                             >
                                                 {{ __('general.course_show.continue_learning') }}
                                             </a>
@@ -99,7 +101,7 @@
                                             wire:click="enroll"
                                             wire:loading.attr="disabled"
                                             wire:target="enroll"
-                                            class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs disabled:opacity-70 sm:text-sm"
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:opacity-70"
                                         >
                                             <span wire:loading.remove wire:target="enroll">{{ __('general.course_show.enroll') }}</span>
 
@@ -129,7 +131,7 @@
                 </div>
 
                 @if($isStudent)
-                    <div class="rounded-xl bg-slate-50 p-4">
+                    <div class="sm:rounded-[1.5rem] sm:border sm:border-[#35A7FF]/15 sm:bg-white/80 sm:p-6 sm:backdrop-blur">
                         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <h2 class="text-sm font-semibold uppercase tracking-wide text-[#004777]">{{ __('general.course_show.course_access') }}</h2>
@@ -141,20 +143,19 @@
                             <div class="text-sm font-semibold text-[#004777]">{{ $progressPercent }}%</div>
                         </div>
 
-                        <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-                            <div class="h-full rounded-full bg-mentor-primary transition-all" style="width: {{ $progressPercent }}%"></div>
+                        <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-[#35A7FF]/15">
+                            <div class="h-full rounded-full bg-[#004777] transition-all" style="width: {{ $progressPercent }}%"></div>
                         </div>
 
-                        <div class="mt-4 grid gap-2 lg:grid-cols-2">
-                            <div class="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-3">
-                                <div class="min-w-0">
+                        <div class="mt-6 grid gap-3 sm:gap-4 lg:grid-cols-2">
+                            <div class="relative isolate min-h-32 overflow-hidden rounded-2xl bg-[#f4f1ff] p-4 sm:min-h-52 sm:p-5">
+                                <div class="relative z-10 max-w-[78%] sm:max-w-[60%]">
                                     <div class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.course_show.assessment_label') }}</div>
-                                    <div class="mt-0.5 truncate text-sm font-semibold text-[#004777]">
+                                    <div class="mt-2 text-base font-bold text-[#004777]">
                                         {{ $assessmentMeta['title'] ?? __('general.course_show.not_published') }}
                                     </div>
-                                </div>
 
-                                <div class="flex shrink-0 items-center gap-2">
+                                <div class="mt-4 flex flex-wrap items-center gap-2">
                                     @if($assessmentMeta)
                                         @if($hasPassedAssessment)
                                             <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">{{ __('general.course_show.assessment_passed_badge') }}</span>
@@ -169,15 +170,16 @@
                                         <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">{{ __('general.course_show.not_published') }}</span>
                                     @endif
                                 </div>
+                                </div>
+                                <img src="{{ asset('images/decor/assesment.png') }}" alt="" class="pointer-events-none absolute -bottom-5 -right-5 w-24 opacity-35 sm:-bottom-8 sm:-right-8 sm:w-44 sm:opacity-100 lg:-bottom-12 lg:-right-12 lg:w-56" aria-hidden="true">
                             </div>
 
-                            <div class="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-3">
-                                <div class="min-w-0">
+                            <div class="relative isolate min-h-32 overflow-hidden rounded-2xl bg-[#fff8df] p-4 sm:min-h-52 sm:p-5">
+                                <div class="relative z-10 max-w-[78%] sm:max-w-[60%]">
                                     <div class="text-xs uppercase tracking-wide text-slate-400">{{ __('general.course_show.certificate_label') }}</div>
-                                    <div class="mt-0.5 text-sm font-semibold text-[#004777]">{{ __('general.course_show.certificate_label') }}</div>
-                                </div>
+                                    <div class="mt-2 text-base font-bold text-[#004777]">{{ __('general.course_show.certificate_label') }}</div>
 
-                                <div class="flex shrink-0 items-center gap-2">
+                                <div class="mt-4 flex flex-wrap items-center gap-2">
                                     @if($courseCertificate && $enrolled)
                                         <a
                                             href="{{ localized_route('certificates.download', $courseCertificate->id) }}"
@@ -193,6 +195,8 @@
                                         <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">{{ __('general.course_show.locked') }}</span>
                                     @endif
                                 </div>
+                                </div>
+                                <img src="{{ asset('images/decor/certificate.png') }}" alt="" class="pointer-events-none absolute -bottom-5 -right-5 w-24 opacity-35 sm:-bottom-8 sm:-right-8 sm:w-44 sm:opacity-100 lg:-bottom-12 lg:-right-12 lg:w-56" aria-hidden="true">
                             </div>
                         </div>
                     </div>
@@ -202,10 +206,10 @@
         </section>
 
         @if($isStudent)
-            <section class="space-y-4">
+            <section class="space-y-6">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h2 class="text-xl font-bold tracking-tight text-[#004777] sm:text-2xl">
+                        <h2 class="text-3xl font-bold tracking-tight text-[#004777] sm:text-4xl">
                             {{ __('general.course_show.course_topics') }}
                         </h2>
                         <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
@@ -220,7 +224,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <div class="grid gap-4 md:grid-cols-2">
                     @foreach($topicsToRender as $index => $topic)
                         @php
                             $status = $topic->progress_status ?? 'not_started';
@@ -243,15 +247,15 @@
                             };
                         @endphp
 
-                        <div class="{{ $index !== 0 ? 'border-t border-slate-200' : '' }} p-4">
-                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <article class="rounded-[1.5rem] border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-[#35A7FF]">
+                            <div class="flex h-full flex-col gap-4">
                                 <div class="flex min-w-0 items-start gap-3 sm:gap-4">
-                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#004777] text-sm font-bold text-white">
+                                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#004777] text-sm font-bold text-white">
                                         {{ $index + 1 }}
                                     </div>
 
                                     <div class="min-w-0">
-                                        <h3 class="text-base font-semibold leading-tight text-[#004777]">
+                                        <h3 class="text-lg font-bold leading-tight text-[#004777]">
                                             {{ $topic->name }}
                                         </h3>
 
@@ -283,29 +287,29 @@
                                     </div>
                                 </div>
 
-                                <div class="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+                                <div class="mt-auto flex shrink-0 flex-wrap gap-2 pt-2 sm:justify-end">
                                     @guest
-                                        <a href="{{ localized_route('login') }}" class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs sm:text-sm">
+                                        <a href="{{ localized_route('login') }}" class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#00395f] sm:text-sm">
                                             {{ __('general.course_show.topic_cta_guest') }}
                                         </a>
                                     @endguest
 
                                     @auth
-                                        <a href="{{ localized_route('topics.show', $topic->slug) }}" class="admin-primary-button inline-flex items-center rounded-xl px-4 py-2 text-xs sm:text-sm">
+                                        <a href="{{ localized_route('topics.show', $topic->slug) }}" class="inline-flex items-center rounded-xl bg-[#004777] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#00395f] sm:text-sm">
                                             {{ __('general.course_show.topic_cta_enrolled') }}
                                         </a>
                                     @endauth
                                 </div>
                             </div>
-                        </div>
+                        </article>
                     @endforeach
                 </div>
             </section>
         @elseif($isMentor)
-            <section class="space-y-4">
+            <section class="space-y-6">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div class="flex flex-col gap-2">
-                        <h2 class="text-xl font-bold tracking-tight text-[#004777] sm:text-2xl">
+                        <h2 class="text-3xl font-bold tracking-tight text-[#004777] sm:text-4xl">
                             {{ __('general.course_show.mentored_topics.title') }}
                         </h2>
                         <p class="text-sm text-slate-500">
@@ -321,8 +325,8 @@
                 </div>
 
                 @if($hasMentoredTopics)
-                    <div class="rounded-2xl border border-slate-200 bg-white p-4">
-                        <div class="space-y-2">
+                    <div>
+                        <div class="grid gap-4 md:grid-cols-2">
                             @foreach($mentoredTopics as $topic)
                                 @php
                                     $mentorRole = $topic->mentor_role ?? 'collaborator';
@@ -335,7 +339,7 @@
                                         : __('general.course_show.role.collaborator');
                                 @endphp
 
-                                <div class="rounded-xl border border-slate-200 p-3">
+                                <div class="rounded-[1.5rem] border border-slate-200 bg-white p-5 transition hover:border-[#35A7FF]">
                                     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                         <div class="min-w-0">
                                             <div class="text-sm font-semibold text-[#004777]">
@@ -361,8 +365,8 @@
                         </div>
                     </div>
                 @else
-                    <div class="rounded-2xl border border-slate-200 bg-white p-4">
-                        <div class="rounded-xl bg-slate-50 p-5">
+                    <div class="rounded-[2rem] bg-[#eef8ff] p-8">
+                        <div>
                             <div class="text-sm font-semibold text-[#004777]">
                                 {{ __('general.course_show.mentored_topics.empty_title') }}
                             </div>
@@ -380,7 +384,7 @@
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
             <div class="absolute inset-0" wire:click="closeAssessmentModal"></div>
 
-            <div class="relative z-10 max-h-[90vh] w-full max-w-6xl overflow-y-auto border border-slate-200 bg-white">
+            <div class="relative z-10 max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-[2rem] border border-slate-200 bg-white">
                 <div class="flex items-center justify-between border-b border-slate-200 px-6 py-5">
                     <div>
                         <h3 class="text-lg font-semibold text-[#004777]">{{ __('general.course_show.assessment_modal.title') }}</h3>
@@ -398,28 +402,29 @@
 
                 <div class="grid grid-cols-1 gap-6 p-6 xl:grid-cols-[0.95fr_1.05fr]">
                     <div class="space-y-4">
-                        <div class="border border-slate-200 p-5">
+                        <div class="relative overflow-hidden rounded-2xl bg-[#f4f1ff] p-5">
                             <div class="text-xs uppercase tracking-wide text-[#004777]/60">{{ __('general.course_show.assessment_modal.assessment') }}</div>
                             <h4 class="mt-2 text-2xl font-bold text-[#004777]">{{ $assessmentMeta['title'] }}</h4>
                             <p class="mt-2 text-sm text-slate-500">
                                 {{ $assessmentMeta['status'] }}
                             </p>
+                            <img src="{{ asset('images/decor/assesment.png') }}" alt="" class="pointer-events-none absolute -bottom-16 -right-12 w-40 opacity-25" aria-hidden="true">
                         </div>
 
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            <div class="border border-slate-200 p-4">
+                            <div class="rounded-2xl border border-slate-200 p-4">
                                 <div class="text-xs text-slate-500">{{ __('general.course_show.assessment_modal.questions') }}</div>
                                 <div class="mt-1 font-semibold text-[#004777]">{{ $assessmentMeta['question_count'] }}</div>
                             </div>
 
-                            <div class="border border-slate-200 p-4">
+                            <div class="rounded-2xl border border-slate-200 p-4">
                                 <div class="text-xs text-slate-500">{{ __('general.course_show.assessment_modal.passing_grade') }}</div>
                                 <div class="mt-1 font-semibold text-[#004777]">{{ $assessmentMeta['passing_grade'] }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="border border-slate-200 bg-slate-50 p-6">
+                    <div class="rounded-2xl bg-[#eef8ff] p-6">
                         <div class="mb-4 text-xs uppercase tracking-wide text-slate-400">
                             {{ __('general.course_show.assessment_modal.instructions') }}
                         </div>

@@ -1,8 +1,6 @@
 @php
-    $isMentor = session('active_role') === 'disciples';
     $studyProgramCount = $studyPrograms->count();
     $featuredCount = $featured->count();
-    $continueCount = count($continueCourses);
 @endphp
 
 <div class="min-h-screen bg-white text-[#0f172a]">
@@ -52,7 +50,7 @@
                       aria-hidden="true"></span>
                 <img src="{{ asset('images/decor/jesus_christ.png') }}"
                      alt="Jesus teaching children"
-                     class="relative z-10 w-full max-w-md drop-shadow-2xl sm:max-w-lg lg:max-w-[34rem]">
+                     class="relative z-10 w-full max-w-md drop-shadow-2xl sm:max-w-lg lg:max-w-[38rem]">
             </div>
         </div>
 
@@ -64,7 +62,7 @@
 
     <section class="relative z-0 overflow-x-clip px-4 pb-16 pt-16 sm:px-6 sm:pb-24 sm:pt-24 lg:px-8">
         <div class="relative z-10 mx-auto grid max-w-6xl gap-5 md:grid-cols-2">
-            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#004777] p-7 text-white shadow-xl shadow-[#004777]/10 sm:p-10 md:min-h-[440px]">
+            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#004777] p-7 text-white sm:p-10 md:min-h-[440px]">
                 <img src="{{ asset('images/decor/background.png') }}"
                      alt=""
                      class="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-10"
@@ -83,7 +81,7 @@
                      class="pointer-events-none mx-auto -mb-14 -translate-y-8 w-[15.5rem] drop-shadow-2xl transition duration-500 group-hover:-translate-y-5 group-hover:translate-x-2 sm:w-[18.25rem] md:absolute md:-bottom-2 md:-right-0 md:mb-0 md:mt-0 md:translate-y-0 md:w-64 md:group-hover:-translate-y-2">
             </article>
 
-            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#eef8ff] p-7 shadow-xl shadow-[#004777]/10 sm:p-10 md:min-h-[440px]">
+            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#eef8ff] p-7 sm:p-10 md:min-h-[440px]">
                 <img src="{{ asset('images/decor/background.png') }}"
                      alt=""
                      class="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.04]"
@@ -102,7 +100,7 @@
                      class="pointer-events-none mx-auto -mb-16 mt-5 -translate-y-8 w-[17rem] drop-shadow-2xl transition duration-500 group-hover:-translate-y-6 group-hover:rotate-2 sm:w-[19.5rem] md:absolute md:-bottom-0 md:-right-2 md:mb-0 md:mt-0 md:translate-y-0 md:w-72 md:group-hover:-translate-y-3">
             </article>
 
-            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#f4f1ff] p-7 shadow-xl shadow-[#004777]/10 sm:p-10 md:min-h-[440px]">
+            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#f4f1ff] p-7 sm:p-10 md:min-h-[440px]">
                 <img src="{{ asset('images/decor/background.png') }}"
                      alt=""
                      class="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.04]"
@@ -121,7 +119,7 @@
                      class="pointer-events-none mx-auto -mb-14 mt-5 -translate-y-8 w-[15.5rem] drop-shadow-2xl transition duration-500 group-hover:-translate-y-6 group-hover:-rotate-2 sm:w-[18.25rem] md:absolute md:-bottom-0 md:-right-2 md:mb-0 md:mt-0 md:translate-y-0 md:w-64 md:group-hover:-translate-y-3">
             </article>
 
-            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#fff8df] p-7 shadow-xl shadow-[#004777]/10 sm:p-10 md:min-h-[440px]">
+            <article class="group relative isolate overflow-hidden rounded-[2rem] bg-[#fff8df] p-7 sm:p-10 md:min-h-[440px]">
                 <img src="{{ asset('images/decor/background.png') }}"
                      alt=""
                      class="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-[0.04]"
@@ -147,115 +145,60 @@
              aria-hidden="true">
     </section>
 
-    @if(!$isGuest && !$isMentor && $continueCount)
-        <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-            <div class="mx-auto max-w-6xl">
-                <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                        <h2 class="text-3xl font-bold text-[#0f172a] sm:text-4xl">{{ __('general.explore_dashboard.continue.title') }}</h2>
-                        <p class="mt-2 text-sm text-slate-600">{{ __('general.explore_dashboard.continue.continue_where_left_off') }}</p>
-                    </div>
-                    <a href="{{ localized_route('courses.index') }}" class="text-sm font-semibold text-[#004777] hover:text-[#35A7FF]">
-                        {{ __('general.explore_dashboard.hero.guest.explore_journey') }}
-                    </a>
-                </div>
-
-                <div class="flex gap-4 overflow-x-auto pb-3">
-                    @foreach($continueCourses as $item)
-                        @php
-                            $progress = (int) ($item->progress_percentage ?? 0);
-                            $progress = max(0, min(100, $progress));
-
-                            $courseImage = $item->course->poster ?? null;
-                            $courseImageSrc = null;
-                            if ($courseImage) {
-                                if (\Illuminate\Support\Str::startsWith($courseImage, ['http://', 'https://'])) {
-                                    $courseImageSrc = $courseImage;
-                                } elseif (\Illuminate\Support\Str::startsWith($courseImage, 'images/')) {
-                                    $courseImageSrc = asset($courseImage);
-                                } else {
-                                    $courseImageSrc = asset('images/thumbnail/' . $courseImage);
-                                }
-                            }
-                        @endphp
-
-                        <a href="{{ localized_route('courses.show', $item->course->slug) }}"
-                           class="w-[280px] shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-[#35A7FF] hover:shadow-xl hover:shadow-[#004777]/5 sm:w-[320px]">
-                            @if($courseImageSrc)
-                                <img src="{{ $courseImageSrc }}" alt="{{ $item->course->title }}" class="h-40 w-full object-cover">
-                            @else
-                                <div class="flex h-40 w-full items-center justify-center bg-slate-100 text-sm text-slate-400">
-                                    {{ __('general.explore_dashboard.featured_teachings.title') }}
-                                </div>
-                            @endif
-
-                            <div class="p-5">
-                                <p class="text-[11px] font-semibold uppercase tracking-wide text-[#35A7FF]">{{ $item->course->studyProgram?->title }}</p>
-                                <h3 class="mt-2 text-base font-bold leading-snug text-[#0f172a]">{{ \Illuminate\Support\Str::limit($item->course->title, 70) }}</h3>
-                                <div class="mt-4">
-                                    <div class="mb-1 flex items-center justify-between text-xs text-slate-500">
-                                        <span>{{ __('general.explore_dashboard.continue.progress') }}</span>
-                                        <span class="font-bold text-[#004777]">{{ $progress }}%</span>
-                                    </div>
-                                    <div class="h-2 overflow-hidden rounded-full bg-[#35A7FF]/15">
-                                        <div class="h-2 rounded-full bg-[#004777]" style="width: {{ $progress }}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
-
     <section id="community" class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:items-center">
-            <div>
-                <h2 class="text-3xl font-bold leading-tight text-[#0f172a] sm:text-5xl">
+        <div class="relative isolate mx-auto grid max-w-6xl items-center gap-8 overflow-hidden rounded-[2rem] bg-[#eef8ff] px-7 py-10 sm:px-10 sm:py-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-14 lg:py-16">
+            {{-- <img src="{{ asset('images/decor/background.png') }}"
+                 alt=""
+                 class="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-[0.04]"
+                 aria-hidden="true"> --}}
+            <div class="pointer-events-none absolute -left-24 -top-24 -z-10 h-72 w-72 rounded-full bg-[#7DD3FC]/45 blur-3xl" aria-hidden="true"></div>
+            <div class="pointer-events-none absolute -bottom-28 right-10 -z-10 h-80 w-80 rounded-full bg-violet-300/30 blur-3xl" aria-hidden="true"></div>
+
+            <div class="relative z-10">
+                <h2 class="max-w-2xl text-3xl font-bold leading-tight text-[#004777] sm:text-5xl">
                     {{ __('general.explore_dashboard.cta.title') }}
                 </h2>
-                <p class="mt-5 text-base leading-7 text-slate-600 sm:text-lg">
+                <p class="mt-5 max-w-xl text-base leading-7 text-slate-600 sm:text-lg">
                     {{ __('general.explore_dashboard.cta.description') }}
                 </p>
 
-                <ul class="mt-8 space-y-4">
-                    <li class="flex gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#35A7FF]/15 text-[#004777]">
-                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <ul class="mt-8 flex flex-wrap gap-3">
+                    <li class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2.5 text-sm font-semibold text-[#004777] shadow-sm">
+                        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#35A7FF]/15">
+                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </span>
-                        <span>{{ __('general.explore_dashboard.cta.learn.description') }}</span>
+                        {{ __('general.explore_dashboard.cta.learn.description') }}
                     </li>
-                    <li class="flex gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#35A7FF]/15 text-[#004777]">
-                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <li class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2.5 text-sm font-semibold text-[#004777] shadow-sm">
+                        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600">
+                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </span>
-                        <span>{{ __('general.explore_dashboard.cta.disciple.description') }}</span>
+                        {{ __('general.explore_dashboard.cta.disciple.description') }}
                     </li>
-                    <li class="flex gap-3">
-                        <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#35A7FF]/15 text-[#004777]">
-                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <li class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2.5 text-sm font-semibold text-[#004777] shadow-sm">
+                        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                            <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </span>
-                        <span>{{ __('general.explore_dashboard.cta.community.description') }}</span>
+                        {{ __('general.explore_dashboard.cta.community.description') }}
                     </li>
                 </ul>
 
                 <a href="{{ localized_route('courses.index') }}"
-                   class="mt-8 inline-flex items-center justify-center rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#00395f]">
+                   class="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#004777]/15 transition hover:-translate-y-0.5 hover:bg-[#00395f]">
                     {{ __('general.explore_dashboard.cta.start_your_journey') }}
                 </a>
             </div>
 
-            <div class="relative overflow-hidden rounded-2xl border border-slate-200 p-3">
-                <img src="{{ asset('images/decor/church_1.jpeg') }}"
-                     alt="{{ __('general.explore_dashboard.defaults.church_illustration') }}"
-                     class="h-80 w-full rounded-xl object-cover sm:h-96">
+            <div class="relative flex min-h-72 items-center justify-center sm:min-h-96 lg:min-h-[28rem] lg:justify-end">
+                <img src="{{ asset('images/decor/book_1.png') }}"
+                     alt="{{ __('general.explore_dashboard.cta.learn.description') }}"
+                     class="relative z-10 w-full max-w-sm drop-shadow-2xl transition duration-500 hover:-translate-y-2 sm:max-w-md lg:max-w-lg">
             </div>
         </div>
     </section>
@@ -285,16 +228,16 @@
                         @endphp
 
                         <a href="{{ localized_route('courses.show', $course->slug) }}"
-                           class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-[#35A7FF] hover:shadow-xl hover:shadow-[#004777]/5">
+                           class="group rounded-2xl border border-slate-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-[#35A7FF]">
                             @if($courseImageSrc)
-                                <img src="{{ $courseImageSrc }}" alt="{{ $course->title }}" class="h-44 w-full object-cover">
+                                <img src="{{ $courseImageSrc }}" alt="{{ $course->title }}" class="h-44 w-full rounded-xl object-cover">
                             @else
-                                <div class="flex h-44 w-full items-center justify-center bg-gradient-to-br from-[#004777]/10 to-[#35A7FF]/10 text-[#004777]">
+                                <div class="flex h-44 w-full items-center justify-center rounded-xl bg-gradient-to-br from-[#004777]/10 to-[#35A7FF]/10 text-[#004777]">
                                     {{ __('general.explore_dashboard.featured_teachings.title') }}
                                 </div>
                             @endif
 
-                            <div class="p-6">
+                            <div class="px-3 pb-3 pt-5">
                                 <p class="text-xs font-semibold uppercase tracking-wide text-[#35A7FF]">{{ $course->studyProgram?->title }}</p>
                                 <h3 class="mt-2 text-lg font-bold leading-snug text-[#0f172a]">{{ \Illuminate\Support\Str::limit($course->title, 80) }}</h3>
                                 <p class="mt-2 text-sm text-slate-500">
@@ -316,27 +259,34 @@
     @endif
 
     <section class="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <div class="mx-auto max-w-4xl text-center">
-            <h2 class="text-3xl font-bold leading-tight text-[#0f172a] sm:text-5xl">
-                {{ __('general.explore_dashboard.cta.title') }}
-            </h2>
-            <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-xl">
-                {{ __('general.explore_dashboard.cta.description') }}
-            </p>
-            <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                <a href="{{ localized_route('courses.index') }}"
-                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#00395f]">
-                    {{ __('general.explore_dashboard.cta.start_your_journey') }}
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </a>
-                @guest
-                    <a href="{{ localized_route('login') }}"
-                       class="inline-flex items-center justify-center rounded-xl border border-[#004777]/20 bg-white px-5 py-3 text-sm font-semibold text-[#004777] transition hover:border-[#35A7FF]">
-                        {{ __('general.explore_dashboard.hero.guest.login') }}
+        <div class="relative mx-auto max-w-6xl rounded-[2rem] border border-[#35A7FF]/20 bg-[#eef8ff] px-7 py-12 text-center sm:px-12 sm:py-16">
+            <img src="{{ asset('images/decor/cta_deco.png') }}" alt=""
+                 class="pointer-events-none absolute -left-12 -top-12 z-20 w-30 rotate-[-20deg] sm:-left-12 sm:-top-12 sm:w-32 lg:-left-20 lg:-top-20 lg:w-42"
+                 aria-hidden="true">
+
+            <div class="relative z-10">
+                <img src="{{ asset('images/decor/cta.png') }}"
+                     alt="{{ __('general.explore_dashboard.final_cta.image_alt') }}"
+                     class="mx-auto mb-6 w-36 drop-shadow-xl sm:w-44">
+
+                <h2 class="mx-auto max-w-3xl text-3xl font-bold leading-tight text-[#004777] sm:text-5xl">
+                    {{ __('general.explore_dashboard.final_cta.title') }}
+                </h2>
+                {{-- <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-xl">
+                    {{ __('general.explore_dashboard.final_cta.description') }}
+                </p> --}}
+                <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                    <a href="{{ localized_route('courses.index') }}"
+                       class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#004777]/15 transition hover:-translate-y-0.5 hover:bg-[#00395f]">
+                        {{ __('general.explore_dashboard.final_cta.button') }}
                     </a>
-                @endguest
+                    @guest
+                        <a href="{{ localized_route('login') }}"
+                           class="inline-flex items-center justify-center rounded-xl border border-[#004777]/20 bg-white px-5 py-3 text-sm font-semibold text-[#004777] transition hover:-translate-y-0.5 hover:border-[#35A7FF]">
+                            {{ __('general.explore_dashboard.hero.guest.login') }}
+                        </a>
+                    @endguest
+                </div>
             </div>
         </div>
     </section>

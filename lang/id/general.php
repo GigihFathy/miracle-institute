@@ -100,6 +100,13 @@ return [
             ],
             'start_your_journey' => 'Mulai Perjalanan Anda',
         ],
+
+        'final_cta' => [
+            'title' => 'Ambil Langkah Imanmu Hari Ini',
+            'description' => 'Jangan biarkan kerinduanmu untuk bertumbuh berhenti di sini. Mulailah belajar, perdalam iman, dan berjalan lebih dekat bersama Yesus melalui perjalanan pemuridan yang dirancang untukmu.',
+            'button' => 'Mulai Bertumbuh Sekarang',
+            'image_alt' => 'Tangan yang memegang sertifikat',
+        ],
     ],
 
     'my_learning' => [
@@ -536,26 +543,36 @@ return [
             'empty' => 'Belum diisi',
         ],
         'fields' => [
-            'image' => 'Foto profil',
             'name' => 'Nama lengkap',
             'email' => 'Alamat email',
             'phone' => 'Nomor telepon',
             'gender' => 'Jenis kelamin',
             'dob' => 'Tanggal lahir',
+            'current_password' => 'Kata sandi saat ini',
+            'new_password' => 'Kata sandi baru',
+            'password_confirmation' => 'Konfirmasi kata sandi baru',
         ],
         'gender' => [
             'male' => 'Laki-laki',
             'female' => 'Perempuan',
         ],
         'form' => [
-            'title' => 'Ubah informasi',
-            'subtitle' => 'Perbarui detail pribadi dan foto profil Anda dari satu tempat.',
+            'title' => 'Pengaturan akun',
+            'subtitle' => 'Tinjau dan perbarui informasi akun pribadi Anda.',
+            'account_tab' => 'Informasi akun',
+            'password_tab' => 'Kata sandi',
             'select_gender' => 'Pilih jenis kelamin',
-            'image_help' => 'Unggah foto persegi untuk hasil terbaik.',
             'save' => 'Simpan perubahan',
+            'password_title' => 'Ubah kata sandi',
+            'password_subtitle' => 'Gunakan kata sandi kuat yang tidak digunakan pada akun lain.',
+            'password_help' => 'Gunakan minimal 8 karakter yang mengandung huruf dan angka.',
+            'update_password' => 'Perbarui kata sandi',
+            'validation_title' => 'Periksa kembali kolom yang ditandai.',
         ],
         'flash' => [
             'saved' => 'Profil berhasil diperbarui.',
+            'password_updated' => 'Kata sandi berhasil diperbarui.',
+            'password_updated_login_again' => 'Kata sandi berhasil diperbarui. Silakan masuk kembali.',
         ],
     ],
 
