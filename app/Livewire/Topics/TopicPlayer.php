@@ -508,6 +508,7 @@ class TopicPlayer extends Component
                     : null;
 
                 $previewUrl = $this->resolveMaterialPreviewUrl($material, $youtubeId);
+                $downloadUrl = $this->resolveMaterialDownloadUrl($material);
 
                 $sourceValue = $material->type === 'video'
                     ? $material->external_url
@@ -536,6 +537,7 @@ class TopicPlayer extends Component
                         'youtube_id' => $youtubeId,
                         'thumbnail_url' => $thumbnailUrl,
                         'preview_url' => $previewUrl,
+                        'download_url' => $downloadUrl,
                         'watch_url' => $youtubeId
                             ? "https://www.youtube.com/watch?v={$youtubeId}"
                             : null,
@@ -568,6 +570,29 @@ class TopicPlayer extends Component
         }
 
         return null;
+    }
+
+    private function resolveMaterialDownloadUrl($material): ?string
+    {
+        if (! $material || ! in_array($material->type, ['pdf', 'ppt'], true)) {
+            return null;
+        }
+
+        $source = trim((string) $material->path);
+
+        if ($source === '') {
+            return null;
+        }
+
+        $driveId = $this->extractGoogleDriveFileId($source);
+
+        if ($driveId) {
+            return "https://drive.google.com/uc?export=download&id={$driveId}";
+        }
+
+        return filter_var($source, FILTER_VALIDATE_URL)
+            ? $source
+            : null;
     }
 
     private function toGoogleDrivePreviewUrl(string $input): ?string

@@ -48,7 +48,6 @@ class MyLearning extends Component
         $user = auth()->user();
         $summary = array_merge([
             'courses_enrolled' => 0,
-            'topics_completed' => 0,
             'certificates' => 0,
         ], (array) $progressService->getUserSummary($user));
 

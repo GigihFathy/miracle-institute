@@ -112,7 +112,7 @@ return [
     'my_learning' => [
         'page_title' => 'Pembelajaran Saya',
         'overview_title' => 'Ringkasan Pembelajaran Saya',
-        'overview_description' => 'Ringkasan singkat progres belajar kamu, termasuk course, topik, dan sertifikat yang sudah didapat.',
+        'overview_description' => 'Lanjutkan perjalanan belajarmu dan pantau course yang diikuti serta sertifikat yang sudah didapat.',
 
         'metrics' => [
             'courses_enrolled' => 'Course Diikuti',
@@ -380,7 +380,7 @@ return [
             'thumbnail_not_available' => 'Thumbnail tidak tersedia',
             'watch_youtube' => 'Tonton di YouTube',
             'youtube_hint' => 'Video akan dibuka di tab baru untuk pengalaman menonton terbaik.',
-            'open_download' => 'Buka / unduh material',
+            'open_download' => 'Unduh Material',
             'preview_not_available' => [
                 'title' => 'Preview belum tersedia',
                 'description' => 'Material ini sudah terdaftar, tetapi URL/file preview belum valid atau belum tersedia.',
@@ -403,7 +403,7 @@ return [
             ],
             'type_label' => 'Tipe: :type',
             'completed_badge' => 'MATERIAL SELESAI',
-            'mark_complete' => 'Tandai Selesai',
+            'mark_complete' => 'Selesai',
         ],
 
         'sessions' => [
@@ -739,7 +739,7 @@ return [
             'thumbnail_not_available' => 'Thumbnail tidak tersedia',
             'watch_youtube' => 'Tonton di YouTube',
             'youtube_hint' => 'Video akan dibuka di tab baru untuk pengalaman menonton terbaik.',
-            'open_download' => 'Buka / unduh material',
+            'open_download' => 'Unduh Material',
             'preview_not_available' => [
                 'title' => 'Preview belum tersedia',
                 'description' => 'Material ini sudah terdaftar, tetapi URL/file preview belum valid atau belum tersedia.',
@@ -762,7 +762,7 @@ return [
             ],
             'type_label' => 'Tipe: :type',
             'completed_badge' => 'MATERIAL SELESAI',
-            'mark_complete' => 'Tandai Selesai',
+            'mark_complete' => 'Selesai',
         ],
         'sessions' => [
             'title' => 'Sesi',

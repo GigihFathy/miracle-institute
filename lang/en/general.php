@@ -112,7 +112,7 @@ return [
     'my_learning' => [
         'page_title' => 'My Learning',
         'overview_title' => 'My Learning Overview',
-        'overview_description' => 'A quick summary of your learning progress, including courses, topics, and certificates earned.',
+        'overview_description' => 'Continue your learning journey and keep track of the courses and certificates you have earned.',
 
         'metrics' => [
             'courses_enrolled' => 'Courses Enrolled',
@@ -379,7 +379,7 @@ return [
             'thumbnail_not_available' => 'Thumbnail not available',
             'watch_youtube' => 'Watch on YouTube',
             'youtube_hint' => 'The video will open in a new tab for the best viewing experience.',
-            'open_download' => 'Open / download material',
+            'open_download' => 'Download Material',
             'preview_not_available' => [
                 'title' => 'Preview not available',
                 'description' => 'This material is registered, but the preview URL/file is invalid or unavailable.',
@@ -402,7 +402,7 @@ return [
             ],
             'type_label' => 'Type: :type',
             'completed_badge' => 'MATERIAL COMPLETED',
-            'mark_complete' => 'Mark Complete',
+            'mark_complete' => 'Complete',
         ],
 
         'sessions' => [
@@ -739,7 +739,7 @@ return [
             'thumbnail_not_available' => 'Thumbnail not available',
             'watch_youtube' => 'Watch on YouTube',
             'youtube_hint' => 'The video will open in a new tab for the best viewing experience.',
-            'open_download' => 'Open / download material',
+            'open_download' => 'Download Material',
             'preview_not_available' => [
                 'title' => 'Preview not available',
                 'description' => 'This material is registered, but the preview URL/file is invalid or unavailable.',
@@ -762,7 +762,7 @@ return [
             ],
             'type_label' => 'Type: :type',
             'completed_badge' => 'MATERIAL COMPLETED',
-            'mark_complete' => 'Mark Complete',
+            'mark_complete' => 'Complete',
         ],
         'sessions' => [
             'title' => 'Sessions',
