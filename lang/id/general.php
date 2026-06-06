@@ -663,33 +663,6 @@ return [
             'back_to_learning' => 'Kembali ke My Learning',
             'back_to_course' => 'Kembali',
             'retry' => 'Ulangi Assessment',
-            'view_certificates' => 'Lihat Sertifikat',
-        ],
-    ],
-
-    'certificate_panel' => [
-        'hero' => [
-            'badge' => 'Student Certificate Center',
-            'title' => 'Sertifikat Pembelajaran Anda',
-            'subtitle' => 'Seluruh sertifikat pembelajaran course yang telah berhasil diselesaikan akan muncul di halaman ini.',
-        ],
-        'filters' => [
-            'search_placeholder' => 'Cari nomor sertifikat...',
-            'per_page' => ':count Per Page',
-        ],
-        'defaults' => [
-            'course_certificate' => 'Sertifikat Course',
-        ],
-        'meta' => [
-            'issued_date' => 'Tanggal Diterbitkan',
-            'certificate_id' => 'ID Sertifikat',
-        ],
-        'actions' => [
-            'download' => 'Unduh Sertifikat',
-        ],
-        'empty' => [
-            'title' => 'Belum Ada Sertifikat',
-            'description' => 'Sertifikat akan tersedia setelah kamu menyelesaikan course pembelajaran.',
         ],
     ],
 
@@ -823,7 +796,6 @@ return [
         'courses' => 'Course',
         'articles' => 'Artikel',
         'my_learning' => 'Pembelajaran Saya',
-        'certificates' => 'Sertifikat',
         'login' => 'Masuk',
     ],
 ];

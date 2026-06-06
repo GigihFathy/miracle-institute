@@ -39,8 +39,6 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Auth\VerifyEmailNotice;
 
-use App\Livewire\Certificates\CertificatePanel;
-
 use App\Livewire\Courses\CourseCatalog;
 use App\Livewire\Courses\CourseShow;
 
@@ -343,7 +341,6 @@ $registerLocalizedRoutes = function (bool $named): void {
                 'assessments.take'
             );
             $nameRoute(Route::get('/assessment-attempts/{attempt}/result', AssessmentResult::class), 'assessments.result');
-            $nameRoute(Route::get('/certificates', CertificatePanel::class), 'certificates.index');
         });
 
             /*

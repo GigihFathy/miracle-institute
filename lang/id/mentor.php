@@ -17,6 +17,7 @@ return [
         'managed_courses' => [
             'title' => 'Course yang Dikelola',
             'subtitle' => 'Daftar course yang bisa kamu kelola.',
+            'search_placeholder' => 'Cari course yang dikelola...',
             'no_course' => 'Tidak Ada Course',
             'topic_count' => '{0} tidak ada topik|{1} :count topik|[2,*] :count topik',
             'active_badge' => 'Aktif',
@@ -24,6 +25,7 @@ return [
             'show' => 'Tampilkan',
             'manage' => 'Kelola',
             'empty' => 'Belum ada topic yang kamu kelola.',
+            'not_found' => 'Tidak ada course yang cocok dengan pencarian.',
         ],
 
         'recent_materials' => [

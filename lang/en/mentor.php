@@ -17,6 +17,7 @@ return [
         'managed_courses' => [
             'title' => 'Managed Courses',
             'subtitle' => 'List of courses you can manage.',
+            'search_placeholder' => 'Search managed courses...',
             'no_course' => 'No Course',
             'topic_count' => '{0} no topic|{1} :count topic|[2,*] :count topics',
             'active_badge' => 'Active',
@@ -24,6 +25,7 @@ return [
             'show' => 'Show',
             'manage' => 'Manage',
             'empty' => 'No topics yet under your management.',
+            'not_found' => 'No managed courses match your search.',
         ],
 
         'recent_materials' => [

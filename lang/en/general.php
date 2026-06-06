@@ -663,33 +663,6 @@ return [
             'back_to_learning' => 'Back to My Learning',
             'back_to_course' => 'Back',
             'retry' => 'Retry Assessment',
-            'view_certificates' => 'View Certificates',
-        ],
-    ],
-
-    'certificate_panel' => [
-        'hero' => [
-            'badge' => 'Student Certificate Center',
-            'title' => 'Your Learning Certificates',
-            'subtitle' => 'All course learning certificates that have been successfully completed will appear on this page.',
-        ],
-        'filters' => [
-            'search_placeholder' => 'Search certificate number...',
-            'per_page' => ':count Per Page',
-        ],
-        'defaults' => [
-            'course_certificate' => 'Course Certificate',
-        ],
-        'meta' => [
-            'issued_date' => 'Issued Date',
-            'certificate_id' => 'Certificate ID',
-        ],
-        'actions' => [
-            'download' => 'Download Certificate',
-        ],
-        'empty' => [
-            'title' => 'No Certificates Yet',
-            'description' => 'Certificates will be available after you complete a course.',
         ],
     ],
 
@@ -823,7 +796,6 @@ return [
         'courses' => 'Courses',
         'articles' => 'Articles',
         'my_learning' => 'My Learning',
-        'certificates' => 'Certificates',
         'login' => 'Login',
     ],
 ];

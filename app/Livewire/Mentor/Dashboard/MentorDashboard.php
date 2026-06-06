@@ -2,15 +2,25 @@
 
 namespace App\Livewire\Mentor\Dashboard;
 
-use App\Models\Assessment;
+use App\Models\Course;
 use App\Models\Material;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use App\Models\TopicUser;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class MentorDashboard extends Component
 {
+    use WithPagination;
+
+    public string $courseSearch = '';
+
+    public function updatedCourseSearch(): void
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $user = auth()->user();
@@ -39,8 +49,6 @@ class MentorDashboard extends Component
 
         $topics = (clone $topicsQuery)->latest()->get();
         $topicIds = $topics->pluck('id');
-        $courseIds = $topics->pluck('course_id')->filter()->unique()->values();
-
         $mentorStudentsCount = $topicIds->isEmpty()
             ? 0
             : TopicProgress::query()
@@ -52,18 +60,42 @@ class MentorDashboard extends Component
             ->where('uploader_id', $userId)
             ->count();
 
-        $mentorAssessmentsCount = $courseIds->isEmpty()
-            ? 0
-            : Assessment::query()
-                ->whereIn('course_id', $courseIds)
-                ->count();
+        $managedCourses = Course::query()
+            ->with([
+                'studyProgram',
+                'topics' => function ($query) use ($userId, $managedTopicIds) {
+                    $query
+                        ->where(function ($topicQuery) use ($userId, $managedTopicIds) {
+                            $topicQuery->where('teacher_id', $userId);
 
-        $latestTopics = (clone $topicsQuery)
+                            if ($managedTopicIds->isNotEmpty()) {
+                                $topicQuery->orWhereIn('id', $managedTopicIds);
+                            }
+                        })
+                        ->latest();
+                },
+            ])
+            ->whereHas('topics', function ($query) use ($userId, $managedTopicIds) {
+                $query->where(function ($topicQuery) use ($userId, $managedTopicIds) {
+                    $topicQuery->where('teacher_id', $userId);
+
+                    if ($managedTopicIds->isNotEmpty()) {
+                        $topicQuery->orWhereIn('id', $managedTopicIds);
+                    }
+                });
+            })
+            ->when(filled($this->courseSearch), function ($query) {
+                $search = trim($this->courseSearch);
+
+                $query->where(function ($courseQuery) use ($search) {
+                    $courseQuery
+                        ->where('title', 'like', '%' . $search . '%')
+                        ->orWhereHas('studyProgram', fn ($programQuery) => $programQuery
+                            ->where('title', 'like', '%' . $search . '%'));
+                });
+            })
             ->latest()
-            ->take(6)
-            ->get();
-
-        $topicsByCourse = $topics->groupBy('course_id')->values();
+            ->paginate(5);
 
         $latestMaterials = Material::query()
             ->with(['topic.course'])
@@ -76,8 +108,7 @@ class MentorDashboard extends Component
             'mentorTopicsCount' => $topics->count(),
             'mentorMaterialsCount' => $mentorMaterialsCount,
             'mentorStudentsCount' => $mentorStudentsCount,
-            'latestTopics' => $latestTopics,
-            'topicsByCourse' => $topicsByCourse,
+            'managedCourses' => $managedCourses,
             'latestMaterials' => $latestMaterials,
         ])->layout('layouts.learning');
     }

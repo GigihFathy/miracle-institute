@@ -29,7 +29,6 @@
 
                 @auth
                     <li><a href="{{ localized_route('learning.dashboard') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.my_learning') }}</a></li>
-                    <li><a href="{{ localized_route('certificates.index') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.certificates') }}</a></li>
                 @endauth
             </ul>
         </div>
