@@ -20,27 +20,8 @@ class DatabaseSeeder extends Seeder
             $this->seedRolePermissions($roles, $permissions);
 
             $users = $this->seedUsers($roles, $asset, $now);
-            // $this->seedSocialAccounts($users, $now);
-
-            // $programs = $this->seedStudyPrograms($now);
-            // $courses = $this->seedCourses($programs, $asset, $now);
-            // $topics = $this->seedTopics($courses, $asset, $now);
-            // $materials = $this->seedMaterials($topics, $asset, $now);
-            // $assessments = $this->seedAssessments($courses, $now);
-            // $questionBanks = $this->seedQuestionsAndOptions($assessments, $topics, $now);
-            
-            // $enrollments = $this->seedCourseEnrollments($courses, $users, $now);
-            // $this->seedTopicCollaborators($topics, $users, $now);
-            // $this->seedTopicProgresses($enrollments, $topics, $now);
-            // $this->seedMaterialProgresses($enrollments, $materials, $topics, $now);
-            // $attempts = $this->seedAssessmentAttemptsAndAnswers($assessments, $questionBanks, $enrollments, $courses, $now);
-
-            // $sessions = $this->seedVideoSessions($topics, $now);
-            // $this->seedAttendances($sessions, $enrollments, $now);
-            // $this->seedCertificates($enrollments, $courses, $topics, $now);
-            // $this->seedArticles($users, $asset, $now);
-            // $this->seedTutorialVideos($now);
-            // $this->seedActivityLogs($users, $courses, $topics, $enrollments, $attempts, $sessions, $now);
+            $program = $this->seedStudentStudyProgram($now);
+            $this->seedAdditionalLearningData($program, $users, $asset, $now);
         });
     }
 
@@ -81,10 +62,26 @@ class DatabaseSeeder extends Seeder
 
     private function seedPermissionsAndRoles($now): array
     {
-        $permissions = ['manage_users', 'manage_courses', 'manage_topics', 'access_topic', 'enroll_course', 'take_assessment', 'manage_assessments', 'manage_certificates', 'view_reports'];
+        $permissions = [
+            'manage_users' => 'Mengelola data pengguna, termasuk melihat daftar user, mengatur role, dan mengelola akses pengguna di panel admin.',
+            'manage_courses' => 'Mengelola course, termasuk membuat, mengubah, menghapus, dan mengatur informasi course di website.',
+            'manage_topics' => 'Mengelola topik pembelajaran, termasuk materi, struktur topik, dan workspace mentor pada course.',
+            'access_topic' => 'Mengakses halaman topik, materi pembelajaran, dan konten belajar yang tersedia untuk peserta.',
+            'enroll_course' => 'Mendaftar atau mengikuti course dari halaman katalog course maupun halaman detail course.',
+            'take_assessment' => 'Mengerjakan assessment atau ujian yang tersedia setelah memenuhi syarat pada course.',
+            'manage_assessments' => 'Mengelola assessment, soal, opsi jawaban, dan pengaturan evaluasi pembelajaran.',
+            'manage_certificates' => 'Mengelola penerbitan, validasi, dan distribusi sertifikat untuk peserta yang memenuhi syarat.',
+            'view_reports' => 'Melihat laporan, ringkasan progres, dan data monitoring pembelajaran pada dashboard atau halaman admin.',
+        ];
         $permissionRows = [];
-        foreach ($permissions as $name) {
-            $permissionRows[$name] = ['id' => $this->uuid(), 'name' => $name, 'created_at' => $now, 'updated_at' => $now];
+        foreach ($permissions as $name => $description) {
+            $permissionRows[$name] = [
+                'id' => $this->uuid(),
+                'name' => $name,
+                'description' => $description,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
         }
         DB::table('permissions')->insert(array_values($permissionRows));
 
@@ -120,31 +117,18 @@ class DatabaseSeeder extends Seeder
         $profiles = [
             // ADMIN
             ['name' => 'System Administrator', 'email' => 'admin@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0001', 'dob' => '1990-01-01', 'roles' => ['admin']],
-            // ['name' => 'Nabila Rahman', 'email' => 'nabila.rahman@edunusa.test', 'gender' => 'female', 'phone' => '+62-811-2000-1001', 'dob' => '1990-02-11', 'roles' => ['admin']],
-            // ['name' => 'Fikri Maulana', 'email' => 'fikri.maulana@edunusa.test', 'gender' => 'male', 'phone' => '+62-811-2000-1002', 'dob' => '1988-08-19', 'roles' => ['admin']],
-            
-            // DISCIPLES & STUDENT (MULTI ROLE)
-            // ['name' => 'Citra Lestari', 'email' => 'citra.lestari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2005', 'dob' => '1994-09-16', 'roles' => ['disciples', 'student']],
-            // ['name' => 'Fajar Hidayat', 'email' => 'fajar.hidayat@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2006', 'dob' => '1990-12-01', 'roles' => ['disciples', 'student']],
-            // ['name' => 'Testing Disciple', 'email' => 'disciple@example.test', 'gender' => 'male', 'phone' => '+62-811-0000-0002', 'dob' => '1992-02-02', 'roles' => ['disciples', 'student']],
-          
-          
-            // DISCIPLES
-            // ['name' => 'Maya Sari', 'email' => 'maya.sari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2001', 'dob' => '1992-04-07', 'roles' => ['disciples']],
-            // ['name' => 'Bagas Wiratama', 'email' => 'bagas.wiratama@edunusa.test', 'gender' => 'male', 'phone' => '+62-812-3000-2002', 'dob' => '1991-06-14', 'roles' => ['disciples']],
-            // ['name' => 'Nadia Prameswari', 'email' => 'nadia.prameswari@edunusa.test', 'gender' => 'female', 'phone' => '+62-812-3000-2003', 'dob' => '1993-01-23', 'roles' => ['disciples']],
-            
-
-            // STUDENT
-            // ['name' => 'Testing Student', 'email' => 'student@example.test', 'gender' => 'female', 'phone' => '+62-811-0000-0003', 'dob' => '2001-03-03', 'roles' => ['student']],
-            // ['name' => 'Alya Nabila', 'email' => 'alya.nabila@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4001', 'dob' => '2002-05-12', 'roles' => ['student']],
-            // ['name' => 'Rizal Fadlan', 'email' => 'rizal.fadlan@edunusa.test', 'gender' => 'male', 'phone' => '+62-814-5000-4002', 'dob' => '2001-07-08', 'roles' => ['student']],
-            // ['name' => 'Sinta Rahma', 'email' => 'sinta.rahma@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4003', 'dob' => '2002-09-21', 'roles' => ['student']],
-            // ['name' => 'Dewa Pratama', 'email' => 'dewa.pratama@edunusa.test', 'gender' => 'male', 'phone' => '+62-814-5000-4004', 'dob' => '2000-12-18', 'roles' => ['student']],
-            // ['name' => 'Putri Azzahra', 'email' => 'putri.azzahra@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4005', 'dob' => '2002-03-15', 'roles' => ['student']],
-            // ['name' => 'Rafi Hidayat', 'email' => 'rafi.hidayat@edunusa.test', 'gender' => 'male', 'phone' => '+62-814-5000-4006', 'dob' => '2001-11-27', 'roles' => ['student']],
-            // ['name' => 'Salma Khairunnisa', 'email' => 'salma.khairunnisa@edunusa.test', 'gender' => 'female', 'phone' => '+62-814-5000-4007', 'dob' => '2002-06-02', 'roles' => ['student']],
         ];
+
+        for ($i = 1; $i <= 10; $i++) {
+            $profiles[] = [
+                'name' => "Siswa {$i}",
+                'email' => "siswa{$i}@example.test",
+                'gender' => $i % 2 === 0 ? 'female' : 'male',
+                'phone' => sprintf('+62-811-1000-%04d', $i),
+                'dob' => now()->subYears(18 + $i)->format('Y-m-d'),
+                'roles' => ['student'],
+            ];
+        }
 
         $rows = [];
         $byEmail = [];
@@ -156,7 +140,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $profile['name'],
                 'email' => $profile['email'],
                 'email_verified_at' => $now->copy()->subDays(rand(1, 30)),
-                'password' => Hash::make('12345678'),
+                'password' => Hash::make('test1234'),
                 'phone' => $profile['phone'],
                 'gender' => $profile['gender'],
                 'dob' => $profile['dob'],
@@ -185,703 +169,122 @@ class DatabaseSeeder extends Seeder
         return ['all' => $rows, 'byEmail' => $byEmail, 'byRole' => $byRole];
     }
 
-    // private function seedSocialAccounts(array $users, $now): void
-    // {
-    //     DB::table('social_accounts')->insert([
-    //         ['id' => $this->uuid(), 'user_id' => $users['byEmail']['admin@example.test']['id'], 'provider' => 'google', 'provider_user_id' => 'google-admin-001', 'provider_email' => 'admin@example.test', 'token' => Str::random(64), 'refresh_token' => Str::random(64), 'expires_at' => $now->copy()->addMonths(6), 'created_at' => $now, 'updated_at' => $now],
-    //         // ['id' => $this->uuid(), 'user_id' => $users['byEmail']['disciple@example.test']['id'], 'provider' => 'google', 'provider_user_id' => 'google-disciple-001', 'provider_email' => 'disciple@example.test', 'token' => Str::random(64), 'refresh_token' => Str::random(64), 'expires_at' => $now->copy()->addMonths(4), 'created_at' => $now, 'updated_at' => $now],
-    //         // ['id' => $this->uuid(), 'user_id' => $users['byEmail']['student@example.test']['id'], 'provider' => 'google', 'provider_user_id' => 'google-student-001', 'provider_email' => 'student@example.test', 'token' => Str::random(64), 'refresh_token' => Str::random(64), 'expires_at' => $now->copy()->addMonths(3), 'created_at' => $now, 'updated_at' => $now],
-    //     ]);
-    // }
-
-    // private function seedStudyPrograms($now): array
-    // {
-    //     $rows = [
-    //         'discipleship' => ['id' => $this->uuid(), 'title' => 'Discipleship', 'slug' => 'discipleship', 'description' => 'Program pembinaan dan pemuridan untuk pertumbuhan iman dan komunitas.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(8), 'updated_at' => $now],
-    //         'sermon' => ['id' => $this->uuid(), 'title' => 'Sermon', 'slug' => 'sermon', 'description' => 'Program pembelajaran penyampaian firman, exegesis, dan komunikasi publik.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(7), 'updated_at' => $now],
-    //         'legacy-ministry-training' => ['id' => $this->uuid(), 'title' => 'Legacy Ministry Training', 'slug' => 'legacy-ministry-training', 'description' => 'Program lama yang sudah tidak aktif namun tetap tersimpan untuk referensi.', 'status' => 'inactive', 'created_at' => $now->copy()->subYear(), 'updated_at' => $now],
-    //     ];
-    //     DB::table('study_programs')->insert(array_values($rows));
-    //     return $rows;
-    // }
-
-    // private function seedCourses(array $programs, string $asset, $now): array
-    // {
-    //     $rows = [
-    //         'discipleship-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Foundations', 'slug' => 'discipleship-foundations', 'poster' => $asset, 'description' => 'Jalur dasar pemuridan untuk peserta baru.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(6), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
-    //         'discipleship-growth-track' => ['id' => $this->uuid(), 'study_program_id' => $programs['discipleship']['id'], 'title' => 'Discipleship Growth Track', 'slug' => 'discipleship-growth-track', 'poster' => $asset, 'description' => 'Jalur pengembangan pemuridan yang sedang berjalan dengan 4 dari 8 topik selesai.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'in_progress', '_teacher_email' => 'disciple@example.test', '_program_slug' => 'discipleship'],
-    //         'sermon-foundations' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Foundations', 'slug' => 'sermon-foundations', 'poster' => $asset, 'description' => 'Jalur dasar persiapan sermon dan interpretasi teks.', 'status' => 'active', 'created_at' => $now->copy()->subMonths(5), 'updated_at' => $now, '_phase' => 'completed', '_teacher_email' => 'bagas.wiratama@edunusa.test', '_program_slug' => 'sermon'],
-    //         'sermon-outreach-lab' => ['id' => $this->uuid(), 'study_program_id' => $programs['sermon']['id'], 'title' => 'Sermon Outreach Lab', 'slug' => 'sermon-outreach-lab', 'poster' => $asset, 'description' => 'Jalur internal yang belum dibuka untuk peserta; topik masih draft.', 'status' => 'inactive', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now, '_phase' => 'pre_learning', '_teacher_email' => 'nadia.prameswari@edunusa.test', '_program_slug' => 'sermon'],
-    //     ];
-
-    //     DB::table('courses')->insert(array_map(fn ($row) => collect($row)->except(['_phase','_teacher_email','_program_slug'])->all(), $rows));
-    //     return $rows;
-    // }
-
-    // private function topicBlueprints(): array
-    // {
-    //     return [
-    //         'discipleship-foundations' => ['Call to Follow', 'Bible Reading Rhythm', 'Prayer and Reflection', 'Community and Fellowship', 'Serving with Integrity', 'Accountability and Mentoring', 'Stewardship and Discipline', 'Final Reflection Project'],
-    //         'discipleship-growth-track' => ['Core Doctrine Review', 'Daily Habits and Time Stewardship', 'Conflict Handling in Community', 'Mentoring Conversation Practice', 'Evangelism Basics', 'Leading Small Group Discussion', 'Personal Growth Journal', 'Workshop Wrap-up'],
-    //         'sermon-foundations' => ['Text Observation', 'Historical and Literary Context', 'Exegesis Essentials', 'Big Idea Development', 'Sermon Outline Structure', 'Illustration Selection', 'Delivery and Voice', 'Feedback and Revision'],
-    //         'sermon-outreach-lab' => ['Worship Context', 'Outreach Messaging', 'Small Group Facilitation', 'Follow-up Discipline', 'Media and Visual Support', 'Schedule and Planning', 'Safety and Pastoral Care', 'Program Wrap-up'],
-    //     ];
-    // }
-
-    // private function seedTopics(array $courses, string $asset, $now): array
-    // {
-    //     $rows = [];
-    //     foreach ($courses as $courseSlug => $course) {
-    //         $topicNames = $this->topicBlueprints()[$courseSlug];
-    //         foreach ($topicNames as $index => $topicName) {
-    //             $status = 'draft';
-    //             if ($course['_phase'] === 'completed') {
-    //                 $status = 'published';
-    //             } elseif ($course['_phase'] === 'in_progress') {
-    //                 $status = $index < 4 ? 'published' : 'draft';
-    //             } else {
-    //                 $status = $index === 7 ? 'archived' : 'draft';
-    //             }
-
-    //             $rows[$courseSlug][] = [
-    //                 'id' => $this->uuid(),
-    //                 'course_id' => $course['id'],
-    //                 'teacher_id' => $this->teacherIdForCourse($course['_teacher_email']),
-    //                 'name' => $topicName,
-    //                 'slug' => Str::slug($courseSlug . '-' . $topicName),
-    //                 'category' => $course['_program_slug'],
-    //                 'description' => $topicName . ' untuk course ' . $course['title'] . '.',
-    //                 'poster' => $asset,
-    //                 'visibility' => 'public',
-    //                 'status' => $status,
-    //                 'sort_order' => $index + 1,
-    //                 'created_at' => $now->copy()->subWeeks(rand(2, 16)),
-    //                 'updated_at' => $now,
-    //             ];
-    //         }
-    //     }
-
-    //     DB::table('topics')->insert(array_merge(...array_values($rows)));
-    //     return $rows;
-    // }
-
-    // private function teacherIdForCourse(string $teacherEmail): string
-    // {
-    //     static $cache = null;
-    //     if ($cache === null) {
-    //         $cache = DB::table('users')->pluck('id', 'email')->all();
-    //     }
-    //     return $cache[$teacherEmail] ?? array_values($cache)[0];
-    // }
-
-    // private function seedMaterials(array $topicsByCourse, string $asset, $now): array
-    // {
-    //     $rows = [];
-    //     $sampleVideoUrl = 'https://www.youtube.com/watch?v=5zi2zI1tUww';
-    //     $samplePdfPath = 'https://drive.google.com/file/d/1HzBPBPWxDFFMzfKz-lelKSX_xJfqob3D/preview';
-    //     $samplePptPath = 'https://drive.google.com/file/d/11Y1yPyIUX-Aj_t6AmaSOuVri4q9D-wHa/preview';
-
-    //     foreach ($topicsByCourse as $courseSlug => $topics) {
-    //         foreach ($topics as $topic) {
-    //             foreach (['video', 'pdf', 'ppt'] as $index => $type) {
-    //                 $path = null;
-    //                 $externalUrl = null;
-
-    //                 if ($type === 'video') {
-    //                     $externalUrl = $sampleVideoUrl;
-    //                 } elseif ($type === 'pdf') {
-    //                     $path = $samplePdfPath;
-    //                 } elseif ($type === 'ppt') {
-    //                     $path = $samplePptPath;
-    //                 }
-
-    //                 $rows[] = [
-    //                     'id' => $this->uuid(),
-    //                     'topic_id' => $topic['id'],
-    //                     'uploader_id' => $topic['teacher_id'],
-    //                     'name' => $topic['name'] . ' ' . strtoupper($type),
-    //                     'type' => $type,
-    //                     'path' => $path,
-    //                     'external_url' => $externalUrl,
-    //                     'visibility' => 'public',
-    //                     'sort_order' => $index + 1,
-    //                     'status' => $topic['status'] === 'published' ? 'active' : 'inactive',
-    //                     'created_at' => $now->copy()->subWeeks(rand(1, 12)),
-    //                     'updated_at' => $now,
-    //                 ];
-    //             }
-    //         }
-    //     }
-
-    //     DB::table('materials')->insert($rows);
-    //     return $rows;
-    // }
-
-    // private function seedAssessments(array $courses, $now): array
-    // {
-    //     $rows = [
-    //         'discipleship-foundations' => ['id' => $this->uuid(), 'course_id' => $courses['discipleship-foundations']['id'], 'title' => 'Discipleship Foundations Assessment', 'passing_grade' => 70, 'randomize_questions' => 1, 'question_limit' => 8, 'status' => 'active', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now],
-    //         'discipleship-growth-track' => ['id' => $this->uuid(), 'course_id' => $courses['discipleship-growth-track']['id'], 'title' => 'Discipleship Growth Track Assessment', 'passing_grade' => 70, 'randomize_questions' => 1, 'question_limit' => 8, 'status' => 'draft', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now],
-    //         'sermon-foundations' => ['id' => $this->uuid(), 'course_id' => $courses['sermon-foundations']['id'], 'title' => 'Sermon Foundations Assessment', 'passing_grade' => 70, 'randomize_questions' => 1, 'question_limit' => 8, 'status' => 'active', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now],
-    //         'sermon-outreach-lab' => ['id' => $this->uuid(), 'course_id' => $courses['sermon-outreach-lab']['id'], 'title' => 'Sermon Outreach Lab Assessment', 'passing_grade' => 70, 'randomize_questions' => 0, 'question_limit' => 8, 'status' => 'inactive', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now],
-    //     ];
-    //     DB::table('assessments')->insert(array_values($rows));
-    //     return $rows;
-    // }
-
-    // private function seedQuestionsAndOptions(array $assessments, array $topics, $now): array
-    // {
-    //     $questionBanks = [];
-    //     $questionRows = [];
-    //     $optionRows = [];
-
-    //     foreach (['discipleship-foundations', 'discipleship-growth-track', 'sermon-foundations'] as $courseSlug) {
-    //         $assessment = $assessments[$courseSlug];
-    //         $topicNames = array_map(fn ($t) => $t['name'], $topics[$courseSlug]);
-
-    //         foreach ($topicNames as $sortOrder => $topicName) {
-    //             $questionId = $this->uuid();
-    //             $questionRows[] = [
-    //                 'id' => $questionId,
-    //                 'assessment_id' => $assessment['id'],
-    //                 'question_type' => 'mcq',
-    //                 'question' => 'Which practice best reflects ' . $topicName . '?',
-    //                 'correct_text_answer' => null,
-    //                 'explanation' => 'Aligned with the learning objective of the topic.',
-    //                 'sort_order' => $sortOrder + 1,
-    //                 'created_at' => $now->copy()->subDays(rand(5, 45)),
-    //                 'updated_at' => $now,
-    //             ];
-
-    //             $correct = $this->uuid();
-    //             $wrong1 = $this->uuid();
-    //             $wrong2 = $this->uuid();
-    //             $wrong3 = $this->uuid();
-
-    //             $options = [
-    //                 ['id' => $correct, 'text' => 'Applying the core lesson of ' . $topicName, 'is_correct' => true],
-    //                 ['id' => $wrong1, 'text' => 'Ignoring the main learning point', 'is_correct' => false],
-    //                 ['id' => $wrong2, 'text' => 'Replacing the topic with unrelated content', 'is_correct' => false],
-    //                 ['id' => $wrong3, 'text' => 'Submitting without reading the material', 'is_correct' => false],
-    //             ];
-
-    //             foreach ($options as $index => $option) {
-    //                 $optionRows[] = [
-    //                     'id' => $option['id'],
-    //                     'question_id' => $questionId,
-    //                     'option_text' => $option['text'],
-    //                     'is_correct' => $option['is_correct'],
-    //                     'sort_order' => $index + 1,
-    //                     'created_at' => $now,
-    //                     'updated_at' => $now,
-    //                 ];
-    //             }
-
-    //             $questionBanks[$courseSlug][] = [
-    //                 'id' => $questionId,
-    //                 'correct_option_id' => $correct,
-    //                 'wrong_option_ids' => [$wrong1, $wrong2, $wrong3],
-    //             ];
-    //         }
-    //     }
-
-    //     DB::table('questions')->insert($questionRows);
-    //     DB::table('question_options')->insert($optionRows);
-
-    //     return $questionBanks;
-    // }
-
-    // private function seedCourseEnrollments(array $courses, array $users, $now): array
-    // {
-    //     $plan = [
-    //         'discipleship-foundations' => [
-    //             ['email' => 'student@example.test', 'status' => 'completed'],
-    //             ['email' => 'alya.nabila@edunusa.test', 'status' => 'completed'],
-    //             ['email' => 'rizal.fadlan@edunusa.test', 'status' => 'completed'],
-    //         ],
-    //         'discipleship-growth-track' => [
-    //             ['email' => 'disciple@example.test', 'status' => 'active'],
-    //             ['email' => 'citra.lestari@edunusa.test', 'status' => 'active'],
-    //             ['email' => 'fajar.hidayat@edunusa.test', 'status' => 'active'],
-    //         ],
-    //         'sermon-foundations' => [
-    //             ['email' => 'sinta.rahma@edunusa.test', 'status' => 'completed'],
-    //             ['email' => 'dewa.pratama@edunusa.test', 'status' => 'completed'],
-    //             ['email' => 'putri.azzahra@edunusa.test', 'status' => 'completed'],
-    //         ],
-    //         'sermon-outreach-lab' => [],
-    //     ];
-
-    //     $rows = [];
-    //     $byCourse = ['discipleship-foundations' => [], 'discipleship-growth-track' => [], 'sermon-foundations' => [], 'sermon-outreach-lab' => []];
-    //     $completed = [];
-
-    //     foreach ($plan as $courseSlug => $items) {
-    //         foreach ($items as $index => $item) {
-    //             $user = $users['byEmail'][$item['email']];
-    //             $enrolledAt = $now->copy()->subDays(50 + ($index * 5));
-    //             $completedAt = $item['status'] === 'completed' ? $enrolledAt->copy()->addDays(18 + $index) : null;
-
-    //             $row = [
-    //                 'id' => $this->uuid(),
-    //                 'user_id' => $user['id'],
-    //                 'course_id' => $courses[$courseSlug]['id'],
-    //                 'status' => $item['status'],
-    //                 'enrolled_at' => $enrolledAt,
-    //                 'completed_at' => $completedAt,
-    //                 'created_at' => $enrolledAt,
-    //                 'updated_at' => $completedAt ?? $now,
-    //             ];
-
-    //             $rows[] = $row;
-    //             $byCourse[$courseSlug][] = $row;
-    //             if ($item['status'] === 'completed') {
-    //                 $completed[] = $row;
-    //             }
-    //         }
-    //     }
-
-    //     DB::table('course_enrollments')->insert($rows);
-
-    //     return ['all' => $rows, 'byCourse' => $byCourse, 'completed' => $completed];
-    // }
-
-    // private function seedTopicProgresses(array $enrollments, array $topics, $now): void
-    // {
-    //     $rows = [];
-    //     foreach ($enrollments['byCourse'] as $courseSlug => $courseEnrollments) {
-    //         foreach ($courseEnrollments as $enrollment) {
-    //             foreach ($topics[$courseSlug] as $index => $topic) {
-    //                 if ($enrollment['status'] === 'completed') {
-    //                     $status = 'completed';
-    //                     $startedAt = $enrollment['enrolled_at']->copy()->addDays($index + 1);
-    //                     $completedAt = $startedAt->copy()->addDay();
-    //                 } elseif ($courseSlug === 'discipleship-growth-track') {
-    //                     if ($index < 4) {
-    //                         $status = 'completed';
-    //                         $startedAt = $enrollment['enrolled_at']->copy()->addDays($index + 1);
-    //                         $completedAt = $startedAt->copy()->addDay();
-    //                     } else {
-    //                         $status = 'started';
-    //                         $startedAt = $now->copy()->subDays(rand(2, 15));
-    //                         $completedAt = null;
-    //                     }
-    //                 } else {
-    //                     $status = 'pending';
-    //                     $startedAt = null;
-    //                     $completedAt = null;
-    //                 }
-
-    //                 $rows[] = [
-    //                     'id' => $this->uuid(),
-    //                     'course_enrollment_id' => $enrollment['id'],
-    //                     'topic_id' => $topic['id'],
-    //                     'status' => $status,
-    //                     'started_at' => $startedAt,
-    //                     'completed_at' => $completedAt,
-    //                     'created_at' => $startedAt ?? $enrollment['enrolled_at'],
-    //                     'updated_at' => $completedAt ?? $now,
-    //                 ];
-    //             }
-    //         }
-    //     }
-    //     DB::table('topic_progresses')->insert($rows);
-    // }
-
-    // private function seedMaterialProgresses(array $enrollments, array $materials, array $topics, $now): void
-    // {
-    //     $rows = [];
-    //     $materialsByTopic = [];
-    //     foreach ($materials as $material) {
-    //         $materialsByTopic[$material['topic_id']][] = $material;
-    //     }
-
-    //     foreach ($enrollments['byCourse'] as $courseSlug => $courseEnrollments) {
-    //         foreach ($courseEnrollments as $enrollment) {
-    //             foreach ($topics[$courseSlug] as $index => $topic) {
-    //                 foreach (($materialsByTopic[$topic['id']] ?? []) as $material) {
-    //                     if ($material['status'] !== 'active') {
-    //                         continue;
-    //                     }
-
-    //                     $completed = $enrollment['status'] === 'completed' || ($courseSlug === 'discipleship-growth-track' && $index < 4);
-    //                     $startedAt = $enrollment['enrolled_at']->copy()->addDays($index + 1);
-    //                     $completedAt = $completed ? $startedAt->copy()->addHours(4) : null;
-
-    //                     $rows[] = [
-    //                         'id' => $this->uuid(),
-    //                         'user_id' => $enrollment['user_id'],
-    //                         'material_id' => $material['id'],
-    //                         'status' => $completed ? 'completed' : 'started',
-    //                         'started_at' => $startedAt,
-    //                         'completed_at' => $completedAt,
-    //                         'created_at' => $startedAt,
-    //                         'updated_at' => $completedAt ?? $now,
-    //                     ];
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     DB::table('material_progresses')->insert($rows);
-    // }
-
-    // private function seedAssessmentAttemptsAndAnswers(array $assessments, array $questionBanks, array $enrollments, array $courses, $now): array
-    // {
-    //     $courseSlugMap = $this->courseSlugMap($courses);
-    //     $attemptRows = [];
-    //     $answerRows = [];
-    //     $attempts = [];
-
-    //     foreach ($enrollments['completed'] as $enrollment) {
-    //         $courseSlug = $courseSlugMap[$enrollment['course_id']] ?? null;
-    //         if (!$courseSlug || !isset($questionBanks[$courseSlug]) || empty($questionBanks[$courseSlug])) {
-    //             continue;
-    //         }
-
-    //         $assessment = $assessments[$courseSlug];
-    //         if ($assessment['status'] !== 'active') {
-    //             continue;
-    //         }
-
-    //         $attemptId = $this->uuid();
-    //         $startedAt = $enrollment['completed_at']->copy()->addHour();
-    //         $submittedAt = $startedAt->copy()->addMinutes(rand(10, 25));
-    //         $score = rand(78, 98);
-
-    //         $attempt = [
-    //             'id' => $attemptId,
-    //             'assessment_id' => $assessment['id'],
-    //             'user_id' => $enrollment['user_id'],
-    //             'attempt_no' => 1,
-    //             'score' => $score,
-    //             'passed' => $score >= $assessment['passing_grade'],
-    //             'started_at' => $startedAt,
-    //             'submitted_at' => $submittedAt,
-    //             'created_at' => $startedAt,
-    //             'updated_at' => $submittedAt,
-    //         ];
-
-    //         $attemptRows[] = $attempt;
-    //         $attempts[] = $attempt;
-
-    //         foreach ($questionBanks[$courseSlug] as $question) {
-    //             $answerRows[] = [
-    //                 'id' => $this->uuid(),
-    //                 'attempt_id' => $attemptId,
-    //                 'question_id' => $question['id'],
-    //                 'question_option_id' => $question['correct_option_id'],
-    //                 'answer_text' => null,
-    //                 'is_correct' => true,
-    //                 'created_at' => $submittedAt,
-    //                 'updated_at' => $submittedAt,
-    //             ];
-    //         }
-    //     }
-
-    //     DB::table('assessment_attempts')->insert($attemptRows);
-    //     DB::table('assessment_answers')->insert($answerRows);
-
-    //     return $attempts;
-    // }
-
-    // private function seedVideoSessions(array $topics, $now): array
-    // {
-    //     $plans = [
-    //         'discipleship-foundations' => ['completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'completed'],
-    //         'discipleship-growth-track' => ['completed', 'completed', 'completed', 'completed', 'ongoing', 'scheduled', 'scheduled', 'cancelled'],
-    //         'sermon-foundations' => ['completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'completed', 'completed'],
-    //         'sermon-outreach-lab' => ['scheduled', 'cancelled', 'scheduled'],
-    //     ];
-
-    //     $rows = [];
-    //     $sessions = [];
-
-    //     foreach ($plans as $courseSlug => $statuses) {
-    //         foreach ($statuses as $index => $status) {
-    //             $topic = $topics[$courseSlug][$index];
-    //             $startAt = $now->copy()->addDays($courseSlug === 'discipleship-growth-track' ? -20 : -30)->addDays($index * 2)->setTime(19, 0);
-    //             if ($status === 'ongoing') {
-    //                 $startAt = $now->copy()->subMinutes(20);
-    //                 $endAt = $now->copy()->addMinutes(40);
-    //             } elseif ($status === 'scheduled') {
-    //                 $startAt = $now->copy()->addDays(2 + $index);
-    //                 $endAt = $startAt->copy()->addHours(2);
-    //             } elseif ($status === 'cancelled') {
-    //                 $startAt = $now->copy()->addDays(5 + $index);
-    //                 $endAt = $startAt->copy()->addHours(2);
-    //             } else {
-    //                 $endAt = $startAt->copy()->addHours(2);
-    //             }
-
-    //             $row = [
-    //                 'id' => $this->uuid(),
-    //                 'topic_id' => $topic['id'],
-    //                 'title' => $topic['name'] . ' Live Session',
-    //                 'zoom_link' => 'https://zoom.example.test/' . Str::slug($courseSlug . '-' . $topic['name']) . '-' . Str::random(6),
-    //                 'record_link' => in_array($status, ['completed', 'ongoing'], true) ? 'https://recording.example.test/' . Str::slug($courseSlug . '-' . $topic['name']) : null,
-    //                 'start_at' => $startAt,
-    //                 'end_at' => $endAt,
-    //                 'reminder_sent_at' => in_array($status, ['completed', 'ongoing'], true) ? $startAt->copy()->subHours(2) : null,
-    //                 'status' => $status,
-    //                 'created_at' => $now->copy()->subWeeks(rand(2, 8)),
-    //                 'updated_at' => $now,
-    //                 '_course_slug' => $courseSlug,
-    //             ];
-
-    //             $rows[] = collect($row)->except(['_course_slug'])->all();
-    //             $sessions[] = $row;
-    //         }
-    //     }
-
-    //     DB::table('video_sessions')->insert($rows);
-    //     return $sessions;
-    // }
-
-    // private function seedAttendances(array $sessions, array $enrollments, $now): void
-    // {
-    //     $rows = [];
-    //     foreach ($sessions as $session) {
-    //         if (!in_array($session['status'], ['completed', 'ongoing'], true)) {
-    //             continue;
-    //         }
-
-    //         $courseEnrollments = $enrollments['byCourse'][$session['_course_slug']] ?? [];
-    //         foreach (array_slice($courseEnrollments, 0, 3) as $index => $enrollment) {
-    //             $status = match ($index) {
-    //                 0 => 'present',
-    //                 1 => 'late',
-    //                 default => 'absent',
-    //             };
-
-    //             $rows[] = [
-    //                 'id' => $this->uuid(),
-    //                 'video_session_id' => $session['id'],
-    //                 'user_id' => $enrollment['user_id'],
-    //                 'status' => $status,
-    //                 'check_in_at' => in_array($status, ['present', 'late'], true) ? $session['start_at']->copy()->addMinutes(5 + ($index * 3)) : null,
-    //                 'clock_out_at' => $status === 'present' ? $session['end_at']->copy()->subMinutes(10) : null,
-    //                 'ip_address' => '10.10.0.' . rand(10, 250),
-    //                 'created_at' => $now,
-    //                 'updated_at' => $now,
-    //             ];
-    //         }
-    //     }
-    //     DB::table('attendances')->insert($rows);
-    // }
-
-    // private function seedCertificates(array $enrollments, array $courses, array $topics, $now): void
-    // {
-    //     $courseSlugMap = $this->courseSlugMap($courses);
-    //     $rows = [];
-
-    //     foreach ($enrollments['completed'] as $enrollment) {
-    //         $courseSlug = $courseSlugMap[$enrollment['course_id']] ?? null;
-    //         if (!$courseSlug) {
-    //             continue;
-    //         }
-
-    //         foreach ($topics[$courseSlug] as $index => $topic) {
-    //             $rows[] = [
-    //                 'id' => $this->uuid(),
-    //                 'certificate_number' => 'TPC-' . strtoupper(Str::slug($courseSlug)) . '-' . $now->format('Ymd') . '-' . strtoupper(Str::random(6)),
-    //                 'user_id' => $enrollment['user_id'],
-    //                 'course_id' => $enrollment['course_id'],
-    //                 'issued_at' => $enrollment['completed_at']->copy()->addDays($index + 1),
-    //                 'status' => 'issued',
-    //                 'created_at' => $now,
-    //                 'updated_at' => $now,
-    //             ];
-    //         }
-
-    //         $rows[] = [
-    //             'id' => $this->uuid(),
-    //             'certificate_number' => 'CRC-' . strtoupper(Str::slug($courseSlug)) . '-' . $now->format('Ymd') . '-' . strtoupper(Str::random(6)),
-    //             'user_id' => $enrollment['user_id'],
-    //             'course_id' => $enrollment['course_id'],
-    //             'issued_at' => $enrollment['completed_at']->copy()->addWeek(),
-    //             'status' => 'issued',
-    //             'created_at' => $now,
-    //             'updated_at' => $now,
-    //         ];
-    //     }
-
-    //     $draftEnrollment = $enrollments['byCourse']['discipleship-growth-track'][0] ?? null;
-    //     if ($draftEnrollment) {
-    //         $rows[] = [
-    //             'id' => $this->uuid(),
-    //             'certificate_number' => 'DRAFT-' . $now->format('Ymd') . '-' . strtoupper(Str::random(6)),
-    //             'user_id' => $draftEnrollment['user_id'],
-    //             'course_id' => $draftEnrollment['course_id'],
-    //             'issued_at' => null,
-    //             'status' => 'draft',
-    //             'created_at' => $now->copy()->subDays(3),
-    //             'updated_at' => $now,
-    //         ];
-    //     }
-
-    //     $expiredEnrollment = $enrollments['completed'][0] ?? null;
-    //     if ($expiredEnrollment) {
-    //         $rows[] = [
-    //             'id' => $this->uuid(),
-    //             'certificate_number' => 'EXP-' . $now->format('Ymd') . '-' . strtoupper(Str::random(6)),
-    //             'user_id' => $expiredEnrollment['user_id'],
-    //             'course_id' => $expiredEnrollment['course_id'],
-    //             'issued_at' => $now->copy()->subYears(2),
-    //             'status' => 'expired',
-    //             'created_at' => $now->copy()->subYears(2),
-    //             'updated_at' => $now,
-    //         ];
-    //     }
-
-    //     DB::table('certificates')->insert($rows);
-    // }
-
-    // private function seedArticles(array $users, string $asset, $now): void
-    // {
-    //     $author = $users['byEmail']['admin@example.test']['name'];
-    //     DB::table('articles')->insert([
-    //         ['id' => $this->uuid(), 'title' => 'Cara Menyusun Discipleship Path yang Terstruktur', 'image' => $asset, 'author' => $author, 'content' => 'Panduan pengelolaan jalur pemuridan yang terukur, terjadwal, dan mudah dipantau oleh admin maupun mentor.', 'status' => 'active', 'clicked' => 52, 'created_at' => $now->copy()->subDays(14), 'updated_at' => $now],
-    //         ['id' => $this->uuid(), 'title' => 'Draft: Rencana Konten Sermon Bulanan', 'image' => $asset, 'author' => $author, 'content' => 'Draft internal untuk pengelolaan konten sermon pada bulan berikutnya.', 'status' => 'draft', 'clicked' => 6, 'created_at' => $now->copy()->subDays(7), 'updated_at' => $now],
-    //         ['id' => $this->uuid(), 'title' => 'Legacy Article Archive', 'image' => $asset, 'author' => $author, 'content' => 'Artikel lama yang dinonaktifkan dari tampilan publik namun tetap disimpan untuk referensi.', 'status' => 'inactive', 'clicked' => 11, 'created_at' => $now->copy()->subMonths(3), 'updated_at' => $now],
-    //     ]);
-    // }
-
-    // private function seedTutorialVideos($now): void
-    // {
-    //     DB::table('tutorial_videos')->insert([
-    //         ['id' => $this->uuid(), 'video_link' => 'https://youtu.be/example-discipleship', 'video_name' => 'Intro to Discipleship Learning', 'created_at' => $now->copy()->subMonths(3), 'updated_at' => $now],
-    //         ['id' => $this->uuid(), 'video_link' => 'https://youtu.be/example-sermon', 'video_name' => 'Sermon Preparation Overview', 'created_at' => $now->copy()->subMonths(2), 'updated_at' => $now],
-    //     ]);
-    // }
-
-    // private function seedActivityLogs(array $users, array $courses, array $topics, array $enrollments, array $attempts, array $sessions, $now): void
-    // {
-    //     $courseSlugMap = $this->courseSlugMap($courses);
-    //     $rows = [];
-
-    //     $firstCompleted = $enrollments['completed'][0] ?? null;
-    //     $firstAttempt = $attempts[0] ?? null;
-    //     $firstSession = $sessions[0] ?? null;
-    //     $firstCourseSlug = $firstCompleted ? ($courseSlugMap[$firstCompleted['course_id']] ?? null) : null;
-    //     $firstTopic = $firstCourseSlug ? ($topics[$firstCourseSlug][0] ?? null) : null;
-
-    //     $rows[] = ['id' => $this->uuid(), 'user_id' => $users['byEmail']['student@example.test']['id'], 'action' => 'course.enrolled', 'payload' => json_encode(['course_id' => $firstCompleted['course_id'] ?? null, 'course_title' => 'Discipleship Foundations', 'source' => 'student_portal'], JSON_UNESCAPED_UNICODE), 'created_at' => $now->copy()->subDays(40), 'updated_at' => $now];
-    //     if ($firstTopic) $rows[] = ['id' => $this->uuid(), 'user_id' => $users['byEmail']['disciple@example.test']['id'], 'action' => 'topic.completed', 'payload' => json_encode(['topic_id' => $firstTopic['id'], 'topic_name' => $firstTopic['name']], JSON_UNESCAPED_UNICODE), 'created_at' => $now->copy()->subDays(22), 'updated_at' => $now];
-    //     if ($firstAttempt) $rows[] = ['id' => $this->uuid(), 'user_id' => $users['byEmail']['student@example.test']['id'], 'action' => 'assessment.submitted', 'payload' => json_encode(['attempt_id' => $firstAttempt['id'], 'score' => $firstAttempt['score']], JSON_UNESCAPED_UNICODE), 'created_at' => $now->copy()->subDays(18), 'updated_at' => $now];
-    //     if ($firstCompleted) $rows[] = ['id' => $this->uuid(), 'user_id' => $users['byEmail']['admin@example.test']['id'], 'action' => 'certificate.issued', 'payload' => json_encode(['certificate_type' => 'course', 'course_id' => $firstCompleted['course_id'], 'user_id' => $firstCompleted['user_id']], JSON_UNESCAPED_UNICODE), 'created_at' => $now->copy()->subDays(10), 'updated_at' => $now];
-    //     if ($firstSession) $rows[] = ['id' => $this->uuid(), 'user_id' => $users['byEmail']['admin@example.test']['id'], 'action' => 'attendance.issue', 'payload' => json_encode(['video_session_id' => $firstSession['id'], 'issue' => 'Late check-in and incomplete attendance capture'], JSON_UNESCAPED_UNICODE), 'created_at' => $now->copy()->subDays(7), 'updated_at' => $now];
-    //     if ($firstSession) $rows[] = ['id' => $this->uuid(), 'user_id' => $users['byEmail']['disciple@example.test']['id'], 'action' => 'session.reminder.sent', 'payload' => json_encode(['video_session_id' => $firstSession['id'], 'status' => 'delivered'], JSON_UNESCAPED_UNICODE), 'created_at' => $now->copy()->subDays(5), 'updated_at' => $now];
-
-    //     DB::table('activity_logs')->insert($rows);
-    // }
-
-
-    // private function seedTopicCollaborators(array $topics, array $users, $now): void
-    // {
-    //     $topicUsers = [];
-    //     $topicPermissions = [];
-
-    //     $permissionMap = [
-    //         'manage_materials',
-    //         'manage_sessions',
-    //         'manage_assessments',
-    //         'manage_attendance',
-    //         'manage_students',
-    //         'publish_topic',
-    //         'view_reports',
-    //     ];
-
-    //     $ownerPermissions = $permissionMap;
-
-    //     $collaboratorPermissions = [
-    //         'manage_materials',
-    //         'manage_sessions',
-    //         'manage_assessments',
-    //         'view_reports',
-    //     ];
-
-    //     $limitedCollaboratorPermissions = [
-    //         'manage_materials',
-    //         'manage_sessions',
-    //     ];
-
-    //     $relations = [
-    //         [
-    //             'topic' => 'introduction-to-discipleship',
-    //             'user' => 'citra.lestari@edunusa.test',
-    //             'role_type' => 'collaborator',
-    //             'permissions' => $collaboratorPermissions,
-    //             'invited_by' => 'disciple@example.test',
-    //         ],
-
-    //         [
-    //             'topic' => 'spiritual-growth-principles',
-    //             'user' => 'fajar.hidayat@edunusa.test',
-    //             'role_type' => 'assistant',
-    //             'permissions' => $limitedCollaboratorPermissions,
-    //             'invited_by' => 'disciple@example.test', 
-    //         ],
-
-    //         [
-    //             'topic' => 'sermon-preparation-basics',
-    //             'user' => 'disciple@example.test',
-    //             'role_type' => 'collaborator',
-    //             'permissions' => [
-    //                 'manage_materials',
-    //                 'manage_assessments',
-    //                 'publish_topic',
-    //                 'view_reports',
-    //             ],
-    //             'invited_by' => 'bagas.wiratama@edunusa.test',
-    //         ],
-    //     ];
-
-    //     foreach ($relations as $relation) {
-    //         if (!isset($topics[$relation['topic']])) {
-    //             continue;
-    //         }
-
-    //         if (!isset($users['byEmail'][$relation['user']])) {
-    //             continue;
-    //         }
-
-    //         $topicUserId = $this->uuid();
-
-    //         $invitedBy = $relation['invited_by']
-    //             ? ($users['byEmail'][$relation['invited_by']]['id'] ?? null)
-    //             : null;
-
-    //         $topicUsers[] = [
-    //             'id' => $topicUserId,
-    //             'topic_id' => $topics[$relation['topic']]['id'],
-    //             'user_id' => $users['byEmail'][$relation['user']]['id'],
-    //             'role_type' => $relation['role_type'],
-    //             'status' => 'active',
-    //             'invited_by' => $invitedBy,
-    //             'joined_at' => $now->copy()->subDays(rand(5, 60)),
-    //             'created_at' => $now,
-    //             'updated_at' => $now,
-    //         ];
-
-    //         foreach ($relation['permissions'] as $permission) {
-    //             $topicPermissions[] = [
-    //                 'id' => $this->uuid(),
-    //                 'topic_user_id' => $topicUserId,
-    //                 'permission' => $permission,
-    //                 'granted_by' => $invitedBy,
-    //                 'created_at' => $now,
-    //                 'updated_at' => $now,
-    //             ];
-    //         }
-    //     }
-
-    //     if (!empty($topicUsers)) {
-    //         DB::table('topic_user')->insert($topicUsers);
-    //     }
-
-    //     if (!empty($topicPermissions)) {
-    //         DB::table('topic_user_permissions')->insert($topicPermissions);
-    //     }
-    // }
+    private function seedStudentStudyProgram($now): array
+    {
+        $program = [
+            'id' => $this->uuid(),
+            'title' => 'Program Siswa Tambahan',
+            'slug' => 'program-siswa-tambahan',
+            'description' => 'Program pembelajaran untuk data siswa dan course tambahan.',
+            'status' => 'active',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ];
+
+        DB::table('study_programs')->insert($program);
+
+        return $program;
+    }
+
+    private function seedAdditionalLearningData(array $program, array $users, string $asset, $now): void
+    {
+        $teacher = $users['byRole']['admin'][0] ?? null;
+        $students = $users['byRole']['student'] ?? [];
+
+        if (!$teacher || $students === []) {
+            return;
+        }
+
+        $courses = [];
+        $topics = [];
+        $sessions = [];
+        $enrollments = [];
+        $attendances = [];
+
+        for ($i = 1; $i <= 10; $i++) {
+            $courseId = $this->uuid();
+            $topicId = $this->uuid();
+            $sessionId = $this->uuid();
+            $courseCreatedAt = $now->copy()->subDays(20 - $i);
+            $sessionStart = $now->copy()->subDays($i)->setTime(19, 0);
+            $sessionEnd = $sessionStart->copy()->addMinutes(90);
+
+            $courses[] = [
+                'id' => $courseId,
+                'study_program_id' => $program['id'],
+                'title' => "Course Tambahan {$i}",
+                'slug' => "course-tambahan-{$i}",
+                'poster' => $asset,
+                'description' => "Course tambahan {$i} untuk kebutuhan data dummy siswa, topik, sesi, dan kehadiran.",
+                'status' => 'active',
+                'created_at' => $courseCreatedAt,
+                'updated_at' => $now,
+            ];
+
+            $topics[] = [
+                'id' => $topicId,
+                'course_id' => $courseId,
+                'teacher_id' => $teacher['id'],
+                'name' => "Topik Utama {$i}",
+                'slug' => "topik-utama-{$i}",
+                'category' => 'general',
+                'description' => "Topik utama untuk Course Tambahan {$i}.",
+                'poster' => $asset,
+                'visibility' => 'public',
+                'status' => 'published',
+                'sort_order' => 1,
+                'created_at' => $courseCreatedAt,
+                'updated_at' => $now,
+            ];
+
+            $sessions[] = [
+                'id' => $sessionId,
+                'topic_id' => $topicId,
+                'title' => "Sesi Live {$i}",
+                'zoom_link' => "https://zoom.example.test/course-{$i}",
+                'record_link' => null,
+                'start_at' => $sessionStart,
+                'end_at' => $sessionEnd,
+                'reminder_sent_at' => $sessionStart->copy()->subMinutes(30),
+                'status' => 'completed',
+                'created_at' => $courseCreatedAt,
+                'updated_at' => $now,
+            ];
+
+            foreach ($students as $index => $student) {
+                $enrollmentId = $this->uuid();
+                $checkInAt = $sessionStart->copy()->addMinutes(($index % 3) * 5);
+                $clockOutAt = $sessionEnd->copy()->subMinutes(10 - ($index % 3));
+
+                $enrollments[] = [
+                    'id' => $enrollmentId,
+                    'user_id' => $student['id'],
+                    'course_id' => $courseId,
+                    'status' => 'active',
+                    'enrolled_at' => $courseCreatedAt->copy()->addDay(),
+                    'completed_at' => null,
+                    'created_at' => $courseCreatedAt,
+                    'updated_at' => $now,
+                ];
+
+                $attendances[] = [
+                    'id' => $this->uuid(),
+                    'video_session_id' => $sessionId,
+                    'user_id' => $student['id'],
+                    'status' => $index % 4 === 0 ? 'late' : 'present',
+                    'check_in_at' => $checkInAt,
+                    'clock_out_at' => $clockOutAt,
+                    'ip_address' => '127.0.0.1',
+                    'created_at' => $sessionStart,
+                    'updated_at' => $now,
+                ];
+            }
+        }
+
+        DB::table('courses')->insert($courses);
+        DB::table('topics')->insert($topics);
+        DB::table('video_sessions')->insert($sessions);
+        DB::table('course_enrollments')->insert($enrollments);
+        DB::table('attendances')->insert($attendances);
+    }
 }

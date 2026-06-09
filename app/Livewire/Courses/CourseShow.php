@@ -12,12 +12,15 @@ use App\Models\TopicProgress;
 use App\Models\TopicUser;
 use App\Services\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class CourseShow extends Component
 {
+    use WithPagination;
     use AuthorizesRequests;
     use InteractsWithMentorTopic;
 
@@ -35,15 +38,19 @@ class CourseShow extends Component
     public ?array $assessmentMeta = null;
 
     public bool $showAssessmentModal = false;
+    public bool $showEnrollModal = false;
 
     public string $topicSearch = '';
     public string $topicSort = 'sort_asc';
     public string $topicStatusFilter = 'all';
+    public int $topicsPerPage = 6;
 
     public string $activeTopicTab = 'general';
 
     public Collection $mentoredTopics;
     public bool $hasMentoredTopics = false;
+
+    protected $paginationTheme = 'tailwind';
 
     public function mount(string $slug): void
     {
@@ -119,6 +126,7 @@ class CourseShow extends Component
         }
 
         $this->activeTopicTab = $tab;
+        $this->resetPage('topicsPage');
     }
 
     public function hydrateMentoredTopics(): void
@@ -431,11 +439,66 @@ class CourseShow extends Component
         $this->showAssessmentModal = false;
     }
 
+    public function confirmEnroll(): void
+    {
+        if (!auth()->check()) {
+            $this->redirectRoute('login');
+
+            return;
+        }
+
+        $this->showEnrollModal = true;
+    }
+
+    public function closeEnrollModal(): void
+    {
+        $this->showEnrollModal = false;
+    }
+
     public function clearTopicFilters(): void
     {
         $this->reset(['topicSearch', 'topicSort', 'topicStatusFilter']);
         $this->topicSort = 'sort_asc';
         $this->topicStatusFilter = 'all';
+        $this->resetPage('topicsPage');
+    }
+
+    public function updatedTopicSearch(): void
+    {
+        $this->resetPage('topicsPage');
+    }
+
+    public function updatedTopicSort(): void
+    {
+        $this->resetPage('topicsPage');
+    }
+
+    public function updatedTopicStatusFilter(): void
+    {
+        $this->resetPage('topicsPage');
+    }
+
+    public function getPaginatedTopicsProperty(): LengthAwarePaginator
+    {
+        $topics = $this->activeTopicTab === 'mentored'
+            ? $this->mentoredTopics->values()
+            : $this->filteredTopics;
+
+        $pageName = 'topicsPage';
+        $currentPage = $this->getPage($pageName);
+        $total = $topics->count();
+        $items = $topics->forPage($currentPage, $this->topicsPerPage)->values();
+
+        return new LengthAwarePaginator(
+            $items,
+            $total,
+            $this->topicsPerPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'pageName' => $pageName,
+            ]
+        );
     }
 
     public function enroll(CourseService $courseService)
@@ -449,6 +512,7 @@ class CourseShow extends Component
         try {
             $courseService->enrollUser(auth()->id(), $this->course->id);
             $this->enrolled = true;
+            $this->closeEnrollModal();
 
             $enrollment = auth()->user()->courseEnrollments()
                 ->where('course_id', $this->course->id)
@@ -462,8 +526,10 @@ class CourseShow extends Component
             }
 
             session()->flash('success', 'Course berhasil diikuti.');
+            $this->dispatch('toast', type: 'success', message: 'Course berhasil diikuti.');
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
+            $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
     }
 
@@ -477,6 +543,7 @@ class CourseShow extends Component
 
         return view('livewire.courses.course-show', [
             'filteredTopics' => $this->filteredTopics,
+            'paginatedTopics' => $this->paginatedTopics,
             'assessment' => $this->assessment,
             'assessmentMeta' => $this->assessmentMeta,
             'certificateEligibility' => $this->certificateEligibility,

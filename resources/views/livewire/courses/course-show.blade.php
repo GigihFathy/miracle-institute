@@ -3,7 +3,7 @@
     $isStudent = auth()->check() && session('active_role') === 'student';
     $canTrack = auth()->check() && $enrolled;
 
-    $topicsToRender = $isMentor ? $mentoredTopics : $filteredTopics;
+    $topicsToRender = $paginatedTopics;
     $totalTopicsCount = $course->topics->count();
     $completedTopicsCount = $this->completedTopicsCount ?? 0;
     $progressPercent = $totalTopicsCount > 0 ? (int) round(($completedTopicsCount / $totalTopicsCount) * 100) : 0;
@@ -11,6 +11,7 @@
     $continueTopic = $filteredTopics->firstWhere('progress_status', 'in_progress')
         ?? $filteredTopics->firstWhere('progress_status', 'available')
         ?? $filteredTopics->first();
+    $topicOffset = ($paginatedTopics->currentPage() - 1) * $paginatedTopics->perPage();
 
     $poster = $course->poster ?? $course->image ?? null;
     $posterSrc = null;
@@ -28,12 +29,6 @@
 
 <div class="min-h-screen bg-white px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
     <div class="mx-auto max-w-6xl space-y-12">
-        @if(session('success'))
-            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
-                {{ session('success') }}
-            </div>
-        @endif
-
         @if(session('error'))
             <div class="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700">
                 {{ session('error') }}
@@ -98,20 +93,10 @@
                                         @endif
                                     @else
                                         <button
-                                            wire:click="enroll"
-                                            wire:loading.attr="disabled"
-                                            wire:target="enroll"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:opacity-70"
+                                            wire:click="confirmEnroll"
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#00395f]"
                                         >
-                                            <span wire:loading.remove wire:target="enroll">{{ __('general.course_show.enroll') }}</span>
-
-                                            <span wire:loading.flex wire:target="enroll" class="items-center gap-2">
-                                                <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                                                </svg>
-                                                {{ __('general.course_show.processing') }}
-                                            </span>
+                                            {{ __('general.course_show.enroll') }}
                                         </button>
                                     @endif
                                 @endif
@@ -251,7 +236,7 @@
                             <div class="flex h-full flex-col gap-4">
                                 <div class="flex min-w-0 items-start gap-3 sm:gap-4">
                                     <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#004777] text-sm font-bold text-white">
-                                        {{ $index + 1 }}
+                                        {{ $topicOffset + $index + 1 }}
                                     </div>
 
                                     <div class="min-w-0">
@@ -304,6 +289,12 @@
                         </article>
                     @endforeach
                 </div>
+
+                @if($paginatedTopics->hasPages())
+                    <div class="pt-2">
+                        {{ $paginatedTopics->links() }}
+                    </div>
+                @endif
             </section>
         @elseif($isMentor)
             <section class="space-y-6">
@@ -327,7 +318,7 @@
                 @if($hasMentoredTopics)
                     <div>
                         <div class="grid gap-4 md:grid-cols-2">
-                            @foreach($mentoredTopics as $topic)
+                            @foreach($topicsToRender as $topic)
                                 @php
                                     $mentorRole = $topic->mentor_role ?? 'collaborator';
                                     $roleBadge = $mentorRole === 'owner'
@@ -363,6 +354,12 @@
                                 </div>
                             @endforeach
                         </div>
+
+                        @if($paginatedTopics->hasPages())
+                            <div class="pt-6">
+                                {{ $paginatedTopics->links() }}
+                            </div>
+                        @endif
                     </div>
                 @else
                     <div class="rounded-[2rem] bg-[#eef8ff] p-8">
@@ -461,6 +458,51 @@
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($showEnrollModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+            <button type="button" class="absolute inset-0" wire:click="closeEnrollModal" aria-label="Tutup modal konfirmasi"></button>
+
+            <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
+                <div class="space-y-3">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran course</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">
+                            Kamu yakin ingin mendaftar ke course
+                            <span class="font-semibold text-[#004777]">{{ $course->title }}</span>?
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        wire:click="closeEnrollModal"
+                        class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="enroll"
+                        wire:loading.attr="disabled"
+                        wire:target="enroll"
+                        class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                        <span wire:loading.remove wire:target="enroll">Ya, daftar sekarang</span>
+                        <span wire:loading.inline-flex wire:target="enroll" class="items-center gap-2">
+                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                            Memproses...
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>

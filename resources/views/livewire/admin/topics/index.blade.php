@@ -174,6 +174,10 @@
                 </div>
 
                 <div class="space-y-4 overflow-y-auto p-5">
+                    <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                        <span class="font-semibold text-rose-500">*</span> menandakan field wajib diisi.
+                    </div>
+
                     @if($selectedCourse)
                         <input
                             value="{{ $selectedCourse->title }}"
@@ -182,31 +186,56 @@
                         >
                     @endif
 
-                    <select wire:model="teacher_id" class="w-full rounded-xl border px-4 py-2">
-                        <option value="">{{ __('admin.topics.form.select_teacher') }}</option>
-                        @foreach($teachers as $teacher)
-                            <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option>
-                        @endforeach
-                    </select>
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Teacher <span class="text-rose-500">*</span>
+                        </label>
+                        <select wire:model="teacher_id" class="w-full rounded-xl border px-4 py-2">
+                            <option value="">{{ __('admin.topics.form.select_teacher') }}</option>
+                            @foreach($teachers as $teacher)
+                                <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                    <input wire:model="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.name_placeholder') }}">
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Nama Topik <span class="text-rose-500">*</span>
+                        </label>
+                        <input wire:model="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.name_placeholder') }}">
+                    </div>
 
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <select wire:model="visibility" class="w-full rounded-xl border px-4 py-2">
-                            <option value="Public">{{ __('admin.topics.visibility.public') }}</option>
-                            <option value="Private">{{ __('admin.topics.visibility.private') }}</option>
-                        </select>
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                Visibility <span class="text-rose-500">*</span>
+                            </label>
+                            <select wire:model="visibility" class="w-full rounded-xl border px-4 py-2">
+                                <option value="Public">{{ __('admin.topics.visibility.public') }}</option>
+                                <option value="Private">{{ __('admin.topics.visibility.private') }}</option>
+                            </select>
+                        </div>
 
-                        <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
-                            <option value="published">{{ __('admin.topics.status.published') }}</option>
-                            <option value="archived">{{ __('admin.topics.status.archived') }}</option>
-                            <option value="draft">{{ __('admin.topics.status.draft') }}</option>
-                        </select>
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                Status <span class="text-rose-500">*</span>
+                            </label>
+                            <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
+                                <option value="published">{{ __('admin.topics.status.published') }}</option>
+                                <option value="archived">{{ __('admin.topics.status.archived') }}</option>
+                                <option value="draft">{{ __('admin.topics.status.draft') }}</option>
+                            </select>
+                        </div>
                     </div>
 
                     <input wire:model="sort_order" type="number" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.sort_order_placeholder') }}">
 
-                    <textarea wire:model="description" rows="4" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.description_placeholder') }}"></textarea>
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Deskripsi <span class="text-rose-500">*</span>
+                        </label>
+                        <textarea wire:model="description" rows="4" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.description_placeholder') }}"></textarea>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between border-t bg-slate-50 p-5">

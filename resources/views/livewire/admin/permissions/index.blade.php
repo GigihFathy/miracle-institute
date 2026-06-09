@@ -24,6 +24,7 @@
                     <thead class="admin-table-head text-left text-slate-600">
                         <tr>
                             <th class="px-4 py-3 font-medium">{{ __('admin.permissions.table.name') }}</th>
+                            <th class="px-4 py-3 font-medium">Deskripsi</th>
                             <th class="px-4 py-3 text-right font-medium">{{ __('admin.permissions.table.action') }}</th>
                         </tr>
                     </thead>
@@ -31,6 +32,9 @@
                         @forelse($rows as $row)
                             <tr class="transition-colors hover:bg-slate-50/60">
                                 <td class="px-4 py-3 font-medium text-slate-900">{{ $row->name }}</td>
+                                <td class="px-4 py-3 text-sm leading-6 text-slate-600">
+                                    {{ $row->description ?: '-' }}
+                                </td>
 
                                 <td class="px-4 py-3">
                                     {{-- <div class="flex justify-end gap-2">
@@ -62,7 +66,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2" class="px-4 py-8 text-center text-slate-500">
+                                <td colspan="3" class="px-4 py-8 text-center text-slate-500">
                                     {{ __('admin.permissions.empty') }}
                                 </td>
                             </tr>
@@ -88,7 +92,14 @@
                 </div>
 
                 <div class="mt-5 space-y-4">
+                    <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                        <span class="font-semibold text-rose-500">*</span> menandakan field wajib diisi.
+                    </div>
+
                     <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Nama Permission <span class="text-rose-500">*</span>
+                        </label>
                         <input wire:model="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.permissions.form.name_placeholder') }}">
                         @error('name')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>

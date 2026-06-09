@@ -214,18 +214,34 @@
                 </div>
 
                 <div class="flex-1 space-y-4 overflow-y-auto p-6">
-                    <select wire:model="study_program_id" class="w-full rounded-xl border px-4 py-2">
-                        <option value="">{{ __('admin.courses.form.select_program') }}</option>
-                        @foreach($studyPrograms as $sp)
-                            <option value="{{ $sp->id }}">{{ $sp->title }}</option>
-                        @endforeach
-                    </select>
+                    <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                        <span class="font-semibold text-rose-500">*</span> menandakan field wajib diisi.
+                    </div>
 
-                    <input wire:model="title" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.courses.form.title_placeholder') }}">
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Program Studi <span class="text-rose-500">*</span>
+                        </label>
+                        <select wire:model="study_program_id" class="w-full rounded-xl border px-4 py-2">
+                            <option value="">{{ __('admin.courses.form.select_program') }}</option>
+                            @foreach($studyPrograms as $sp)
+                                <option value="{{ $sp->id }}">{{ $sp->title }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Judul Course <span class="text-rose-500">*</span>
+                        </label>
+                        <input wire:model="title" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.courses.form.title_placeholder') }}">
+                    </div>
 
                     <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                         <div>
-                            <label class="mb-1 block text-xs text-slate-500">{{ __('admin.courses.form.certificate_course_number_label') }}</label>
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                {{ __('admin.courses.form.certificate_course_number_label') }} <span class="text-rose-500">*</span>
+                            </label>
                             <input
                                 wire:model="certificate_course_number"
                                 type="number"
@@ -234,21 +250,37 @@
                                 class="w-full rounded-xl border px-4 py-2"
                                 placeholder="{{ __('admin.courses.form.certificate_course_number_placeholder') }}"
                             >
+                            <p class="mt-1 text-[11px] text-slate-500">Wajib diisi. Sistem akan menampilkan 3 digit seperti `001` atau `007`.</p>
                         </div>
 
                         <div>
-                            <label class="mb-1 block text-xs text-slate-500">{{ __('admin.courses.form.certificate_prefix_code_label') }}</label>
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                {{ __('admin.courses.form.certificate_prefix_code_label') }} <span class="text-rose-500">*</span>
+                            </label>
                             <input
                                 wire:model="certificate_prefix_code"
                                 class="w-full rounded-xl border px-4 py-2"
                                 placeholder="{{ __('admin.courses.form.certificate_prefix_code_placeholder') }}"
                             >
+                            <p class="mt-1 text-[11px] text-slate-500">Wajib diisi. Prefix akan disimpan dalam huruf besar untuk format sertifikat.</p>
                         </div>
+                    </div>
+
+                    <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#eef8ff] px-4 py-3">
+                        <div class="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#004777]/65">
+                            Contoh Nomor Sertifikat
+                        </div>
+                        <div class="mt-1 text-sm font-bold text-[#004777]">
+                            {{ $this->certificateNumberPreview }}
+                        </div>
+                        <p class="mt-2 text-[11px] leading-5 text-slate-600">
+                            Preview ini mengikuti format sertifikat course yang dipakai sistem saat sertifikat diterbitkan.
+                        </p>
                     </div>
 
                     <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                         <div>
-                            <label class="mb-1 block text-xs text-slate-500">{{ __('admin.courses.form.poster_preview') }}</label>
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">{{ __('admin.courses.form.poster_preview') }}</label>
                             <div class="flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border bg-slate-100">
                                 @if($poster)
                                     <img src="{{ asset($poster) }}" alt="poster" class="h-full w-full object-contain">
@@ -260,7 +292,7 @@
 
                         <div class="md:col-span-2">
                             <div class="mb-2 flex items-center justify-between gap-3">
-                                <label class="block text-xs text-slate-500">{{ __('admin.courses.form.choose_thumbnail') }}</label>
+                                <label class="block text-xs font-semibold text-slate-600">{{ __('admin.courses.form.choose_thumbnail') }}</label>
                                 <a
                                     href="{{ localized_route('admin.courses.thumbnails') }}"
                                     class="text-xs font-medium text-[#004777] underline"
@@ -285,12 +317,22 @@
                         </div>
                     </div>
 
-                    <textarea wire:model="description" rows="4" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.courses.form.description_placeholder') }}"></textarea>
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Deskripsi <span class="text-rose-500">*</span>
+                        </label>
+                        <textarea wire:model="description" rows="4" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.courses.form.description_placeholder') }}"></textarea>
+                    </div>
 
-                    <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
-                        <option value="active">{{ __('admin.courses.status.active') }}</option>
-                        <option value="inactive">{{ __('admin.courses.status.inactive') }}</option>
-                    </select>
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Status <span class="text-rose-500">*</span>
+                        </label>
+                        <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
+                            <option value="active">{{ __('admin.courses.status.active') }}</option>
+                            <option value="inactive">{{ __('admin.courses.status.inactive') }}</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="flex shrink-0 justify-end gap-2 border-t bg-slate-50 p-6">

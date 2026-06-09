@@ -113,7 +113,10 @@ class PermissionIndex extends Component
         $query = Permission::query();
 
         if ($this->search !== '') {
-            $query->where('name', 'like', "%{$this->search}%");
+            $query->where(function ($builder) {
+                $builder->where('name', 'like', "%{$this->search}%")
+                    ->orWhere('description', 'like', "%{$this->search}%");
+            });
         }
 
         return view('livewire.admin.permissions.index', [

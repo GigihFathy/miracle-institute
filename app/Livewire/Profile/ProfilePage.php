@@ -87,6 +87,7 @@ class ProfilePage extends Component
         ]);
 
         session()->flash('success', __('general.profile.flash.saved'));
+        $this->dispatch('toast', type: 'success', message: __('general.profile.flash.saved'));
 
         return null;
     }

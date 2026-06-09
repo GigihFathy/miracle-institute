@@ -41,6 +41,7 @@ use App\Observers\CertificateObserver;
 use App\Observers\VideoSessionObserver;
 
 // Facades & Core
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -77,6 +78,8 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Carbon::setLocale($locale);
+        Paginator::defaultView('vendor.pagination.miracle');
+        Paginator::defaultSimpleView('vendor.pagination.miracle-simple');
 
     
         /*

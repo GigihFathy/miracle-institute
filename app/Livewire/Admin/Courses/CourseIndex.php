@@ -50,8 +50,8 @@ class CourseIndex extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'poster' => 'nullable|string|max:255',
-            'certificate_course_number' => 'nullable|integer|min:1|max:999',
-            'certificate_prefix_code' => 'nullable|string|max:50',
+            'certificate_course_number' => 'required|integer|min:1|max:999',
+            'certificate_prefix_code' => 'required|string|max:50',
             'description' => 'required|string',
             'status' => 'required|string|max:50',
         ];
@@ -98,8 +98,8 @@ class CourseIndex extends Component
                 'title' => $this->title,
                 'slug' => Str::slug($this->title),
                 'poster' => $this->poster,
-                'certificate_course_number' => $this->certificate_course_number !== '' ? (int) $this->certificate_course_number : null,
-                'certificate_prefix_code' => $this->certificate_prefix_code !== '' ? Str::upper(trim($this->certificate_prefix_code)) : null,
+                'certificate_course_number' => (int) $this->certificate_course_number,
+                'certificate_prefix_code' => Str::upper(trim($this->certificate_prefix_code)),
                 'description' => $this->description,
                 'status' => $this->status,
             ]
@@ -108,6 +108,29 @@ class CourseIndex extends Component
         $this->resetForm();
         $this->showModal = false;
         $this->dispatch('toast', type: 'success', message: 'Course berhasil disimpan.');
+    }
+
+    public function getCertificateNumberPreviewProperty(): string
+    {
+        $courseNumber = str_pad(
+            (string) ((int) $this->certificate_course_number > 0 ? (int) $this->certificate_course_number : 1),
+            3,
+            '0',
+            STR_PAD_LEFT
+        );
+
+        $prefixCode = trim($this->certificate_prefix_code) !== ''
+            ? Str::upper(trim($this->certificate_prefix_code))
+            : $this->buildCertificatePrefixPreview();
+
+        return sprintf(
+            '%s-%s/%s/%s/%s',
+            '00001',
+            $courseNumber,
+            $prefixCode,
+            now()->format('m'),
+            now()->format('Y')
+        );
     }
 
     public function delete(string $id): void
@@ -186,5 +209,27 @@ class CourseIndex extends Component
         $this->thumbnails = $files
             ->map(fn ($file) => 'images/thumbnail/' . $file->getFilename())
             ->all();
+    }
+
+    private function buildCertificatePrefixPreview(): string
+    {
+        $source = trim($this->slug !== '' ? $this->slug : $this->title);
+
+        if ($source === '') {
+            return 'CRS';
+        }
+
+        $words = preg_split('/[\s\-_]+/', Str::upper($source)) ?: [];
+        $code = '';
+
+        foreach ($words as $word) {
+            $word = preg_replace('/[^A-Z0-9]/', '', $word);
+
+            if ($word !== '') {
+                $code .= substr($word, 0, 1);
+            }
+        }
+
+        return $code !== '' ? $code : 'CRS';
     }
 }

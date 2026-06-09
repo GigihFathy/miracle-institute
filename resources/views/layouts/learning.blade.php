@@ -19,18 +19,6 @@
         @include('layouts.partials.learning-topbar')
 
         <main class="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
-            @if (session('success'))
-                <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                    {{ session('error') }}
-                </div>
-            @endif
-
             {{ $slot }}
 
             <x-ui.flash-toasts />

@@ -101,7 +101,14 @@
                 </div>
 
                 <div class="mt-5 space-y-4">
+                    <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                        <span class="font-semibold text-rose-500">*</span> menandakan field wajib diisi.
+                    </div>
+
                     <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            {{ __('admin.roles.form.name_placeholder') }} <span class="text-rose-500">*</span>
+                        </label>
                         <input wire:model="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.roles.form.name_placeholder') }}">
                         @error('name')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
@@ -109,6 +116,9 @@
                     </div>
 
                     <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            {{ __('admin.roles.form.label_placeholder') }} <span class="text-rose-500">*</span>
+                        </label>
                         <input wire:model="label" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.roles.form.label_placeholder') }}">
                         @error('label')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
@@ -116,6 +126,9 @@
                     </div>
 
                     <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Deskripsi
+                        </label>
                         <textarea wire:model="description" rows="3" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.roles.form.description_placeholder') }}"></textarea>
                         @error('description')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>

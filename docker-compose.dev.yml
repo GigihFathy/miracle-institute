@@ -33,6 +33,62 @@ services:
       - /var/www/html/node_modules
     command: php artisan serve --host=0.0.0.0 --port=8000
 
+  queue-worker:
+    image: miracle-institute-app
+    container_name: miracle-institute-queue-worker-dev
+    restart: unless-stopped
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      VITE_SERVER_HOST: vite
+      VITE_SERVER_PORT: 5173
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: miracle_institute
+      DB_USERNAME: miracle
+      DB_PASSWORD: miracle2512
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+      - app-storage:/var/www/html/storage
+      - app-cache:/var/www/html/bootstrap/cache
+      - /var/www/html/node_modules
+    command: php artisan queue:work database --queue=emails,default --sleep=3 --tries=3 --timeout=120
+
+  scheduler:
+    image: miracle-institute-app
+    container_name: miracle-institute-scheduler-dev
+    restart: unless-stopped
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      VITE_SERVER_HOST: vite
+      VITE_SERVER_PORT: 5173
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: miracle_institute
+      DB_USERNAME: miracle
+      DB_PASSWORD: miracle2512
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+      - app-storage:/var/www/html/storage
+      - app-cache:/var/www/html/bootstrap/cache
+      - /var/www/html/node_modules
+    command: /bin/sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+
   vite:
     build:
       context: .

@@ -17,6 +17,9 @@ class CourseCatalog extends Component
     public string $searchInput = '';
     public string $studyProgram = '';
     public string $sort = 'newest';
+    public bool $showEnrollModal = false;
+    public ?string $pendingCourseId = null;
+    public ?string $pendingCourseTitle = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -52,21 +55,51 @@ class CourseCatalog extends Component
         $this->resetPage();
     }
 
-    public function enroll(CourseService $courseService, string $courseId)
+    public function confirmEnroll(string $courseId): void
+    {
+        if (!auth()->check()) {
+            $this->redirectRoute('login');
+
+            return;
+        }
+
+        $course = Course::query()
+            ->select(['id', 'title'])
+            ->findOrFail($courseId);
+
+        $this->pendingCourseId = $course->id;
+        $this->pendingCourseTitle = $course->title;
+        $this->showEnrollModal = true;
+    }
+
+    public function closeEnrollModal(): void
+    {
+        $this->reset(['showEnrollModal', 'pendingCourseId', 'pendingCourseTitle']);
+    }
+
+    public function enroll(CourseService $courseService)
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
 
+        if (!$this->pendingCourseId) {
+            return;
+        }
+
+        $courseId = $this->pendingCourseId;
         $course = Course::findOrFail($courseId);
         $this->authorize('enroll', $course);
 
         try {
             $courseService->enrollUser(auth()->id(), $courseId);
+            $this->closeEnrollModal();
             session()->flash('success', 'Berhasil mendaftar course.');
+            $this->dispatch('toast', type: 'success', message: 'Berhasil mendaftar course.');
             $this->dispatch('$refresh');
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
+            $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
     }
 

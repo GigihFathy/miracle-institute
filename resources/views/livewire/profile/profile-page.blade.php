@@ -15,12 +15,6 @@
 
 <div class="min-h-screen bg-white px-4 pb-16 pt-8 text-[#0f172a] sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
     <div class="mx-auto max-w-6xl space-y-10">
-        @if(session('success'))
-            <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-medium text-emerald-700">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <section class="rounded-[2rem] border border-[#004777]/15 bg-white px-7 py-10 sm:px-10 sm:py-14 lg:px-14">
             <div class="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
                 <div class="min-w-0 flex-1">

@@ -158,6 +158,10 @@
                 </div>
 
                 <div class="space-y-4 overflow-y-auto p-5">
+                    <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                        <span class="font-semibold text-rose-500">*</span> menandakan field wajib diisi.
+                    </div>
+
                     @if($selectedCourse)
                         <input
                             value="{{ $selectedCourse->title }}"
@@ -169,6 +173,9 @@
                         @enderror
                     @else
                         <div class="space-y-1">
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                Course <span class="text-rose-500">*</span>
+                            </label>
                             <select wire:model="course_id" class="w-full rounded-xl border px-4 py-2">
                             <option value="">{{ __('admin.assessments.form.select_course') }}</option>
                             @foreach($courses as $course)
@@ -183,6 +190,9 @@
                     @endif
 
                     <div class="space-y-1">
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Judul Assessment <span class="text-rose-500">*</span>
+                        </label>
                         <input wire:model="title"
                             class="w-full rounded-xl border px-4 py-2"
                             placeholder="{{ __('admin.assessments.form.title_placeholder') }}">
@@ -193,6 +203,9 @@
 
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div class="space-y-1">
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                Passing Grade <span class="text-rose-500">*</span>
+                            </label>
                             <input wire:model="passing_grade" type="number"
                                 class="w-full rounded-xl border px-4 py-2"
                                 placeholder="{{ __('admin.assessments.form.passing_grade_placeholder') }}">
@@ -217,6 +230,9 @@
                     </label>
 
                     <div class="space-y-1">
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Status <span class="text-rose-500">*</span>
+                        </label>
                         <select wire:model="status"
                             class="w-full rounded-xl border px-4 py-2">
                             <option value="active">{{ __('admin.assessments.status.active') }}</option>
@@ -265,6 +281,10 @@
                 </div>
 
                 <div class="space-y-4 overflow-y-auto p-5">
+                    <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-500">
+                        <span class="font-semibold text-rose-500">*</span> menandakan field wajib diisi.
+                    </div>
+
                     @if($selectedAssessment)
                         <div class="rounded-xl border px-4 py-2 bg-slate-50 text-sm">{{ $selectedCourse?->title }} · {{ $selectedAssessment->title }}</div>
                     @endif
@@ -327,16 +347,21 @@
                     @endif
 
                     <div class="space-y-4">
-                        <textarea wire:model="question_text"
-                            rows="4"
-                            class="w-full rounded-xl border px-4 py-2"
-                            placeholder="{{ __('admin.question_manager.form.question_placeholder') }}"></textarea>
-                        @error('question_text')
-                            <p class="text-sm text-rose-600">{{ $message }}</p>
-                        @enderror
+                        <div>
+                            <label class="mb-1 block text-xs font-semibold text-slate-600">
+                                Pertanyaan <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea wire:model="question_text"
+                                rows="4"
+                                class="w-full rounded-xl border px-4 py-2"
+                                placeholder="{{ __('admin.question_manager.form.question_placeholder') }}"></textarea>
+                            @error('question_text')
+                                <p class="text-sm text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
 
                         <div class="space-y-3">
-                            <div class="text-sm font-medium">{{ __('admin.question_manager.form.options_title') }}</div>
+                            <div class="text-sm font-medium">{{ __('admin.question_manager.form.options_title') }} <span class="text-rose-500">*</span></div>
 
                             @foreach($question_options as $i => $opt)
                                 <div class="flex items-center gap-3">

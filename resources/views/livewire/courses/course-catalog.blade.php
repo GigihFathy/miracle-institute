@@ -181,7 +181,7 @@
                                 @if(!$isMentor)
                                     @auth
                                         @unless($enrolled)
-                                            <button wire:click="enroll('{{ $course->id }}')"
+                                            <button wire:click="confirmEnroll('{{ $course->id }}')"
                                                     class="pointer-events-auto relative z-20 inline-flex items-center justify-center rounded-full bg-[#004777] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#00395f]">
                                                 {{ __('general.course_catalog.actions.enroll') }}
                                             </button>
@@ -213,4 +213,49 @@
             </div>
         </div>
     </section>
+
+    @if($showEnrollModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+            <button type="button" class="absolute inset-0" wire:click="closeEnrollModal" aria-label="Tutup modal konfirmasi"></button>
+
+            <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
+                <div class="space-y-3">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran course</h3>
+                        <p class="mt-2 text-sm leading-6 text-slate-600">
+                            Kamu yakin ingin mendaftar ke course
+                            <span class="font-semibold text-[#004777]">{{ $pendingCourseTitle }}</span>?
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        wire:click="closeEnrollModal"
+                        class="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="enroll"
+                        wire:loading.attr="disabled"
+                        wire:target="enroll"
+                        class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                        <span wire:loading.remove wire:target="enroll">Ya, daftar sekarang</span>
+                        <span wire:loading.inline-flex wire:target="enroll" class="items-center gap-2">
+                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                            Memproses...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

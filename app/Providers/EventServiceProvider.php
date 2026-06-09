@@ -26,10 +26,10 @@ use App\Email\Listeners\SendAttendanceIssueNotification;
 use App\Email\Listeners\SendContentCompletionNotification;
 use App\Email\Listeners\SendCourseEnrollmentNotification;
 use App\Email\Listeners\SendVideoSessionScheduledNotification;
-use App\Email\Listeners\SendCertificateIssuedNotification;
+use App\Email\Listeners\SendCertificateReadyEmail;
 
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -74,7 +74,7 @@ class EventServiceProvider extends ServiceProvider
 
 
         CertificateIssued::class => [
-            SendCertificateIssuedNotification::class,
+            SendCertificateReadyEmail::class,
         ],
 
         
