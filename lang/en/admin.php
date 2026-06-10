@@ -481,7 +481,7 @@ return [
         'status' => [
             'published' => 'Published',
             'archived' => 'Archived',
-            'draft' => 'Draft',
+            'draft' => 'Unpublished',
         ],
         'visibility' => [
             'public' => 'Public',

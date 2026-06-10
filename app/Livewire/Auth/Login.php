@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
+use Throwable;
 
 class Login extends Component
 {
@@ -44,9 +45,13 @@ class Login extends Component
         }
 
         if (! $user->hasVerifiedEmail()) {
-            $user->sendEmailVerificationNotification();
-
-            session()->flash('status', __('auth.verification_required'));
+            try {
+                $user->sendEmailVerificationNotification();
+                session()->flash('status', __('auth.verification_required'));
+            } catch (Throwable $exception) {
+                report($exception);
+                session()->flash('warning', __('auth.mail_unavailable'));
+            }
 
             return redirect()->to(localized_route('login'));
         }

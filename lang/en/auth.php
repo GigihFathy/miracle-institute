@@ -53,6 +53,7 @@ return [
     'verification_email_sent' => 'We have sent a verification email. Please check your inbox.',
     'verification_required' => 'Your account is not verified yet. We have resent the verification link.',
     'verification_link_resent' => 'The verification link has been resent.',
+    'mail_unavailable' => 'Your account was processed, but the verification email could not be sent right now because the mail server connection is unavailable. Please try resending it again shortly.',
     'email_already_verified' => 'Your email is already verified.',
     'email_verified_success' => 'Your email has been verified. You can continue using your account now.',
 

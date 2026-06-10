@@ -41,6 +41,8 @@ use App\Observers\CertificateObserver;
 use App\Observers\VideoSessionObserver;
 
 // Facades & Core
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
@@ -80,6 +82,15 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale($locale);
         Paginator::defaultView('vendor.pagination.miracle');
         Paginator::defaultSimpleView('vendor.pagination.miracle-simple');
+
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url): MailMessage {
+            return (new MailMessage)
+                ->subject('Verifikasi Akun Anda')
+                ->view('emails.auth.verify-email', [
+                    'notifiable' => $notifiable,
+                    'verificationUrl' => $url,
+                ]);
+        });
 
     
         /*

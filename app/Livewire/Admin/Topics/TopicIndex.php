@@ -57,7 +57,7 @@ class TopicIndex extends Component
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'visibility' => 'required|string|max:50',
-            'status' => 'required|string|max:50',
+            'status' => 'required|in:published,archived,draft',
             'sort_order' => 'nullable|integer|min:0',
         ];
     }
@@ -120,7 +120,7 @@ class TopicIndex extends Component
                 'slug' => Str::slug($this->name),
                 'description' => $this->description,
                 'visibility' => $this->visibility,
-                'status' => $this->status,
+                'status' => $this->normalizeStatus($this->status),
                 'sort_order' => $this->sort_order,
             ]
         );
@@ -153,7 +153,14 @@ class TopicIndex extends Component
             })
             ->when($this->selectedCourse, fn ($q) => $q->where('course_id', $this->selectedCourse->id))
             ->when($this->teacherFilter, fn ($q) => $q->where('teacher_id', $this->teacherFilter))
-            ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
+            ->when($this->statusFilter, function ($q) {
+                if ($this->statusFilter === 'published') {
+                    $q->whereIn('status', ['published', 'active']);
+                    return;
+                }
+
+                $q->where('status', $this->statusFilter);
+            })
             ->orderBy('course_id')
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -212,5 +219,10 @@ class TopicIndex extends Component
             ->max('sort_order');
 
         return max(1, ((int) $lastSortOrder) + 1);
+    }
+
+    private function normalizeStatus(string $status): string
+    {
+        return $status === 'active' ? 'published' : $status;
     }
 }

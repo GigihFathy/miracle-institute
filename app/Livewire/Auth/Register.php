@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
+use Throwable;
 
 class Register extends Component
 {
@@ -51,9 +52,13 @@ class Register extends Component
         }
 
         Auth::login($user);
-        $user->sendEmailVerificationNotification();
-
-        session()->flash('status', __('auth.verification_email_sent'));
+        try {
+            $user->sendEmailVerificationNotification();
+            session()->flash('status', __('auth.verification_email_sent'));
+        } catch (Throwable $exception) {
+            report($exception);
+            session()->flash('warning', __('auth.mail_unavailable'));
+        }
 
         return redirect()->to(localized_route('verification.notice'));
     }

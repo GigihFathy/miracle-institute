@@ -354,13 +354,26 @@
 
                 <div class="flex justify-end gap-2">
                     <button type="button" wire:click="$set('showModal', false)"
-                        class="rounded-xl border px-4 py-2">
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                        class="rounded-xl border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-60">
                         {{ __('admin.sessions.actions.cancel') }}
                     </button>
 
                     <button wire:click="save"
-                        class="admin-primary-button rounded-xl border border-brand-dark/20 px-4 py-2 transition">
-                        {{ __('admin.sessions.actions.save') }}
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                        class="admin-primary-button inline-flex min-w-[9rem] items-center justify-center gap-2 rounded-xl border border-brand-dark/20 px-4 py-2 transition disabled:cursor-not-allowed disabled:opacity-70">
+                        <span wire:loading.remove wire:target="save">
+                            {{ __('admin.sessions.actions.save') }}
+                        </span>
+                        <span wire:loading.inline-flex wire:target="save" class="items-center gap-2">
+                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
+                            </svg>
+                            <span>Menyimpan...</span>
+                        </span>
                     </button>
                 </div>
             </div>

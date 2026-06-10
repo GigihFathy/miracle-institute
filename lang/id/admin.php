@@ -482,7 +482,7 @@ return [
         'status' => [
             'published' => 'Terbit',
             'archived' => 'Diarsipkan',
-            'draft' => 'Draft',
+            'draft' => 'Belum Terbit',
         ],
         'visibility' => [
             'public' => 'Publik',

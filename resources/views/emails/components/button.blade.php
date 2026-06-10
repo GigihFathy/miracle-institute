@@ -7,7 +7,7 @@
     <tr>
         <td>
             <a href="{{ $url }}"
-               style="display:inline-block;background:{{ $color }};color:#ffffff;text-decoration:none;padding:13px 20px;border-radius:14px;font-size:14px;font-weight:800;letter-spacing:.01em;">
+               style="display:inline-block;background:{{ $color }};color:#ffffff;text-decoration:none;padding:14px 22px;border-radius:16px;font-size:14px;font-weight:800;letter-spacing:.01em;box-shadow:0 12px 28px rgba(0,71,119,.18);">
                 {{ $slot }}
             </a>
         </td>

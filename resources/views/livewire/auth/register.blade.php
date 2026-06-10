@@ -4,6 +4,12 @@
         <p class="text-sm text-[#004777]/70">{{ __('auth.register.subtitle') }}</p>
     </div>
 
+    @if (session('warning'))
+        <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            {{ session('warning') }}
+        </div>
+    @endif
+
     <form wire:submit.prevent="submit" class="space-y-4">
         <div>
             <input type="text" required minlength="2" wire:model.debounce.300ms="name"

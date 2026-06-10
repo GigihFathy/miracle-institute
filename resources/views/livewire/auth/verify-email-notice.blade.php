@@ -12,6 +12,12 @@
         </div>
     @endif
 
+    @if (session('warning'))
+        <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            {{ session('warning') }}
+        </div>
+    @endif
+
     <button wire:click="resend" class="w-full rounded-xl bg-[#004777] py-2.5 text-white transition hover:bg-[#004777]/90">
         {{ __('auth.verify_email.submit') }}
     </button>

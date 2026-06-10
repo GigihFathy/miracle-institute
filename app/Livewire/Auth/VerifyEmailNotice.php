@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use Livewire\Component;
+use Throwable;
 
 class VerifyEmailNotice extends Component
 {
@@ -12,9 +13,13 @@ class VerifyEmailNotice extends Component
             return redirect()->to(localized_route('dashboard'));
         }
 
-        auth()->user()->sendEmailVerificationNotification();
-
-        session()->flash('status', __('auth.verification_link_resent'));
+        try {
+            auth()->user()->sendEmailVerificationNotification();
+            session()->flash('status', __('auth.verification_link_resent'));
+        } catch (Throwable $exception) {
+            report($exception);
+            session()->flash('warning', __('auth.mail_unavailable'));
+        }
     }
 
     public function render()
