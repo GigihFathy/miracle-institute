@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'LMS') }} · {{ __('admin.layout.page_title_suffix') }}</title>
+    @include('layouts.partials.seo', [
+        'seoTitle' => config('app.name', 'LMS') . ' · ' . __('admin.layout.page_title_suffix'),
+        'seoDescription' => 'Area admin untuk mengelola konten, pengguna, dan pembelajaran di Miracle Institute.',
+        'seoRobots' => 'noindex, nofollow',
+    ])
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

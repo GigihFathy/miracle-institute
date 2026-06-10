@@ -102,9 +102,9 @@ return [
         ],
 
         'final_cta' => [
-            'title' => 'Ambil Langkah Imanmu Hari Ini',
+            'title' => 'Mulai Perjalananmu Bersama Kami',
             'description' => 'Jangan biarkan kerinduanmu untuk bertumbuh berhenti di sini. Mulailah belajar, perdalam iman, dan berjalan lebih dekat bersama Yesus melalui perjalanan pemuridan yang dirancang untukmu.',
-            'button' => 'Mulai Bertumbuh Sekarang',
+            'button' => 'Saya Mau Ikut',
             'image_alt' => 'Tangan yang memegang sertifikat',
         ],
     ],
