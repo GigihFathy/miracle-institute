@@ -20,9 +20,7 @@ class VideoSessionJoinController extends Controller
 
         $user = $request->user();
         $now = now();
-
-        abort_unless(in_array($videoSession->status, ['scheduled', 'ongoing'], true), 403);
-        abort_unless($now->betweenIncluded($videoSession->start_at, $videoSession->end_at), 403);
+        abort_unless($videoSession->canJoinAt($now), 403);
 
         $activeRole = session('active_role');
 
@@ -30,20 +28,18 @@ class VideoSessionJoinController extends Controller
             $lockKey = "attendance:{$videoSession->id}:{$user->id}";
 
             Cache::lock($lockKey, 10)->block(3, function () use ($request, $user, $videoSession, $now) {
-                Attendance::firstOrCreate(
-                    [
-                        'video_session_id' => $videoSession->id,
-                        'user_id' => $user->id,
-                    ],
-                    [
-                        'status' => $now->lte($videoSession->start_at->copy()->addMinutes(45))
-                            ? 'present'
-                            : 'late',
-                        'check_in_at' => $now,
-                        'clock_out_at' => null,
-                        'ip_address' => $request->ip(),
-                    ]
-                );
+                $attendance = Attendance::query()->firstOrNew([
+                    'video_session_id' => $videoSession->id,
+                    'user_id' => $user->id,
+                ]);
+
+                if (! $attendance->exists || ! $attendance->check_in_at) {
+                    $attendance->status = $videoSession->attendanceStatusAt($now);
+                    $attendance->check_in_at = $now;
+                    $attendance->ip_address = $request->ip();
+                }
+
+                $attendance->save();
             });
         }
 

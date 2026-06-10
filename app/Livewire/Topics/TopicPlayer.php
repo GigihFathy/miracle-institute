@@ -27,6 +27,7 @@ class TopicPlayer extends Component
     public bool $isMentor = false;
     public bool $canOpenMentorWorkspace = false;
     public bool $canStudentInteract = false;
+    public array $videoCompletionUnlocked = [];
 
     public bool $showSessionModal = false;
     public ?string $selectedSessionId = null;
@@ -122,6 +123,17 @@ class TopicPlayer extends Component
             return;
         }
 
+        $activeMaterial = $this->materialsQuery()->find($this->activeMaterialId);
+
+        if (
+            $activeMaterial?->type === 'video' &&
+            $this->extractYoutubeVideoId((string) $activeMaterial->external_url) &&
+            ! ($this->videoCompletionUnlocked[$this->activeMaterialId] ?? false)
+        ) {
+            session()->flash('error', 'Video harus ditonton minimal 70% sebelum bisa diselesaikan.');
+            return;
+        }
+
         $result = $progressService->markMaterialCompleted(auth()->id(), $this->activeMaterialId);
 
         $this->hydrateTopicCompletion();
@@ -132,6 +144,23 @@ class TopicPlayer extends Component
                 ? 'Material selesai. Topik juga dinyatakan completed.'
                 : 'Material selesai. Topik akan completed setelah semua materi dan syarat sesi terpenuhi.'
         );
+    }
+
+    public function unlockVideoCompletion(string $materialId): void
+    {
+        abort_unless($this->canStudentInteract, 403);
+
+        $material = $this->materialsQuery()->find($materialId);
+
+        if (! $material || $material->type !== 'video') {
+            return;
+        }
+
+        if (! $this->extractYoutubeVideoId((string) $material->external_url)) {
+            return;
+        }
+
+        $this->videoCompletionUnlocked[$materialId] = true;
     }
 
     public function syncTopicCompletion(ProgressService $progressService): void
@@ -284,7 +313,7 @@ class TopicPlayer extends Component
         }
 
         if (! $this->canClockOut($session, $attendance)) {
-            session()->flash('error', 'Clock out hanya bisa dilakukan saat session masih aktif.');
+            session()->flash('error', 'Clock out hanya bisa dilakukan mulai 15 menit sebelum sesi berakhir hingga 2 jam setelah sesi selesai.');
 
             return;
         }
@@ -559,7 +588,7 @@ class TopicPlayer extends Component
             $youtubeId = $youtubeId ?: $this->extractYoutubeVideoId((string) $material->external_url);
 
             if ($youtubeId) {
-                return "https://www.youtube.com/embed/{$youtubeId}?rel=0&modestbranding=1";
+                return "https://www.youtube.com/embed/{$youtubeId}?enablejsapi=1&playsinline=1&rel=0&modestbranding=1";
             }
 
             return $this->toGoogleDrivePreviewUrl((string) $material->external_url);
@@ -742,8 +771,6 @@ class TopicPlayer extends Component
             return false;
         }
 
-        $clockOutWindowStart = $session->end_at->copy()->subMinutes(15);
-
-        return now()->betweenIncluded($clockOutWindowStart, $session->end_at);
+        return $session->canClockOutAt(now());
     }
 }

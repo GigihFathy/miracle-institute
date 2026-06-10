@@ -22,7 +22,6 @@ class MaterialIndex extends Component
     use WithFileUploads;
 
     public bool $showModal = false;
-    public bool $uploading = false;
     public array $openTopics = [];
 
     public ?string $editingId = null;
@@ -75,11 +74,6 @@ class MaterialIndex extends Component
                 'max:2048'
             ],
         ];
-    }
-
-    public function updatedMaterialFile(): void
-    {
-        $this->uploading = true;
     }
 
     public function updatedType(): void
@@ -175,7 +169,6 @@ class MaterialIndex extends Component
             );
         } catch (RuntimeException $e) {
             $this->addError('materialFile', 'Upload gagal: ' . $e->getMessage());
-            $this->uploading = false;
             return;
         }
 
@@ -197,7 +190,6 @@ class MaterialIndex extends Component
             Material::create($payload);
         }
 
-        $this->uploading = false;
         $this->resetForm();
         $this->dispatch('materialsUpdated');
 
@@ -291,7 +283,6 @@ class MaterialIndex extends Component
         $this->sort_order = 1;
         $this->type = null;
         $this->showModal = false;
-        $this->uploading = false;
     }
 
     private function nextSortOrderForTopic(?string $topicId): int

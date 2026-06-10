@@ -44,7 +44,7 @@ class JoinSessionButton extends Component
         $now = now();
         $start = Carbon::parse($this->session->start_at);
         $end = Carbon::parse($this->session->end_at);
-        $clockInDeadline = $start->copy()->addMinutes(45);
+        $clockInDeadline = $this->session->clockInClosesAt() ?? $start->copy()->addMinutes(45);
 
         if ($now->lt($start)) {
             $this->stateLabel = 'Scheduled';
@@ -69,14 +69,14 @@ class JoinSessionButton extends Component
         }
 
         $this->clockInDeadlineLabel = $clockInDeadline->format('d M Y, H:i');
-        $clockOutWindowStart = $end->copy()->subMinutes(15);
+        $clockOutWindowStart = $this->session->clockOutOpensAt() ?? $end->copy()->subMinutes(15);
+        $clockOutWindowEnd = $this->session->clockOutClosesAt() ?? $end->copy()->addHours(2);
 
-        $this->canJoin = in_array($this->session->status, ['scheduled', 'ongoing'], true)
-            && $now->betweenIncluded($start, $end);
+        $this->canJoin = $this->session->canJoinAt($now);
 
         $this->canClockOut = (bool) $this->attendance
             && ! $this->attendance->clock_out_at
-            && $now->betweenIncluded($clockOutWindowStart, $end);
+            && $now->betweenIncluded($clockOutWindowStart, $clockOutWindowEnd);
     }
 
     public function joinSession()
@@ -106,7 +106,7 @@ class JoinSessionButton extends Component
         }
 
         if (! $this->canClockOut) {
-            session()->flash('error', 'Clock out hanya bisa dilakukan dalam 15 menit terakhir sebelum sesi berakhir.');
+            session()->flash('error', 'Clock out hanya bisa dilakukan mulai 15 menit sebelum sesi berakhir hingga 2 jam setelah sesi selesai.');
             return;
         }
 

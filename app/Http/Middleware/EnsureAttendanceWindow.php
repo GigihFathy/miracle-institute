@@ -16,11 +16,7 @@ class EnsureAttendanceWindow
             $session = VideoSession::findOrFail($session);
         }
 
-        $now = now();
-        $windowStart = $session->start_at->copy()->subMinutes(15);
-        $windowEnd = $session->end_at;
-
-        if ($now->lt($windowStart) || $now->gt($windowEnd)) {
+        if (! $session->canJoinAt(now())) {
             abort(403, 'Attendance window is not active.');
         }
 

@@ -108,7 +108,7 @@ class AttendanceButton extends Component
         $now = now();
 
         if (! $this->canClockOut($now)) {
-            session()->flash('error', 'Clock-out hanya tersedia dalam 15 menit terakhir sebelum sesi berakhir.');
+            session()->flash('error', 'Clock-out hanya tersedia mulai 15 menit sebelum sesi berakhir hingga 2 jam setelah sesi selesai.');
             return;
         }
 
@@ -132,7 +132,7 @@ class AttendanceButton extends Component
         }
 
         if (!$this->attendance) {
-            $this->canJoin = $this->canClockIn(now());
+            $this->canJoin = $this->session->canJoinAt(now());
             $this->canClockOut = false;
 
             $this->stateLabel = match (true) {
@@ -168,10 +168,7 @@ class AttendanceButton extends Component
             return null;
         }
 
-        $startWindow = $this->session->start_at->copy()->addMinutes(45);
-        $endWindow = $this->session->end_at->copy()->subMinutes(15);
-
-        return $startWindow->lt($endWindow) ? $startWindow : $endWindow;
+        return $this->session->clockInClosesAt();
     }
 
     private function resolveClockOutDeadline(): ?Carbon
@@ -180,16 +177,7 @@ class AttendanceButton extends Component
             return null;
         }
 
-        return $this->session->end_at->copy()->subMinutes(15);
-    }
-
-    private function canClockIn(Carbon $moment): bool
-    {
-        if (!$this->clockInDeadline) {
-            return false;
-        }
-
-        return $moment->betweenIncluded($this->session->start_at, $this->clockInDeadline);
+        return $this->session->clockOutOpensAt();
     }
 
     private function canClockOut(Carbon $moment): bool
@@ -198,7 +186,7 @@ class AttendanceButton extends Component
             return false;
         }
 
-        return $moment->betweenIncluded($this->clockOutDeadline, $this->session->end_at);
+        return $this->session->canClockOutAt($moment);
     }
 
     public function render()

@@ -199,8 +199,14 @@
                     </button>
                     <button wire:click="save"
                             wire:loading.attr="disabled"
+                            wire:target="save"
                             class="admin-primary-button rounded-xl border border-brand-dark/20 px-4 py-2 transition">
-                        {{ $uploading ? __('admin.materials.actions.uploading') : __('admin.materials.actions.save') }}
+                        <span wire:loading.remove wire:target="save">
+                            {{ __('admin.materials.actions.save') }}
+                        </span>
+                        <span wire:loading wire:target="save">
+                            {{ __('admin.materials.actions.uploading') }}
+                        </span>
                     </button>
                 </div>
             </div>

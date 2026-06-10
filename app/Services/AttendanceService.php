@@ -14,28 +14,19 @@ class AttendanceService
         $session = VideoSession::with('topic')->findOrFail($sessionId);
         $now = Carbon::now();
 
-        $windowStart = $session->start_at->copy()->subMinutes(15);
-        $windowEnd = $session->end_at->copy();
-
-        if ($now->lt($windowStart)) {
+        if (! $session->canJoinAt($now)) {
             throw ValidationException::withMessages([
-                'attendance' => 'Absensi belum dibuka.',
-            ]);
-        }
-
-        if ($now->gt($windowEnd)) {
-            throw ValidationException::withMessages([
-                'attendance' => 'Absensi sudah ditutup.',
+                'attendance' => 'Sesi Zoom tidak tersedia untuk diikuti saat ini.',
             ]);
         }
 
         return Attendance::updateOrCreate(
             [
-                'session_id' => $sessionId,
+                'video_session_id' => $sessionId,
                 'user_id' => $userId,
             ],
             [
-                'status' => $now->gt($session->start_at) ? 'late' : 'present',
+                'status' => $session->attendanceStatusAt($now),
                 'check_in_at' => $now,
                 'ip_address' => request()->ip(),
             ]
