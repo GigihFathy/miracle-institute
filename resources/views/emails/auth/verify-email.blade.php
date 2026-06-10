@@ -6,8 +6,6 @@
     'icon' => 'VK',
     'heroTitle' => 'Aktifkan akun Anda untuk mulai belajar',
     'heroText' => 'Satu langkah lagi untuk mengakses materi, sesi, dan fitur belajar di platform.',
-    'heroImage' => asset('images/decor/verification.png'),
-    'heroImageAlt' => 'Ilustrasi verifikasi akun',
 ])
     <p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#334155;">
         Halo <strong>{{ $notifiable->name }}</strong>, terima kasih sudah mendaftar di {{ config('app.name') }}.

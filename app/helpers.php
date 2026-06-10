@@ -96,17 +96,6 @@ if (! function_exists('localized_route')) {
         mixed $parameters = [],
         bool $absolute = true
     ): string {
-        $supportedLocales = ['en', 'id'];
-
-        $locale = app()->getLocale();
-        if (! is_string($locale) || ! in_array($locale, $supportedLocales, true)) {
-            $locale = session('locale', config('app.fallback_locale', config('app.locale', 'en')));
-        }
-
-        if (! in_array($locale, $supportedLocales, true)) {
-            $locale = config('app.fallback_locale', 'en');
-        }
-
         if (
             $parameters instanceof Model ||
             $parameters instanceof UrlRoutable ||
@@ -122,31 +111,6 @@ if (! function_exists('localized_route')) {
 
         unset($parameters['locale']);
 
-        $url = route($routeName, $parameters, $absolute);
-
-        if ($locale !== 'en') {
-            return $url;
-        }
-
-        $parts = parse_url($url);
-
-        if ($parts === false) {
-            return $url;
-        }
-
-        $path = $parts['path'] ?? '/';
-        $path = $path === '/' ? '/en' : '/en' . $path;
-
-        if (! $absolute) {
-            return $path . (isset($parts['query']) ? '?' . $parts['query'] : '');
-        }
-
-        $scheme = $parts['scheme'] ?? 'http';
-        $host = $parts['host'] ?? '';
-        $port = isset($parts['port']) ? ':' . $parts['port'] : '';
-        $query = isset($parts['query']) ? '?' . $parts['query'] : '';
-        $fragment = isset($parts['fragment']) ? '#' . $parts['fragment'] : '';
-
-        return $scheme . '://' . $host . $port . $path . $query . $fragment;
+        return route($routeName, $parameters, $absolute);
     }
 }

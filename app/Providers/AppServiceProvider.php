@@ -73,13 +73,7 @@ class AppServiceProvider extends ServiceProvider
         | Internationalization & Localization
         |--------------------------------------------------------------------------
         */
-        $locale = config('app.locale', config('app.fallback_locale', 'en'));
-
-        if (! in_array($locale, ['en', 'id'], true)) {
-            $locale = config('app.fallback_locale', 'en');
-        }
-
-        Carbon::setLocale($locale);
+        Carbon::setLocale(config('app.locale', 'id'));
         Paginator::defaultView('vendor.pagination.miracle');
         Paginator::defaultSimpleView('vendor.pagination.miracle-simple');
 

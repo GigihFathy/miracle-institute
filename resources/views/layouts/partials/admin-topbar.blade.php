@@ -6,7 +6,6 @@
             </div>
 
             <div class="flex items-center gap-3">
-                @livewire('shared.language-switcher')
                 <form method="POST" action="{{ localized_route('logout') }}">
                     @csrf
                     <button class="rounded-xl border border-brand-dark/20 bg-transparent px-3 py-2 text-sm text-brand-dark transition hover:bg-brand/10">

@@ -39,7 +39,7 @@ class EmailVerificationTest extends TestCase
             ->set('password', 'password123')
             ->set('password_confirmation', 'password123')
             ->call('submit')
-            ->assertRedirect(route('verification.notice', ['locale' => 'id']));
+            ->assertRedirect(route('verification.notice'));
 
         $user = User::where('email', 'budi@example.test')->first();
 
@@ -66,7 +66,7 @@ class EmailVerificationTest extends TestCase
             ->set('password', 'password123')
             ->set('remember', true)
             ->call('submit')
-            ->assertRedirect(route('login', ['locale' => 'id']));
+            ->assertRedirect(route('login'));
 
         $this->assertGuest();
         Notification::assertSentTo($user, VerifyEmail::class);
@@ -78,9 +78,9 @@ class EmailVerificationTest extends TestCase
             'email_verified_at' => null,
         ]);
 
-        $response = $this->actingAs($user)->get(route('dashboard', ['locale' => 'id']));
+        $response = $this->actingAs($user)->get(route('dashboard'));
 
-        $response->assertRedirect(route('verification.notice', ['locale' => 'id']));
+        $response->assertRedirect(route('verification.notice'));
     }
 
     public function test_signed_verification_link_marks_email_as_verified(): void
@@ -98,7 +98,6 @@ class EmailVerificationTest extends TestCase
             'verification.verify',
             now()->addMinutes(60),
             [
-                'locale' => 'id',
                 'id' => $user->getKey(),
                 'hash' => sha1($user->getEmailForVerification()),
             ],
@@ -106,7 +105,7 @@ class EmailVerificationTest extends TestCase
 
         $response = $this->actingAs($user)->get($url);
 
-        $response->assertRedirect(route('redirect.by.role', ['locale' => 'id']));
+        $response->assertRedirect(route('redirect.by.role'));
         $this->assertNotNull($user->fresh()->email_verified_at);
     }
 }

@@ -78,6 +78,15 @@ Route::get('/id/{path?}', function (Request $request, ?string $path = null) {
     return redirect()->to(($target ?: '/') . ($query ? '?' . $query : ''), 301);
 })->where('path', '.*');
 
+Route::get('/en/{path?}', function (Request $request, ?string $path = null) {
+    $target = '/' . ltrim((string) $path, '/');
+    $target = $target === '/' ? '' : $target;
+
+    $query = $request->getQueryString();
+
+    return redirect()->to(($target ?: '/') . ($query ? '?' . $query : ''), 301);
+})->where('path', '.*');
+
 /*
 |--------------------------------------------------------------------------
 | Non-localized Google OAuth callbacks
@@ -551,7 +560,3 @@ $registerLocalizedRoutes = function (bool $named): void {
 };
 
 Route::group([], fn () => $registerLocalizedRoutes(true));
-
-Route::prefix('{locale}')
-    ->where(['locale' => 'en'])
-    ->group(fn () => $registerLocalizedRoutes(false));

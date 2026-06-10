@@ -36,7 +36,6 @@
 
             <div class="flex items-center gap-3">
                 @auth
-                    @livewire('shared.language-switcher')
                     @livewire('shared.profile-dropdown')
                 @endauth
 
