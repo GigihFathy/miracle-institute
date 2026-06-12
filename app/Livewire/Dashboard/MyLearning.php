@@ -14,11 +14,18 @@ class MyLearning extends Component
 {
     use WithTableState;
 
-    public $tab = 'courses';
+    public string $view = 'overview';
     public $searchCourse = '';
     public $filterCourse = 'all';
     public $searchCertificate = '';
     public $sortCertificate = 'latest';
+    public function mount(): void
+    {
+        $view = (string) request()->query('view', 'overview');
+        $this->view = in_array($view, ['overview', 'courses', 'certificates', 'sessions'], true)
+            ? $view
+            : 'overview';
+    }
 
     public function resetCourseFilters()
     {
@@ -53,7 +60,7 @@ class MyLearning extends Component
 
         $hasEnrollments = CourseEnrollment::where('user_id', $user->id)->exists();
 
-        $enrollments = CourseEnrollment::with(['course.studyProgram', 'course.topics'])
+        $filteredEnrollments = CourseEnrollment::with(['course.studyProgram', 'course.topics'])
             ->where('user_id', $user->id)
             ->latest()
             ->get()
@@ -100,7 +107,12 @@ class MyLearning extends Component
             ->take(5)
             ->get();
 
-        $certificates = Certificate::with(['course', 'user.courseEnrollments.course'])
+        $calendarSessions = VideoSession::with('topic.course')
+            ->whereHas('topic', fn ($q) => $q->whereIn('course_id', $courseIds))
+            ->orderBy('start_at')
+            ->get();
+
+        $filteredCertificates = Certificate::with(['course', 'user.courseEnrollments.course'])
             ->where('user_id', $user->id)
             ->when(filled($this->searchCertificate), function ($query) {
                 $query->where(function ($certificateQuery) {
@@ -112,15 +124,20 @@ class MyLearning extends Component
                 });
             })
             ->orderBy('issued_at', $this->sortCertificate === 'oldest' ? 'asc' : 'desc')
-            ->take(6)
             ->get();
+
+        $coursePreview = $filteredEnrollments->take(6)->values();
+        $certificatePreview = $filteredCertificates->take(6)->values();
 
         return view('livewire.dashboard.my-learning', compact(
             'summary',
             'hasEnrollments',
-            'enrollments',
+            'filteredEnrollments',
+            'filteredCertificates',
+            'coursePreview',
+            'certificatePreview',
             'upcomingSessions',
-            'certificates'
+            'calendarSessions'
         ))->layout('layouts.learning');
     }
 }

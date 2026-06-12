@@ -7,6 +7,7 @@ use App\Models\Assessment;
 use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Course;
+use App\Models\CourseEnrollment;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use App\Services\CourseService;
@@ -47,19 +48,27 @@ class CourseShow extends Component
     public int $topicsPerPage = 6;
 
     public string $activeTopicTab = 'general';
+    public ?string $selectedMentorTopicId = null;
+    public ?string $selectedMentorMaterialId = null;
+    public ?string $selectedStudentTopicId = null;
+    public ?string $selectedStudentMaterialId = null;
 
     public Collection $mentoredTopics;
     public bool $hasMentoredTopics = false;
+    public Collection $mentorStudents;
 
     protected $paginationTheme = 'tailwind';
 
     public function mount(string $slug): void
     {
         $this->mentoredTopics = collect();
+        $this->mentorStudents = collect();
 
         $this->course = Course::query()
             ->with([
                 'studyProgram',
+                'enrollments.user',
+                'enrollments.topicProgresses',
                 'topics' => function ($q) {
                     $q->with([
                         'materials',
@@ -118,11 +127,49 @@ class CourseShow extends Component
         }
 
         $this->hydrateMentoredTopics();
+        $this->hydrateMentorStudents();
+
+        if ($this->mentoredTopics->isNotEmpty()) {
+            $this->selectedMentorTopicId = $this->mentoredTopics->first()->id;
+            $this->selectedMentorMaterialId = $this->mentoredTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+        }
+
+        if ($this->course->topics->isNotEmpty()) {
+            $this->selectedStudentTopicId = $this->course->topics->first()->id;
+            $this->selectedStudentMaterialId = $this->course->topics->first()?->materials->sortBy('sort_order')->first()?->id;
+        }
+
+        $requestedTab = request()->query('tab');
+        $requestedTopicId = request()->query('topic');
+
+        if (auth()->check() && session('active_role') === 'disciples') {
+            $this->activeTopicTab = 'overview';
+        } elseif (auth()->check() && session('active_role') === 'student') {
+            $this->activeTopicTab = 'overview';
+        }
+
+        if (is_string($requestedTab) && $requestedTab !== '') {
+            $this->setTopicTab($requestedTab);
+        }
+
+        if (is_string($requestedTopicId) && $requestedTopicId !== '') {
+            if (auth()->check() && session('active_role') === 'disciples') {
+                $this->selectMentorTopic($requestedTopicId);
+            } else {
+                $this->selectStudentTopic($requestedTopicId);
+            }
+        }
     }
 
     public function setTopicTab(string $tab): void
     {
-        if (!in_array($tab, ['general', 'mentored'], true)) {
+        $allowedTabs = auth()->check() && session('active_role') === 'disciples'
+            ? ['overview', 'topics', 'students']
+            : (auth()->check() && session('active_role') === 'student'
+                ? ['overview', 'topics']
+                : ['general', 'mentored']);
+
+        if (!in_array($tab, $allowedTabs, true)) {
             return;
         }
 
@@ -134,6 +181,8 @@ class CourseShow extends Component
     {
         $this->mentoredTopics = collect();
         $this->hasMentoredTopics = false;
+        $this->selectedMentorTopicId = null;
+        $this->selectedMentorMaterialId = null;
 
         if (!auth()->check() || session('active_role') !== 'disciples') {
             return;
@@ -156,6 +205,62 @@ class CourseShow extends Component
             ->values();
 
         $this->hasMentoredTopics = $this->mentoredTopics->isNotEmpty();
+
+        if ($this->hasMentoredTopics) {
+            $this->selectedMentorTopicId = $this->mentoredTopics->first()->id;
+            $this->selectedMentorMaterialId = $this->mentoredTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+        }
+    }
+
+    public function selectMentorTopic(string $topicId): void
+    {
+        if ($this->mentoredTopics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
+            $this->selectedMentorTopicId = $topicId;
+            $topic = $this->mentoredTopics->firstWhere('id', $topicId);
+            $this->selectedMentorMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
+        }
+    }
+
+    public function selectMentorMaterial(string $materialId): void
+    {
+        $topic = $this->mentoredTopics->firstWhere('id', $this->selectedMentorTopicId);
+
+        if ($topic && $topic->materials->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
+            $this->selectedMentorMaterialId = $materialId;
+        }
+    }
+
+    public function selectStudentTopic(string $topicId): void
+    {
+        if ($this->course->topics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
+            $this->selectedStudentTopicId = $topicId;
+            $topic = $this->course->topics->firstWhere('id', $topicId);
+            $this->selectedStudentMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
+        }
+    }
+
+    public function selectStudentMaterial(string $materialId): void
+    {
+        $topic = $this->course->topics->firstWhere('id', $this->selectedStudentTopicId);
+
+        if ($topic && $topic->materials->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
+            $this->selectedStudentMaterialId = $materialId;
+        }
+    }
+
+    public function hydrateMentorStudents(): void
+    {
+        $this->mentorStudents = collect();
+
+        if (!auth()->check() || session('active_role') !== 'disciples') {
+            return;
+        }
+
+        $this->mentorStudents = $this->course->enrollments
+            ->filter(fn (CourseEnrollment $enrollment) => $enrollment->user !== null)
+            ->unique('user_id')
+            ->sortBy(fn (CourseEnrollment $enrollment) => Str::lower($enrollment->user?->name ?? ''))
+            ->values();
     }
 
     private function buildAssessmentMeta(): void
@@ -476,7 +581,9 @@ class CourseShow extends Component
 
     public function getPaginatedTopicsProperty(): LengthAwarePaginator
     {
-        $topics = $this->activeTopicTab === 'mentored'
+        $isMentorWorkspace = auth()->check() && session('active_role') === 'disciples';
+
+        $topics = ($isMentorWorkspace && $this->activeTopicTab === 'topics') || $this->activeTopicTab === 'mentored'
             ? $this->mentoredTopics->values()
             : $this->filteredTopics;
 
@@ -533,7 +640,15 @@ class CourseShow extends Component
     {
         $activeTab = $this->activeTopicTab;
 
-        if ($activeTab === 'mentored' && (!auth()->check() || session('active_role') !== 'disciples')) {
+        if (auth()->check() && session('active_role') === 'disciples') {
+            if (!in_array($activeTab, ['overview', 'topics', 'students'], true)) {
+                $activeTab = 'overview';
+            }
+        } elseif (auth()->check() && session('active_role') === 'student') {
+            if (!in_array($activeTab, ['overview', 'topics'], true)) {
+                $activeTab = 'overview';
+            }
+        } elseif ($activeTab === 'mentored' && (!auth()->check() || session('active_role') !== 'disciples')) {
             $activeTab = 'general';
         }
 
@@ -545,6 +660,7 @@ class CourseShow extends Component
             'certificateEligibility' => $this->certificateEligibility,
             'mentoredTopics' => $this->mentoredTopics,
             'hasMentoredTopics' => $this->hasMentoredTopics,
+            'mentorStudents' => $this->mentorStudents,
             'activeTab' => $activeTab,
         ])->layout('layouts.learning');
     }

@@ -115,8 +115,11 @@
                         @error('topic_id') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     @endif
 
-                    <label class="mb-1 block text-xs font-semibold text-slate-600">Nama Material <span class="text-rose-500">*</span></label>
-                    <input wire:model.live="name" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.materials.form.name_placeholder') }}">
+                    <div class="mb-1 flex items-center justify-between gap-3">
+                        <label class="block text-xs font-semibold text-slate-600">Nama Material <span class="text-rose-500">*</span></label>
+                        <span class="text-[11px] text-slate-400">{{ mb_strlen($name ?? '') }}/50</span>
+                    </div>
+                    <input wire:model.live="name" maxlength="50" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.materials.form.name_placeholder') }}">
                     @error('name') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
 
                     <label class="mb-1 block text-xs font-semibold text-slate-600">Tipe Material <span class="text-rose-500">*</span></label>

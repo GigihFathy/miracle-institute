@@ -206,9 +206,12 @@
                     </div>
 
                     <div>
-                        <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Nama Topik <span class="text-rose-500">*</span>
-                        </label>
+                        <div class="mb-1 flex items-center justify-between gap-3">
+                            <label class="block text-xs font-semibold text-slate-600">
+                                Nama Topik <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[11px] text-slate-400">{{ mb_strlen($name ?? '') }}/70</span>
+                        </div>
                         <input wire:model="name" maxlength="70" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.name_placeholder') }}">
                         @error('name') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>

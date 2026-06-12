@@ -246,9 +246,12 @@
                     </div>
 
                     <div>
-                        <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Judul Kursus <span class="text-rose-500">*</span>
-                        </label>
+                        <div class="mb-1 flex items-center justify-between gap-3">
+                            <label class="block text-xs font-semibold text-slate-600">
+                                Judul Kursus <span class="text-rose-500">*</span>
+                            </label>
+                            <span class="text-[11px] text-slate-400">{{ mb_strlen($title ?? '') }}/150</span>
+                        </div>
                         <input wire:model="title" maxlength="150" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.courses.form.title_placeholder') }}">
                         @error('title') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>

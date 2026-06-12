@@ -130,7 +130,10 @@
                         @endif
 
                         <div class="space-y-2">
-                            <label class="text-sm font-semibold text-[#004777]">{{ __('general.profile.fields.name') }}</label>
+                            <div class="flex items-center justify-between gap-3">
+                                <label class="text-sm font-semibold text-[#004777]">{{ __('general.profile.fields.name') }}</label>
+                                <span class="text-[11px] text-slate-400">{{ mb_strlen($name ?? '') }}/35</span>
+                            </div>
                             <input wire:model.live.debounce.300ms="name" type="text" maxlength="35"
                                    aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}"
                                    aria-describedby="name-error"

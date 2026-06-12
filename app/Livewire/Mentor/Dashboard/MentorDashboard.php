@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use App\Models\TopicUser;
+use App\Models\VideoSession;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -15,6 +16,13 @@ class MentorDashboard extends Component
     use WithPagination;
 
     public string $courseSearch = '';
+    public string $view = 'overview';
+
+    public function mount(): void
+    {
+        $view = request()->query('view', 'overview');
+        $this->view = in_array($view, ['overview', 'sessions'], true) ? $view : 'overview';
+    }
 
     public function updatedCourseSearch(): void
     {
@@ -104,12 +112,35 @@ class MentorDashboard extends Component
             ->take(5)
             ->get();
 
+        $upcomingSessions = $topicIds->isEmpty()
+            ? collect()
+            : VideoSession::query()
+                ->with(['topic.course'])
+                ->whereIn('topic_id', $topicIds)
+                ->whereNotNull('start_at')
+                ->where('start_at', '>=', now())
+                ->orderBy('start_at')
+                ->take(3)
+                ->get();
+
+        $calendarSessions = $topicIds->isEmpty()
+            ? collect()
+            : VideoSession::query()
+                ->with(['topic.course'])
+                ->whereIn('topic_id', $topicIds)
+                ->whereNotNull('start_at')
+                ->orderBy('start_at')
+                ->get();
+
         return view('livewire.mentor.dashboard.mentor-dashboard', [
+            'view' => $this->view,
             'mentorTopicsCount' => $topics->count(),
             'mentorMaterialsCount' => $mentorMaterialsCount,
             'mentorStudentsCount' => $mentorStudentsCount,
             'managedCourses' => $managedCourses,
             'latestMaterials' => $latestMaterials,
+            'upcomingSessions' => $upcomingSessions,
+            'calendarSessions' => $calendarSessions,
         ])->layout('layouts.learning');
     }
 }

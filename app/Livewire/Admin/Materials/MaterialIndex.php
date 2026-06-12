@@ -61,7 +61,7 @@ class MaterialIndex extends Component
     {
         return [
             'topic_id' => ['required', 'exists:topics,id'],
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:50'],
             'type' => ['required', Rule::in(Material::TYPES)],
             'visibility' => ['required', Rule::in(Material::VISIBILITIES)],
             'status' => ['required', Rule::in(Material::STATUSES)],

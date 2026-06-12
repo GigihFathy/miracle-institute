@@ -112,11 +112,11 @@ return [
     'my_learning' => [
         'page_title' => 'Pembelajaran Saya',
         'overview_title' => 'Ringkasan Pembelajaran Saya',
-        'overview_description' => 'Lanjutkan perjalanan belajarmu dan pantau course yang diikuti serta sertifikat yang sudah didapat.',
+        'overview_description' => 'Lanjutkan perjalanan belajarmu dan pantau kursus yang diikuti serta sertifikat yang sudah didapat.',
 
         'metrics' => [
-            'courses_enrolled' => 'Course Diikuti',
-            'courses_enrolled_hint' => 'Course yang sedang Anda ikuti',
+            'courses_enrolled' => 'Kursus Diikuti',
+            'courses_enrolled_hint' => 'Kursus yang sedang Anda ikuti',
             'topics_completed' => 'Topik Diselesaikan',
             'topics_completed_hint' => 'Topik yang telah Anda selesaikan',
             'certificates' => 'Sertifikat',
@@ -125,28 +125,28 @@ return [
 
         'tabs' => [
             'aria_label' => 'Bagian pembelajaran',
-            'courses' => 'Course',
+            'courses' => 'Kursus',
             'session' => 'Sesi',
             'certificate' => 'Sertifikat',
         ],
 
         'courses' => [
-            'title' => 'Course yang sedang berjalan',
-            'search_placeholder' => 'Cari course...',
+            'title' => 'Kursus yang sedang berjalan',
+            'search_placeholder' => 'Cari kursus...',
             'filters' => [
                 'all' => 'Semua',
                 'in_progress' => 'Sedang Berjalan',
                 'completed' => 'Selesai',
             ],
-            'no_description' => 'Tidak ada deskripsi yang tersedia untuk course ini.',
+            'no_description' => 'Tidak ada deskripsi yang tersedia untuk kursus ini.',
             'progress_text' => ':completed / :total topik diselesaikan',
             'reset_filters' => 'Reset Filter',
-            'browse_courses' => 'Telusuri Course',
+            'browse_courses' => 'Telusuri Kursus',
             'empty' => [
-                'filtered_title' => 'Tidak ada course yang cocok',
+                'filtered_title' => 'Tidak ada kursus yang cocok',
                 'filtered_description' => 'Coba ubah kata kunci pencarian atau filter progress agar kursusnya muncul kembali.',
-                'no_courses_title' => 'Belum ada course',
-                'no_courses_description' => 'Kamu belum mengikuti course apa pun.',
+                'no_courses_title' => 'Belum ada kursus',
+                'no_courses_description' => 'Kamu belum mengikuti kursus apa pun.',
             ],
         ],
 
@@ -157,12 +157,12 @@ return [
 
         'certificates' => [
             'title' => 'Sertifikat',
-            'default_course_certificate' => 'Sertifikat Course',
+            'default_course_certificate' => 'Sertifikat Kursus',
             'number_label' => 'Nomor Sertifikat',
             'issued_label' => 'Diterbitkan',
             'download' => 'Unduh Sertifikat',
             'empty_title' => 'Belum Ada Sertifikat',
-            'empty_description' => 'Sertifikat akan tersedia setelah kamu menyelesaikan course.',
+            'empty_description' => 'Sertifikat akan tersedia setelah kamu menyelesaikan kursus.',
         ],
     ],
 
@@ -248,7 +248,7 @@ return [
         'mentor_mode' => 'Mode Mentor',
         'guest_notice' => 'Masuk untuk menyimpan progres belajar, mengerjakan assessment, dan mengakses sertifikat saat sudah tersedia.',
 
-        'course_access' => 'Progres Course',
+        'course_access' => 'Progres Kursus',
         'course_access_description' => 'Pantau kesiapan assessment dan sertifikat dari sini.',
 
         'assessment_label' => 'Assessment',
@@ -284,7 +284,7 @@ return [
         'assessment_pending' => 'Menunggu progres',
         'assessment_completed' => 'Selesai',
 
-        'course_topics' => 'Topik Course',
+        'course_topics' => 'Topik Kursus',
         'topics_count' => '{0} Tidak Ada Topik|{1} :count Topik|[2,*] :count Topik',
         'completed_count' => ':count Selesai',
 

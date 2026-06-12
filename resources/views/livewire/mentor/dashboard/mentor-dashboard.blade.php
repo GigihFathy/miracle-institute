@@ -1,24 +1,210 @@
 @php
     use Illuminate\Support\Str;
+
+    $calendarSessionItems = ($calendarSessions ?? collect())->map(function ($session) {
+        return [
+            'date' => $session->start_at?->format('Y-m-d'),
+            'title' => $session->title,
+            'topic' => $session->topic?->name ?? '-',
+            'course' => $session->topic?->course?->title ?? '-',
+            'datetime' => $session->start_at?->format('d M Y H:i') ?? '-',
+            'status' => ucfirst($session->status),
+            'url' => $session->topic?->slug
+                ? localized_route('mentor.topics.show', $session->topic->slug)
+                : null,
+        ];
+    });
+    $calendarWeekdays = __('admin.dashboard.calendar.weekdays');
+    $calendarMonths = __('admin.dashboard.calendar.months');
 @endphp
 
 <div class="min-h-screen bg-white px-4 pb-16 pt-8 text-[#0f172a] sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
     <main class="mx-auto max-w-6xl space-y-8">
-        <section class="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 px-6 py-9 sm:px-10 sm:py-12">
-            <div class="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#35A7FF]/10 blur-3xl" aria-hidden="true"></div>
+        <section class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+            <div class="relative overflow-hidden rounded-[2rem] bg-[#eef8ff] px-7 py-9 sm:px-10 sm:py-12">
+                <div class="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#35A7FF]/10 blur-3xl" aria-hidden="true"></div>
 
-            <div class="relative max-w-3xl">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-[#35A7FF]">
-                    {{ __('mentor.dashboard.page_title') }}
-                </p>
-                <h1 class="mt-3 text-3xl font-bold leading-tight text-[#004777] sm:text-5xl">
-                    {{ __('mentor.dashboard.page_title') }}
-                </h1>
-                <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                    {{ __('mentor.dashboard.page_subtitle') }}
-                </p>
+                <div class="relative max-w-2xl">
+                    <p class="text-sm font-bold uppercase tracking-[0.16em] text-[#35A7FF]">
+                        {{ __('mentor.dashboard.welcome.eyebrow') }}
+                    </p>
+                    <h1 class="mt-3 text-3xl font-bold leading-tight text-[#004777] sm:text-4xl">
+                        {{ __('mentor.dashboard.welcome.title', ['name' => auth()->user()->name]) }}
+                    </h1>
+                    <p class="mt-4 max-w-xl text-base leading-7 text-slate-600">
+                        {{ __('mentor.dashboard.welcome.subtitle') }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative overflow-hidden rounded-[2rem] border border-[#d9ecfb] bg-white px-7 py-8 sm:px-8 sm:py-10">
+                <div class="flex h-full flex-col">
+                    <div>
+                        <h2 class="text-2xl font-bold leading-tight text-[#004777] sm:text-3xl">
+                            {{ __('mentor.dashboard.sessions.title') }}
+                        </h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-500">
+                            {{ __('mentor.dashboard.sessions.subtitle') }}
+                        </p>
+                    </div>
+
+                    <div class="mt-6 flex-1 space-y-3">
+                        @forelse($upcomingSessions as $session)
+                            <a
+                                href="{{ localized_route('mentor.topics.show', $session->topic?->slug) }}"
+                                class="block rounded-2xl border border-slate-200 bg-[#f8fbff] p-4 transition hover:border-[#35A7FF] hover:bg-white"
+                            >
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="truncate text-base font-bold text-[#004777] lg:line-clamp-2 lg:whitespace-normal">
+                                            {{ $session->topic?->name }}
+                                        </p>
+                                        <p class="mt-1 truncate text-sm text-slate-500 lg:line-clamp-1 lg:whitespace-normal">
+                                            {{ $session->topic?->course?->title }}
+                                        </p>
+                                    </div>
+
+                                    <div class="shrink-0 rounded-xl bg-white px-3 py-2 text-right shadow-sm">
+                                        <p class="text-xs font-semibold uppercase tracking-wide text-[#35A7FF]">
+                                            {{ $session->start_at?->format('d M') }}
+                                        </p>
+                                        <p class="mt-1 text-sm font-bold text-[#004777]">
+                                            {{ $session->start_at?->format('H:i') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="flex h-full min-h-48 items-center justify-center rounded-2xl border border-dashed border-[#d7dcef] bg-[#f8fbff] px-6 text-center">
+                                <div>
+                                    <p class="text-base font-semibold text-[#004777]">{{ __('mentor.dashboard.sessions.title') }}</p>
+                                    <p class="mt-2 text-sm leading-6 text-[#5f6785]">{{ __('mentor.dashboard.sessions.empty') }}</p>
+                                </div>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <div class="mt-5">
+                        <a
+                            href="{{ localized_route('mentor.dashboard', ['view' => 'sessions']) }}"
+                            class="inline-flex items-center gap-2 rounded-xl border border-[#004777]/15 bg-white px-4 py-2 text-sm font-semibold text-[#004777] transition hover:bg-[#f4faff]"
+                        >
+                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18h-10.5A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2ZM3.5 8.5v6.75c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25V8.5h-13Zm1.25-3A1.25 1.25 0 0 0 3.5 6.75V7h13v-.25a1.25 1.25 0 0 0-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                            </svg>
+                            {{ __('mentor.dashboard.sessions.view_more') }}
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
+
+        @if($view === 'sessions')
+            <section class="space-y-4 rounded-[1.75rem] border border-slate-200 bg-white p-5 sm:p-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#004777] sm:text-3xl">{{ __('mentor.dashboard.sessions.calendar_title') }}</h2>
+                        <p class="mt-1 text-sm text-slate-500">{{ __('mentor.dashboard.sessions.calendar_subtitle') }}</p>
+                    </div>
+
+                    <a
+                        href="{{ localized_route('mentor.dashboard') }}"
+                        class="inline-flex items-center rounded-xl border border-[#004777]/15 bg-white px-4 py-2 text-sm font-semibold text-[#004777] transition hover:bg-[#f4faff]"
+                    >
+                        {{ __('mentor.dashboard.sessions.back') }}
+                    </a>
+                </div>
+
+                <div
+                    x-data="calendarComponent(@js($calendarSessionItems), @js($calendarWeekdays), @js($calendarMonths))"
+                    x-init="init()"
+                    class="space-y-4"
+                >
+                    <div class="flex items-center justify-between">
+                        <button @click="prevMonth()" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-[#004777] transition hover:bg-slate-50" aria-label="Bulan sebelumnya">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M11.78 4.22a.75.75 0 0 1 0 1.06L7.06 10l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <div class="font-semibold text-[#004777]" x-text="monthYear"></div>
+                        <button @click="nextMonth()" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-[#004777] transition hover:bg-slate-50" aria-label="Bulan berikutnya">
+                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M8.22 4.22a.75.75 0 0 1 1.06 0l5.25 5.25a.75.75 0 0 1 0 1.06l-5.25 5.25a.75.75 0 0 1-1.06-1.06L12.94 10 8.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-7 text-center text-xs font-medium text-slate-500">
+                        <template x-for="day in weekdays" :key="day">
+                            <div x-text="day"></div>
+                        </template>
+                    </div>
+
+                    <div class="grid grid-cols-7 gap-2 text-sm">
+                        <template x-for="blank in blanks" :key="'blank-' + blank">
+                            <div></div>
+                        </template>
+
+                        <template x-for="day in days" :key="day">
+                            <button
+                                type="button"
+                                @click="selectDay(day)"
+                                :class="isSelected(day)
+                                    ? 'border-[#35A7FF] bg-[#eef8ff] text-[#004777]'
+                                    : (hasSession(day)
+                                        ? 'border-sky-200 bg-sky-100 text-slate-700 hover:border-sky-300 hover:bg-sky-100'
+                                        : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50')"
+                                class="relative h-16 rounded-xl border p-2 text-left transition sm:h-20"
+                            >
+                                <div x-text="day" class="text-xs font-medium"></div>
+
+                                <template x-if="sessionCount(day) > 0">
+                                    <div class="absolute bottom-2 left-2 right-2 flex items-center justify-start sm:justify-between">
+                                        <div class="h-2 w-2 rounded-full bg-blue-500 sm:hidden"></div>
+                                        <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' sesi'"></span>
+                                    </div>
+                                </template>
+                            </button>
+                        </template>
+                    </div>
+
+                    <div class="rounded-2xl bg-[#f8fbff] p-4">
+                        <div class="text-sm font-semibold text-[#004777]" x-text="selectedLabel"></div>
+
+                        <div class="mt-4 space-y-3" x-show="selectedSessions.length > 0">
+                            <template x-for="session in selectedSessions" :key="session.datetime + session.title">
+                                <a
+                                    :href="session.url || '#'"
+                                    :class="session.url ? 'hover:border-[#35A7FF] hover:bg-[#fdfefe]' : 'cursor-default'"
+                                    class="block rounded-xl border border-slate-200 bg-white p-4 transition"
+                                >
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="truncate font-medium text-slate-900 lg:whitespace-normal" x-text="session.title"></div>
+                                            <div class="mt-1 flex flex-col gap-1 text-xs text-slate-500 sm:block">
+                                                <span class="block max-w-[180px] truncate lg:inline lg:max-w-none lg:align-middle" x-text="session.topic"></span>
+                                                <span class="hidden lg:inline"> • </span>
+                                                <span class="block max-w-[180px] truncate lg:inline lg:max-w-none" x-text="session.course"></span>
+                                            </div>
+                                            <div class="mt-1 text-xs text-slate-400" x-text="session.datetime"></div>
+                                        </div>
+                                        <span class="shrink-0 self-start rounded bg-slate-100 px-2 py-1 text-[11px] text-slate-600" x-text="session.status"></span>
+                                    </div>
+                                </a>
+                            </template>
+                        </div>
+
+                        <div x-show="selectedDate && selectedSessions.length === 0" class="mt-4 text-sm text-slate-500">
+                            {{ __('mentor.dashboard.sessions.empty_selected') }}
+                        </div>
+
+                        <div x-show="!selectedDate" class="mt-4 text-sm text-slate-500">
+                            {{ __('mentor.dashboard.sessions.click_day') }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
 
         <section class="grid gap-4 sm:grid-cols-3">
             <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
@@ -226,3 +412,79 @@
         </div>
     </main>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('calendarComponent', (sessions, weekdays, monthNames) => ({
+            current: new Date(),
+            sessions,
+            weekdays,
+            monthNames,
+            days: [],
+            blanks: [],
+            monthYear: '',
+            selectedDate: '',
+            selectedSessions: [],
+            selectedLabel: '',
+
+            init() {
+                this.generate();
+            },
+
+            generate() {
+                const year = this.current.getFullYear();
+                const month = this.current.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                this.blanks = Array.from({ length: firstDay }, (_, index) => index);
+                this.days = Array.from({ length: daysInMonth }, (_, index) => index + 1);
+                this.monthYear = `${this.monthNames[month]} ${year}`;
+
+                if (this.selectedDate) {
+                    const selected = new Date(this.selectedDate);
+                    if (selected.getFullYear() !== year || selected.getMonth() !== month) {
+                        this.selectedDate = '';
+                        this.selectedSessions = [];
+                        this.selectedLabel = '';
+                    }
+                }
+            },
+
+            formatDate(day) {
+                const month = String(this.current.getMonth() + 1).padStart(2, '0');
+                return `${this.current.getFullYear()}-${month}-${String(day).padStart(2, '0')}`;
+            },
+
+            hasSession(day) {
+                return this.sessions.some(session => session.date === this.formatDate(day));
+            },
+
+            sessionCount(day) {
+                return this.sessions.filter(session => session.date === this.formatDate(day)).length;
+            },
+
+            selectDay(day) {
+                this.selectedDate = this.formatDate(day);
+                this.selectedSessions = this.sessions.filter(session => session.date === this.selectedDate);
+                this.selectedLabel = `${day} ${this.monthNames[this.current.getMonth()]} ${this.current.getFullYear()}`;
+            },
+
+            isSelected(day) {
+                return this.selectedDate === this.formatDate(day);
+            },
+
+            prevMonth() {
+                this.current = new Date(this.current.getFullYear(), this.current.getMonth() - 1, 1);
+                this.generate();
+            },
+
+            nextMonth() {
+                this.current = new Date(this.current.getFullYear(), this.current.getMonth() + 1, 1);
+                this.generate();
+            },
+        }));
+    });
+</script>
+@endpush

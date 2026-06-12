@@ -127,8 +127,11 @@
                 <form wire:submit.prevent="saveMaterial" enctype="multipart/form-data" class="space-y-4">
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="sm:col-span-2">
-                            <label class="text-xs font-medium">Name</label>
-                            <input wire:model="materialName" class="mentor-workspace-field mt-1">
+                            <div class="flex items-center justify-between gap-3">
+                                <label class="text-xs font-medium">Name</label>
+                                <span class="text-[11px] text-slate-400">{{ mb_strlen($materialName ?? '') }}/50</span>
+                            </div>
+                            <input wire:model="materialName" maxlength="50" class="mentor-workspace-field mt-1">
                         </div>
 
                         <div>

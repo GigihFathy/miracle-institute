@@ -5,6 +5,24 @@ return [
         'page_title' => 'Dashboard Mentor',
         'page_subtitle' => 'Ringkasan singkat untuk mengelola topic, material, dan progres pembelajaran.',
 
+        'welcome' => [
+            'eyebrow' => 'Selamat Datang',
+            'title' => 'Halo, :name',
+            'subtitle' => 'Pantau topik yang kamu bimbing dan cek sesi mengajar terdekat dari sini.',
+        ],
+
+        'sessions' => [
+            'title' => 'Jadwal Mengajar',
+            'subtitle' => 'Sesi terdekat yang akan kamu bawakan.',
+            'view_more' => 'Lihat Jadwal',
+            'calendar_title' => 'Jadwal Mengajar',
+            'calendar_subtitle' => 'Pilih bulan dan tanggal untuk melihat semua sesi mengajar.',
+            'back' => 'Kembali',
+            'empty' => 'Belum ada sesi mengajar terjadwal.',
+            'empty_selected' => 'Tidak ada sesi pada tanggal ini.',
+            'click_day' => 'Klik tanggal pada kalender untuk melihat sesi yang berlangsung pada hari itu.',
+        ],
+
         'stats' => [
             'topics' => 'Topik',
             'topics_hint' => 'Topik yang kamu kelola',

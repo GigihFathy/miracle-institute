@@ -26,11 +26,14 @@ class TopicWorkspace extends Component
 
         abort_unless($this->canAccessTopic($this->topic), 403);
 
+        $requestedTab = (string) request()->query('tab', $this->tab);
         $allowedTabs = array_keys($this->availableTabs());
 
-        if (!in_array($this->tab, $allowedTabs, true)) {
-            $this->tab = $allowedTabs[0] ?? 'overview';
+        if (!in_array($requestedTab, $allowedTabs, true)) {
+            $requestedTab = $allowedTabs[0] ?? 'overview';
         }
+
+        $this->tab = $requestedTab;
     }
 
     public function setTab(string $tab): void

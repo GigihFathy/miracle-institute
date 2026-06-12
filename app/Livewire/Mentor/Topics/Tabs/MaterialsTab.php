@@ -133,7 +133,7 @@ class MaterialsTab extends Component
         );
 
         $this->validate([
-            'materialName' => ['required', 'string', 'max:255'],
+            'materialName' => ['required', 'string', 'max:50'],
             'materialType' => ['required', Rule::in($this->availableMaterialTypes())],
             'materialStatus' => ['required', Rule::in(Material::STATUSES)],
             'materialSortOrder' => ['required', 'integer', 'min:0'],
