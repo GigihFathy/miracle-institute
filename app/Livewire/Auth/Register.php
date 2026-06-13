@@ -31,6 +31,10 @@ class Register extends Component
 
     public function updated($propertyName): void
     {
+        if ($propertyName === 'name') {
+            $this->name = mb_substr((string) $this->name, 0, 35);
+        }
+
         $this->validateOnly($propertyName);
     }
 

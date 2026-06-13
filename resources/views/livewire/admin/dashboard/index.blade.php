@@ -164,11 +164,11 @@
                 </div>
 
                 <div class="grid grid-cols-7 gap-2 text-sm">
-                    <template x-for="blank in blanks" :key="blank">
+                    <template x-for="blank in blanks" :key="`${monthKey}-blank-${blank}`">
                         <div></div>
                     </template>
 
-                    <template x-for="day in days" :key="day">
+                    <template x-for="day in days" :key="`${monthKey}-day-${day}`">
                         <button
                             type="button"
                             @click="selectDay(day)"
@@ -249,12 +249,14 @@
                 monthNames,
                 days: [],
                 blanks: [],
+                monthKey: '',
                 monthYear: '',
                 selectedDate: '',
                 selectedSessions: [],
                 selectedLabel: 'Belum ada tanggal dipilih',
 
                 init() {
+                    this.current.setDate(1);
                     this.generate();
                 },
 
@@ -268,7 +270,12 @@
                     this.blanks = Array.from({ length: firstDay });
                     this.days = Array.from({ length: totalDays }, (_, i) => i + 1);
 
+                    this.monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
                     this.monthYear = `${this.monthNames[month] ?? ''} ${year}`.trim();
+
+                    if (this.selectedDate && !this.selectedDate.startsWith(`${this.monthKey}-`)) {
+                        this.clearSelection();
+                    }
                 },
 
                 hasSession(day) {
@@ -313,11 +320,13 @@
                 },
 
                 prevMonth() {
+                    this.current.setDate(1);
                     this.current.setMonth(this.current.getMonth() - 1);
                     this.generate();
                 },
 
                 nextMonth() {
+                    this.current.setDate(1);
                     this.current.setMonth(this.current.getMonth() + 1);
                     this.generate();
                 }

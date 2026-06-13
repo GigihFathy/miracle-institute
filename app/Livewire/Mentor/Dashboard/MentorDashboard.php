@@ -112,16 +112,15 @@ class MentorDashboard extends Component
             ->take(5)
             ->get();
 
-        $upcomingSessions = $topicIds->isEmpty()
-            ? collect()
+        $nearestUpcomingSession = $topicIds->isEmpty()
+            ? null
             : VideoSession::query()
                 ->with(['topic.course'])
                 ->whereIn('topic_id', $topicIds)
                 ->whereNotNull('start_at')
                 ->where('start_at', '>=', now())
                 ->orderBy('start_at')
-                ->take(3)
-                ->get();
+                ->first();
 
         $calendarSessions = $topicIds->isEmpty()
             ? collect()
@@ -139,7 +138,7 @@ class MentorDashboard extends Component
             'mentorStudentsCount' => $mentorStudentsCount,
             'managedCourses' => $managedCourses,
             'latestMaterials' => $latestMaterials,
-            'upcomingSessions' => $upcomingSessions,
+            'nearestUpcomingSession' => $nearestUpcomingSession,
             'calendarSessions' => $calendarSessions,
         ])->layout('layouts.learning');
     }

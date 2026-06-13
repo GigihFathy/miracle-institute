@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This project is set up for manual Docker-based deployment with no CI/CD.
+This project supports Docker-based deployment and can be wired into CI/CD with GitHub Actions without a container registry.
 
 ## What is included
 
@@ -80,6 +80,59 @@ docker compose exec app php artisan config:cache
 docker compose exec app php artisan view:cache
 ```
 
+## Recommended CI/CD flow
+
+Use GitHub Actions to:
+
+1. run automated checks
+2. connect to the VPS over SSH
+3. clone or update the repository on the server
+4. run `docker compose up -d --build`
+5. run Laravel migrations and cache warmup
+
+The repository already includes an example workflow at `.github/workflows/cicd.yml`.
+
+### Required GitHub secrets
+
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_SSH_KEY`
+
+### Required server files
+
+The recommended deploy path is:
+
+```bash
+/opt/miracle-institute
+```
+
+Keep the production `.env` file in that folder.
+
+Create or update `.env` with at least:
+
+```env
+APP_PORT=8082
+```
+
+If you already have services on `8080` and `8081`, `8082` is a safe default based on the current server snapshot.
+
+### First server bootstrap
+
+Create the folder once:
+
+```bash
+mkdir -p /opt/miracle-institute
+```
+
+Then let GitHub Actions populate or update the repository there on each deploy.
+
+### Port notes
+
+- This stack only publishes the web service port from `nginx`.
+- MySQL is internal-only in this compose file, so it does not consume a host port.
+- The default public port is `8082` to avoid collisions with existing services already using `8080` and `8081`.
+- If you later place host nginx, Caddy, or Traefik in front of the app, proxy traffic to `127.0.0.1:8082`.
+
 ## Useful commands
 
 View logs:
@@ -111,7 +164,7 @@ docker compose down
 
 ## HTTPS
 
-This stack exposes nginx on port 80. For HTTPS, put the server behind:
+This stack exposes the container on port 80 and publishes it to host port `8082` by default. For HTTPS, put the server behind:
 
 - a host-level nginx reverse proxy with Let's Encrypt, or
 - a gateway like Traefik or Caddy

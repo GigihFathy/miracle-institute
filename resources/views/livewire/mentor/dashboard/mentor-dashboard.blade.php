@@ -35,6 +35,32 @@
                         {{ __('mentor.dashboard.welcome.subtitle') }}
                     </p>
                 </div>
+
+                <div class="relative mt-8 grid gap-4 sm:grid-cols-3">
+                    <div class="rounded-2xl border border-white/80 bg-white/80 p-5 backdrop-blur">
+                        <div class="text-xs font-bold uppercase tracking-wide text-slate-500">
+                            {{ __('mentor.dashboard.stats.topics') }}
+                        </div>
+                        <div class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorTopicsCount }}</div>
+                        <p class="mt-2 text-sm text-slate-500">{{ __('mentor.dashboard.stats.topics_hint') }}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-white/80 bg-white/80 p-5 backdrop-blur">
+                        <div class="text-xs font-bold uppercase tracking-wide text-slate-500">
+                            {{ __('mentor.dashboard.stats.materials') }}
+                        </div>
+                        <div class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorMaterialsCount }}</div>
+                        <p class="mt-2 text-sm text-slate-500">{{ __('mentor.dashboard.stats.materials_hint') }}</p>
+                    </div>
+
+                    <div class="rounded-2xl border border-white/80 bg-white/80 p-5 backdrop-blur">
+                        <div class="text-xs font-bold uppercase tracking-wide text-slate-500">
+                            {{ __('mentor.dashboard.stats.students') }}
+                        </div>
+                        <div class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorStudentsCount }}</div>
+                        <p class="mt-2 text-sm text-slate-500">{{ __('mentor.dashboard.stats.students_hint') }}</p>
+                    </div>
+                </div>
             </div>
 
             <div class="relative overflow-hidden rounded-[2rem] border border-[#d9ecfb] bg-white px-7 py-8 sm:px-8 sm:py-10">
@@ -49,39 +75,39 @@
                     </div>
 
                     <div class="mt-6 flex-1 space-y-3">
-                        @forelse($upcomingSessions as $session)
+                        @if($nearestUpcomingSession)
                             <a
-                                href="{{ localized_route('mentor.topics.show', $session->topic?->slug) }}"
+                                href="{{ localized_route('mentor.topics.show', $nearestUpcomingSession->topic?->slug) }}"
                                 class="block rounded-2xl border border-slate-200 bg-[#f8fbff] p-4 transition hover:border-[#35A7FF] hover:bg-white"
                             >
                                 <div class="flex items-start justify-between gap-3">
                                     <div class="min-w-0">
                                         <p class="truncate text-base font-bold text-[#004777] lg:line-clamp-2 lg:whitespace-normal">
-                                            {{ $session->topic?->name }}
+                                            {{ $nearestUpcomingSession->topic?->name }}
                                         </p>
                                         <p class="mt-1 truncate text-sm text-slate-500 lg:line-clamp-1 lg:whitespace-normal">
-                                            {{ $session->topic?->course?->title }}
+                                            {{ $nearestUpcomingSession->topic?->course?->title }}
                                         </p>
                                     </div>
 
                                     <div class="shrink-0 rounded-xl bg-white px-3 py-2 text-right shadow-sm">
                                         <p class="text-xs font-semibold uppercase tracking-wide text-[#35A7FF]">
-                                            {{ $session->start_at?->format('d M') }}
+                                            {{ $nearestUpcomingSession->start_at?->format('d M') }}
                                         </p>
                                         <p class="mt-1 text-sm font-bold text-[#004777]">
-                                            {{ $session->start_at?->format('H:i') }}
+                                            {{ $nearestUpcomingSession->start_at?->format('H:i') }}
                                         </p>
                                     </div>
                                 </div>
                             </a>
-                        @empty
+                        @else
                             <div class="flex h-full min-h-48 items-center justify-center rounded-2xl border border-dashed border-[#d7dcef] bg-[#f8fbff] px-6 text-center">
                                 <div>
                                     <p class="text-base font-semibold text-[#004777]">{{ __('mentor.dashboard.sessions.title') }}</p>
                                     <p class="mt-2 text-sm leading-6 text-[#5f6785]">{{ __('mentor.dashboard.sessions.empty') }}</p>
                                 </div>
                             </div>
-                        @endforelse
+                        @endif
                     </div>
 
                     <div class="mt-5">
@@ -205,61 +231,6 @@
                 </div>
             </section>
         @endif
-
-        <section class="grid gap-4 sm:grid-cols-3">
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">
-                            {{ __('mentor.dashboard.stats.topics') }}
-                        </p>
-                        <p class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorTopicsCount }}</p>
-                    </div>
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-[#004777]">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                            <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 18.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                </div>
-                <p class="mt-3 text-sm text-slate-500">{{ __('mentor.dashboard.stats.topics_hint') }}</p>
-            </div>
-
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">
-                            {{ __('mentor.dashboard.stats.materials') }}
-                        </p>
-                        <p class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorMaterialsCount }}</p>
-                    </div>
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-[#004777]">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M7 3h7l5 5v13H7V3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                            <path d="M14 3v5h5M10 13h6M10 17h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                </div>
-                <p class="mt-3 text-sm text-slate-500">{{ __('mentor.dashboard.stats.materials_hint') }}</p>
-            </div>
-
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <p class="text-xs font-bold uppercase tracking-wide text-slate-500">
-                            {{ __('mentor.dashboard.stats.students') }}
-                        </p>
-                        <p class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorStudentsCount }}</p>
-                    </div>
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-[#004777]">
-                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM17 8a3 3 0 0 1 0 6M20 20v-1a3 3 0 0 0-2-2.83" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                </div>
-                <p class="mt-3 text-sm text-slate-500">{{ __('mentor.dashboard.stats.students_hint') }}</p>
-            </div>
-        </section>
 
         <div class="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
             <section class="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-7">

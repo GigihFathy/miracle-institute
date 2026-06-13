@@ -16,7 +16,7 @@
                 <span class="text-sm font-medium text-[#004777]">{{ __('general.profile.fields.name') }}</span>
                 <span class="text-[11px] text-[#004777]/45">{{ mb_strlen($name ?? '') }}/35</span>
             </div>
-            <input type="text" required minlength="2" maxlength="35" wire:model.debounce.300ms="name"
+            <input type="text" required minlength="2" maxlength="35" wire:model.live.debounce.300ms="name"
                 placeholder="{{ __('auth.register.name_placeholder') }}" class="w-full rounded-xl border border-[#004777]/15 bg-[#f4faff] px-4 py-2.5 text-[#004777] outline-none transition placeholder:text-[#004777]/35 focus:border-[#35A7FF] focus:bg-white">
                 @error('name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>

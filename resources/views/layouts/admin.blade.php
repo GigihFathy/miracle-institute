@@ -114,6 +114,92 @@
     </style>
 
     @livewireScripts
+    <script>
+        (() => {
+            function setupAdminSidebar() {
+                const sidebar = document.getElementById('admin-mobile-sidebar');
+                const overlay = document.getElementById('admin-mobile-sidebar-overlay');
+
+                if (!sidebar || !overlay) {
+                    return;
+                }
+
+                const openButtons = document.querySelectorAll('[data-admin-sidebar-open]');
+                const closeButtons = document.querySelectorAll('[data-admin-sidebar-close]');
+                const toggleButtons = document.querySelectorAll('[data-admin-sidebar-toggle]');
+
+                const openSidebar = () => {
+                    overlay.style.display = 'block';
+                    sidebar.style.display = 'flex';
+
+                    requestAnimationFrame(() => {
+                        sidebar.style.transform = 'translateX(0)';
+                    });
+
+                    document.body.classList.add('overflow-hidden');
+                };
+
+                const closeSidebar = () => {
+                    overlay.style.display = 'none';
+                    sidebar.style.transform = 'translateX(-100%)';
+                    document.body.classList.remove('overflow-hidden');
+
+                    window.setTimeout(() => {
+                        if (sidebar.style.transform !== 'translateX(0)') {
+                            sidebar.style.display = 'none';
+                        }
+                    }, 300);
+                };
+
+                const toggleSidebar = () => {
+                    const isOpen = sidebar.style.display !== 'none' && sidebar.style.transform === 'translateX(0)';
+
+                    if (isOpen) {
+                        closeSidebar();
+                        return;
+                    }
+
+                    openSidebar();
+                };
+
+                window.__adminSidebarOpen = openSidebar;
+                window.__adminSidebarClose = closeSidebar;
+                window.__adminSidebarToggle = toggleSidebar;
+
+                openButtons.forEach((button) => {
+                    button.addEventListener('click', openSidebar);
+                });
+
+                closeButtons.forEach((button) => {
+                    button.addEventListener('click', closeSidebar);
+                });
+
+                toggleButtons.forEach((button) => {
+                    button.addEventListener('click', toggleSidebar);
+                });
+
+                window.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        closeSidebar();
+                    }
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 1024) {
+                        closeSidebar();
+                    }
+                });
+
+                closeSidebar();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupAdminSidebar, { once: true });
+            } else {
+                setupAdminSidebar();
+            }
+        })();
+    </script>
     @stack('scripts')
 </body>
 </html>

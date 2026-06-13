@@ -1,6 +1,6 @@
 @php
     $generalRoutes = [
-        ['label' => __('general.navigation.dashboard'), 'route' => 'explore.dashboard'],
+        ['label' => 'Home', 'route' => 'explore.dashboard'],
         ['label' => __('general.navigation.courses'), 'route' => 'courses.index'],
     ];
 
@@ -21,7 +21,7 @@
                     <span class="sr-only">{{ config('app.name', 'LMS') }}</span>
                 </a>
 
-                <div class="hidden items-center gap-5 text-sm md:flex">
+                <div class="hidden items-center gap-5 text-sm sm:flex">
                     @foreach($generalRoutes as $item)
                         <a href="{{ localized_route($item['route']) }}" class="{{ $navClass($item['route']) }}">
                             {{ $item['label'] }}
@@ -41,15 +41,25 @@
 
                 @guest
                     <a href="{{ localized_route('login') }}"
-                       class="hidden rounded-xl border px-3 py-2 text-sm hover:bg-slate-50 sm:block">
+                       class="rounded-xl border px-3 py-2 text-sm hover:bg-slate-50">
                         {{ __('general.navigation.login') }}
                     </a>
                 @endguest
             </div>
         </div>
 
-        <div class="pb-3 lg:hidden">
-            @livewire('shared.topbar-course-search')
+        <div class="space-y-3 pb-3 lg:hidden">
+            <div class="flex items-center gap-4 overflow-x-auto text-sm sm:hidden">
+                @foreach($generalRoutes as $item)
+                    <a href="{{ localized_route($item['route']) }}" class="shrink-0 {{ $navClass($item['route']) }}">
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            </div>
+
+            <div class="lg:hidden">
+                @livewire('shared.topbar-course-search')
+            </div>
         </div>
     </div>
 </header>

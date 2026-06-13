@@ -88,6 +88,11 @@ class TopicIndex extends Component
         $this->sort_order = $this->nextSortOrderForCourse($this->course_id);
     }
 
+    public function updatedName($value): void
+    {
+        $this->name = mb_substr((string) $value, 0, 70);
+    }
+
     public function edit(string $id): void
     {
         $row = Topic::findOrFail($id);

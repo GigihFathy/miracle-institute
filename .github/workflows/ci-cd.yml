@@ -1,0 +1,108 @@
+name: CI CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, intl, pdo_mysql, dom, gd, zip
+          coverage: none
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Prepare Laravel environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite
+        shell: bash
+
+      - name: Run database migrations
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          CACHE_STORE: database
+          SESSION_DRIVER: database
+          QUEUE_CONNECTION: sync
+        run: php artisan migrate --force
+
+      - name: Run PHPUnit
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          CACHE_STORE: database
+          SESSION_DRIVER: database
+          QUEUE_CONNECTION: sync
+        run: php artisan test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 30m
+          script: |
+            set -eu
+            DEPLOY_PATH="/opt/miracle-institute"
+            REPO_URL="https://github.com/TazkieCT/miracle-institute.git"
+
+            if docker compose version >/dev/null 2>&1; then
+              DOCKER_COMPOSE="docker compose"
+            elif command -v docker-compose >/dev/null 2>&1; then
+              DOCKER_COMPOSE="docker-compose"
+            else
+              echo "Docker Compose is not installed on the server."
+              exit 1
+            fi
+
+            mkdir -p "$DEPLOY_PATH"
+
+            if [ ! -d "$DEPLOY_PATH/.git" ]; then
+              git clone "$REPO_URL" "$DEPLOY_PATH"
+            fi
+
+            cd "$DEPLOY_PATH"
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+
+            $DOCKER_COMPOSE build app nginx
+            $DOCKER_COMPOSE rm -sf app queue-worker scheduler nginx || true
+            $DOCKER_COMPOSE up -d --remove-orphans
+            $DOCKER_COMPOSE exec -T app php artisan migrate --force
+            $DOCKER_COMPOSE exec -T app php artisan config:cache
+            $DOCKER_COMPOSE exec -T app php artisan view:cache

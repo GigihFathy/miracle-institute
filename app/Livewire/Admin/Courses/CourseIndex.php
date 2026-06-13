@@ -64,8 +64,10 @@ class CourseIndex extends Component
 
     public function updatedTitle($value): void
     {
+        $this->title = mb_substr((string) $value, 0, 150);
+
         if (!$this->editingId) {
-            $this->slug = Str::slug($value);
+            $this->slug = Str::slug($this->title);
         }
     }
 
