@@ -129,7 +129,12 @@ class MyLearning extends Component
         $coursePreview = $filteredEnrollments->take(6)->values();
         $certificatePreview = $filteredCertificates->take(6)->values();
 
+        $showAllCourses = $this->view === 'courses';
+        $showAllCertificates = $this->view === 'certificates';
+        $showAllSessions = $this->view === 'sessions';
+
         return view('livewire.dashboard.my-learning', compact(
+            'view',
             'summary',
             'hasEnrollments',
             'filteredEnrollments',
@@ -137,7 +142,10 @@ class MyLearning extends Component
             'coursePreview',
             'certificatePreview',
             'upcomingSessions',
-            'calendarSessions'
+            'calendarSessions',
+            'showAllCourses',
+            'showAllCertificates',
+            'showAllSessions'
         ))->layout('layouts.learning');
     }
 }
