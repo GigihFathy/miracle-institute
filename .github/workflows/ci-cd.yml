@@ -74,6 +74,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 30m
           script: |
             set -eu
             DEPLOY_PATH="/opt/miracle-institute"
@@ -100,6 +101,7 @@ jobs:
             git pull --ff-only origin main
 
             $DOCKER_COMPOSE build app nginx
+            $DOCKER_COMPOSE rm -sf app queue-worker scheduler nginx || true
             $DOCKER_COMPOSE up -d --remove-orphans
             $DOCKER_COMPOSE exec -T app php artisan migrate --force
             $DOCKER_COMPOSE exec -T app php artisan config:cache
