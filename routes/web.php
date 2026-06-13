@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\GoogleIntegrationController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseThumbnailController;
 use App\Http\Controllers\VideoSessionJoinController;
+use App\Models\User;
 
 
 
@@ -58,7 +59,6 @@ use App\Services\RoleService;
 use Google\Client as GoogleClient;
 
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -207,21 +207,6 @@ $registerLocalizedRoutes = function (bool $named): void {
         $nameRoute(Route::get('/email/verify', VerifyEmailNotice::class), 'verification.notice');
 
         $nameRoute(
-            Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-                $request->fulfill();
-
-                event(new Verified($request->user()));
-
-                return redirect()->to(localized_route('redirect.by.role'))
-                    ->with('success', __('auth.email_verified_success'));
-            })->middleware([
-                'signed',
-                'throttle:6,1',
-            ]),
-            'verification.verify'
-        );
-
-        $nameRoute(
             Route::post('/email/verification-notification', function (Request $request) {
                 if ($request->user()->hasVerifiedEmail()) {
                     return back()->with('status', __('auth.email_already_verified'));
@@ -234,6 +219,34 @@ $registerLocalizedRoutes = function (bool $named): void {
             'verification.send'
         );
     });
+
+    $nameRoute(
+        Route::get('/email/verify/{id}/{hash}', function (Request $request, string $id, string $hash) {
+            $user = User::query()->findOrFail($id);
+
+            abort_unless(
+                hash_equals(sha1($user->getEmailForVerification()), $hash),
+                403
+            );
+
+            if (! $user->hasVerifiedEmail()) {
+                $user->markEmailAsVerified();
+                event(new Verified($user));
+            }
+
+            if (! Auth::check() || (string) Auth::id() !== (string) $user->getKey()) {
+                Auth::login($user);
+                $request->session()->regenerate();
+            }
+
+            return redirect()->to(localized_route('home'))
+                ->with('success', __('auth.email_verified_success'));
+        })->middleware([
+            'signed',
+            'throttle:6,1',
+        ]),
+        'verification.verify'
+    );
 
         /*
         |--------------------------------------------------------------------------
