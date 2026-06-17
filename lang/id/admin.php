@@ -15,7 +15,7 @@ return [
                 'hint' => 'Pengguna terdaftar',
             ],
             'courses' => [
-                'label' => 'Kursus',
+                'label' => 'Course',
                 'hint' => 'Pelajaran tersedia',
             ],
             'topics' => [
@@ -81,7 +81,7 @@ return [
 
         'common' => [
             'no_topic' => 'Tidak Ada Topik',
-            'no_course' => 'Tidak Ada Kursus',
+            'no_course' => 'Tidak Ada Course',
         ],
     ],
 
@@ -353,10 +353,10 @@ return [
     ],
 
     'courses' => [
-        'page_title' => 'Kursus',
+        'page_title' => 'Course',
         'page_subtitle' => 'Halaman utama kursus. Detail topik, materi, sesi, assessment, dan sertifikat dibuka dari sini.',
         'actions' => [
-            'create' => '+ Kursus Baru',
+            'create' => '+ Course Baru',
             'manage_thumbnails' => 'Kelola Thumbnail',
             'topics' => 'Topik',
             'materials' => 'Materi',
@@ -375,7 +375,7 @@ return [
         ],
         'per_page' => '{1} :count / halaman|[2,*] :count / halaman',
         'table' => [
-            'course' => 'Kursus',
+            'course' => 'Course',
             'program' => 'Program',
             'topics' => 'Topik',
             'enrollments' => 'Enrollment',
@@ -390,8 +390,8 @@ return [
         'empty' => 'Tidak ada data.',
         'confirm_delete' => 'Hapus kursus ini?',
         'modal' => [
-            'create_title' => 'Kursus Baru',
-            'edit_title' => 'Edit Kursus',
+            'create_title' => 'Course Baru',
+            'edit_title' => 'Edit Course',
         ],
         'form' => [
             'select_program' => 'Pilih program',
@@ -410,12 +410,12 @@ return [
     ],
 
     'course_thumbnails' => [
-        'page_title' => 'Thumbnail Kursus',
+        'page_title' => 'Thumbnail Course',
         'page_subtitle' => 'Upload dan kelola template thumbnail reusable untuk kursus.',
         'confirm_delete' => 'Hapus template thumbnail ini?',
         'empty' => 'Belum ada template thumbnail.',
         'actions' => [
-            'back_to_courses' => 'Kembali ke Kursus',
+            'back_to_courses' => 'Kembali ke Course',
             'upload' => 'Upload Thumbnail',
             'uploading' => 'Mengunggah...',
             'delete' => 'Hapus',
@@ -453,7 +453,7 @@ return [
             'save' => 'Simpan',
         ],
         'stats' => [
-            'courses' => 'Kursus',
+            'courses' => 'Course',
             'topics' => 'Topik',
             'materials' => 'Materi',
             'sessions' => 'Sesi',
@@ -466,7 +466,7 @@ return [
             'all_status' => 'Semua status',
         ],
         'table' => [
-            'course' => 'Kursus',
+            'course' => 'Course',
             'topic' => 'Topik',
             'teacher' => 'Pengajar',
             'order' => 'Urutan',
@@ -601,7 +601,7 @@ return [
             'cancelled' => 'sesi dibatalkan manual',
         ],
         'table' => [
-            'course' => 'Kursus',
+            'course' => 'Course',
             'title' => 'Judul',
             'schedule' => 'Jadwal',
             'status' => 'Status',
@@ -651,7 +651,7 @@ return [
             'all_status' => 'Semua status',
         ],
         'types' => [
-            'course' => 'Kursus',
+            'course' => 'Course',
             'topic' => 'Topik',
         ],
         'status' => [
@@ -661,7 +661,7 @@ return [
         ],
         'table' => [
             'certificate' => 'Sertifikat',
-            'course_topic' => 'Kursus / Topik',
+            'course_topic' => 'Course / Topik',
             'type' => 'Tipe',
             'issued' => 'Diterbitkan',
             'status' => 'Status',
@@ -750,7 +750,7 @@ return [
             'draft' => 'Draft',
         ],
         'table' => [
-            'course' => 'Kursus',
+            'course' => 'Course',
             'assessment' => 'Assessment',
             'questions' => 'Q',
             'grade' => 'Nilai',
@@ -787,7 +787,7 @@ return [
             'save' => 'Simpan',
         ],
         'stats' => [
-            'course' => 'Kursus',
+            'course' => 'Course',
             'questions' => 'Bank Soal',
             'attempts' => 'Percobaan',
             'passing_grade' => 'Passing Grade',
@@ -823,7 +823,7 @@ return [
         'dashboard' => 'Dashboard',
         'study_programs' => 'Study Program',
         'learning' => 'Learning',
-        'courses' => 'Kursus',
+        'courses' => 'Course',
         'topics' => 'Topik',
         'materials' => 'Materi',
         'sessions' => 'Sesi',

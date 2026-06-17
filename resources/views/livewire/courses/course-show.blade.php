@@ -15,7 +15,7 @@
     $mentorTabs = [
         'overview' => 'Ringkasan',
         'topics' => 'Topik',
-        'students' => 'Siswa',
+        'students' => 'Murid',
     ];
     $studentTabs = [
         'overview' => 'Ringkasan',
@@ -105,7 +105,7 @@
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $mentorMaterialsCount }}</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Siswa</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Murid</div>
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $mentorStudentsCount }}</div>
                     </div>
                 </div>
@@ -460,7 +460,7 @@
                     <div class="mentor-workspace-panel">
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
-                                <h2 class="mentor-workspace-heading">Ringkasan Kursus</h2>
+                                <h2 class="mentor-workspace-heading">Ringkasan Course</h2>
                                 <p class="mentor-workspace-subheading">
                                     {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
                                 </p>
@@ -485,7 +485,7 @@
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentorSessionsCount }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Siswa</div>
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Murid</div>
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentorStudentsCount }}</div>
                             </div>
                         </div>
@@ -613,7 +613,7 @@
                 <section class="mentor-workspace-panel">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 class="mentor-workspace-heading">Siswa</h2>
+                            <h2 class="mentor-workspace-heading">Murid</h2>
                             <p class="mentor-workspace-subheading">Daftar peserta kursus dalam tampilan hanya baca.</p>
                         </div>
                     </div>
@@ -623,7 +623,7 @@
                             <table class="min-w-full text-sm">
                                 <thead class="bg-[var(--mentor-primary)]">
                                     <tr class="text-left">
-                                        <th class="px-5 py-4 font-bold text-white">Siswa</th>
+                                        <th class="px-5 py-4 font-bold text-white">Murid</th>
                                         <th class="px-5 py-4 font-bold text-white">Email</th>
                                         <th class="px-5 py-4 font-bold text-white">Progres</th>
                                         <th class="px-5 py-4 font-bold text-white">Enrolled</th>
@@ -837,7 +837,7 @@
                         wire:click="confirmEnroll"
                         class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f]"
                     >
-                        Daftar Kursus
+                        Daftar Course
                     </button>
                 </div>
             </div>

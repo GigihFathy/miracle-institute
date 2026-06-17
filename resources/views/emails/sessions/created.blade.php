@@ -9,7 +9,7 @@
         Ada sesi pertemuan baru yang baru saja dibuat untuk course Anda.
     </p>
 
-    <p style="margin:0 0 6px 0;"><strong>Kursus:</strong> {{ $session->topic->course->title }}</p>
+    <p style="margin:0 0 6px 0;"><strong>Course:</strong> {{ $session->topic->course->title }}</p>
     <p style="margin:0 0 6px 0;"><strong>Topik:</strong> {{ $session->topic->name }}</p>
     <p style="margin:0 0 6px 0;"><strong>Judul sesi:</strong> {{ $session->title }}</p>
     <p style="margin:0 0 6px 0;"><strong>Mulai:</strong> {{ optional($session->start_at)->format('d M Y H:i') }}</p>

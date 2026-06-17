@@ -9,7 +9,7 @@
         Sesi pertemuan berikut akan dimulai dalam 3 hari.
     </p>
 
-    <p style="margin:0 0 6px 0;"><strong>Kursus:</strong> {{ $session->topic->course->title }}</p>
+    <p style="margin:0 0 6px 0;"><strong>Course:</strong> {{ $session->topic->course->title }}</p>
     <p style="margin:0 0 6px 0;"><strong>Topik:</strong> {{ $session->topic->name }}</p>
     <p style="margin:0 0 6px 0;"><strong>Sesi:</strong> {{ $session->title }}</p>
     <p style="margin:0 0 16px 0;"><strong>Mulai:</strong> {{ optional($session->start_at)->format('d M Y H:i') }}</p>

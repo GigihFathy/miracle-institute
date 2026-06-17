@@ -12,7 +12,7 @@ class LearningAccessRequirementService
     {
         if (! $this->topicHasStudentAccessRequirements($topic)) {
             throw new RuntimeException(
-                'Topik wajib memiliki minimal 1 sesi sebelum bisa diaktifkan dan diakses oleh siswa.'
+                'Topik wajib memiliki minimal 1 sesi sebelum bisa diaktifkan dan diakses oleh murid.'
             );
         }
     }

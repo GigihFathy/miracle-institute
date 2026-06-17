@@ -34,7 +34,7 @@ class EnsureTopicAccess
         $requirements = app(LearningAccessRequirementService::class);
 
         if (! $requirements->topicIsPublished($topic) || ! $requirements->topicHasStudentAccessRequirements($topic)) {
-            abort(403, 'Topik ini belum aktif untuk siswa.');
+            abort(403, 'Topik ini belum aktif untuk murid.');
         }
 
         $enrolled = $request->user()

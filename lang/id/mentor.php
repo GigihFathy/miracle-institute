@@ -28,8 +28,8 @@ return [
             'topics_hint' => 'Topik yang kamu kelola',
             'materials' => 'Materi',
             'materials_hint' => 'Materi yang kamu upload',
-            'students' => 'Siswa',
-            'students_hint' => 'Siswa yang terhubung',
+            'students' => 'Murid',
+            'students_hint' => 'Murid yang terhubung',
         ],
 
         'managed_courses' => [
@@ -66,7 +66,7 @@ return [
             ],
             'metrics' => [
                 'materials' => 'Materi',
-                'students' => 'Siswa',
+                'students' => 'Murid',
                 'active' => 'AKTIF',
                 'inactive' => 'NONAKTIF',
                 'assessment' => 'Assessment',

@@ -140,7 +140,7 @@
                                     wire:click="openRecap('{{ $row->id }}')"
                                     class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-100"
                                 >
-                                    Rekap Kursus
+                                    Rekap Course
                                 </button>
 
                                 <div class="my-1 w-full border-t"></div>
@@ -248,7 +248,7 @@
                     <div>
                         <div class="mb-1 flex items-center justify-between gap-3">
                             <label class="block text-xs font-semibold text-slate-600">
-                                Judul Kursus <span class="text-rose-500">*</span>
+                                Judul Course <span class="text-rose-500">*</span>
                             </label>
                             <span class="text-[11px] text-slate-400">{{ mb_strlen($title ?? '') }}/150</span>
                         </div>
@@ -377,7 +377,7 @@
             <div class="relative z-10 flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div class="flex items-start justify-between gap-4 border-b p-5">
                     <div>
-                        <h2 class="text-lg font-semibold text-slate-900">Rekap Kursus</h2>
+                        <h2 class="text-lg font-semibold text-slate-900">Rekap Course</h2>
                         <p class="mt-1 text-sm text-slate-500">
                             {{ $selectedCourseRecap->title }} · {{ $selectedCourseRecap->studyProgram?->title ?? '-' }}
                         </p>

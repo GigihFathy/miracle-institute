@@ -179,7 +179,7 @@
                     @else
                         <div class="space-y-1">
                             <label class="mb-1 block text-xs font-semibold text-slate-600">
-                                Kursus <span class="text-rose-500">*</span>
+                                Course <span class="text-rose-500">*</span>
                             </label>
                             <select wire:model="course_id" class="w-full rounded-xl border px-4 py-2">
                             <option value="">{{ __('admin.assessments.form.select_course') }}</option>

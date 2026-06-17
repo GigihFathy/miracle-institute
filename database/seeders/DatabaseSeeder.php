@@ -122,8 +122,8 @@ class DatabaseSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $profiles[] = [
-                'name' => "Siswa {$i}",
-                'email' => "siswa{$i}@example.test",
+                'name' => "Murid {$i}",
+                'email' => "murid{$i}@example.test",
                 'gender' => $i % 2 === 0 ? 'female' : 'male',
                 'phone' => sprintf('+62-811-1000-%04d', $i),
                 'dob' => now()->subYears(18 + $i)->format('Y-m-d'),

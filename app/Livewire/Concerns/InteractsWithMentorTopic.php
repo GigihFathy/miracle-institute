@@ -61,7 +61,7 @@ trait InteractsWithMentorTopic
             'manage_sessions' => 'Kelola Sesi',
             'manage_assessments' => 'Kelola Assessment',
             'manage_attendance' => 'Kelola Absensi',
-            'manage_students' => 'Kelola Siswa',
+            'manage_students' => 'Kelola Murid',
             'publish_topics' => 'Publikasi Topik',
             'view_reports' => 'Lihat Laporan',
             'manage_certificates' => 'Kelola Sertifikat',

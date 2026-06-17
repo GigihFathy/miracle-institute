@@ -20,7 +20,7 @@
 
     @if($selectedCourse)
         <div class="rounded-2xl border bg-white p-4">
-            <div class="text-xs text-slate-500">Kursus Terpilih</div>
+            <div class="text-xs text-slate-500">Course Terpilih</div>
             <div class="mt-1 text-lg font-semibold text-slate-900">{{ $selectedCourse->title }}</div>
         </div>
     @endif
@@ -226,8 +226,8 @@
 
         <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-xs leading-6 text-slate-600">
             <p class="font-semibold text-[#004777]">Keterangan status topik</p>
-            <p><span class="font-semibold">Belum diterbitkan</span> berarti topik masih tahap persiapan dan belum tampil untuk siswa.</p>
-            <p><span class="font-semibold">Diterbitkan</span> berarti topik sudah aktif dan bisa diakses siswa jika syarat aksesnya sudah terpenuhi.</p>
+            <p><span class="font-semibold">Belum diterbitkan</span> berarti topik masih tahap persiapan dan belum tampil untuk murid.</p>
+            <p><span class="font-semibold">Diterbitkan</span> berarti topik sudah aktif dan bisa diakses murid jika syarat aksesnya sudah terpenuhi.</p>
             <p><span class="font-semibold">Diarsipkan</span> berarti topik tidak lagi dipakai di alur belajar aktif, tetapi datanya masih disimpan.</p>
         </div>
     </section>
@@ -317,8 +317,8 @@
                         </summary>
 
                         <div class="mt-3 space-y-2 leading-6">
-                            <p><span class="font-semibold">Belum diterbitkan</span> dipakai saat topik masih disusun dan belum siap dilihat siswa.</p>
-                            <p><span class="font-semibold">Diterbitkan</span> dipakai saat topik sudah siap diakses siswa. Topik hanya bisa diterbitkan jika sudah punya minimal 1 sesi.</p>
+                            <p><span class="font-semibold">Belum diterbitkan</span> dipakai saat topik masih disusun dan belum siap dilihat murid.</p>
+                            <p><span class="font-semibold">Diterbitkan</span> dipakai saat topik sudah siap diakses murid. Topik hanya bisa diterbitkan jika sudah punya minimal 1 sesi.</p>
                             <p><span class="font-semibold">Diarsipkan</span> dipakai saat topik lama sudah tidak ingin ditampilkan ke alur belajar aktif, tetapi datanya tetap disimpan untuk referensi.</p>
                         </div>
                     </details>
