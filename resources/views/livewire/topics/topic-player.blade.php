@@ -346,7 +346,7 @@
                     $attendanceBadgeClass = match ($attendance?->status) {
                         'present' => 'border-emerald-200 bg-emerald-100 text-emerald-700',
                         'late' => 'border-amber-200 bg-amber-100 text-amber-700',
-                        'absent' => 'border-rose-200 bg-rose-100 text-rose-700',
+                        'online', 'absent' => 'border-sky-200 bg-sky-100 text-sky-700',
                         default => 'border-slate-200 bg-slate-100 text-slate-700',
                     };
                 @endphp
@@ -369,7 +369,7 @@
 
                         @if($attendance)
                             <span class="rounded-full border px-2 py-1 text-[11px] {{ $attendanceBadgeClass }}">
-                                {{ strtoupper($attendance->status) }}
+                                {{ strtoupper($attendance->status === 'absent' ? 'online' : $attendance->status) }}
                             </span>
                         @endif
                     </div>

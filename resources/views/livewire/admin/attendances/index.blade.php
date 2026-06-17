@@ -57,7 +57,7 @@
                 <option value="">{{ __('admin.attendances.filters.all_status') }}</option>
                 <option value="present">{{ __('admin.attendances.status.present') }}</option>
                 <option value="late">{{ __('admin.attendances.status.late') }}</option>
-                <option value="absent">{{ __('admin.attendances.status.absent') }}</option>
+                <option value="online">{{ __('admin.attendances.status.absent') }}</option>
             </select>
 
             <select wire:model.live="perPage" class="rounded-xl border px-4 py-2">
@@ -185,7 +185,7 @@
                 <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
                     <option value="present">{{ __('admin.attendances.status.present') }}</option>
                     <option value="late">{{ __('admin.attendances.status.late') }}</option>
-                    <option value="absent">{{ __('admin.attendances.status.absent') }}</option>
+                    <option value="online">{{ __('admin.attendances.status.absent') }}</option>
                 </select>
                 @error('status') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
 

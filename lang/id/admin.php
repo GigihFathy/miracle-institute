@@ -35,18 +35,18 @@ return [
                 'title' => 'Distribusi Kehadiran',
                 'present' => 'Hadir',
                 'late' => 'Terlambat',
-                'absent' => 'Absen',
+                'absent' => 'Online',
             ],
             'summary' => [
                 'present' => 'Hadir',
                 'late' => 'Terlambat',
-                'absent' => 'Absen',
+                'absent' => 'Online',
             ],
         ],
 
         'problem_sessions' => [
             'title' => '⚠ Session Bermasalah',
-            'absent_count' => ':count absen',
+            'absent_count' => ':count online',
             'empty' => 'Tidak ditemukan session bermasalah',
         ],
 
@@ -695,7 +695,7 @@ return [
             'total' => 'Total',
             'present' => 'Hadir',
             'late' => 'Terlambat',
-            'absent' => 'Absen',
+            'absent' => 'Online',
         ],
         'search_placeholder' => 'Cari pengguna/sesi...',
         'filters' => [
@@ -706,7 +706,7 @@ return [
         'status' => [
             'present' => 'Hadir',
             'late' => 'Terlambat',
-            'absent' => 'Absen',
+            'absent' => 'Online',
         ],
         'table' => [
             'session' => 'Sesi',

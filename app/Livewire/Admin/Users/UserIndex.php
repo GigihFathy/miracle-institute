@@ -63,7 +63,7 @@ class UserIndex extends Component
                 'sessions_total' => $sessionIds->count(),
                 'attendance_present' => $courseAttendances->where('status', 'present')->count(),
                 'attendance_late' => $courseAttendances->where('status', 'late')->count(),
-                'attendance_absent' => $courseAttendances->where('status', 'absent')->count(),
+                'attendance_absent' => $courseAttendances->whereIn('status', ['online', 'absent'])->count(),
             ];
         })->all();
 

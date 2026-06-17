@@ -64,7 +64,7 @@ class JoinSessionButton extends Component
             $this->attendanceBadgeClass = match ($this->attendance->status) {
                 'present' => 'bg-emerald-100 text-emerald-700',
                 'late' => 'bg-amber-100 text-amber-700',
-                'absent' => 'bg-rose-100 text-rose-700',
+                'online', 'absent' => 'bg-sky-100 text-sky-700',
                 default => 'bg-slate-100 text-slate-700',
             };
         }
@@ -83,12 +83,12 @@ class JoinSessionButton extends Component
             $this->attendanceLabel = match ($this->attendance->status) {
                 'present' => 'Hadir',
                 'late' => 'Terlambat',
-                'absent' => 'Absen',
+                'online', 'absent' => 'Online',
                 default => 'Sudah check-in',
             };
         } elseif ($now->gt($end)) {
-            $this->attendanceBadgeClass = 'bg-rose-100 text-rose-700';
-            $this->attendanceLabel = 'Absen';
+            $this->attendanceBadgeClass = 'bg-sky-100 text-sky-700';
+            $this->attendanceLabel = 'Online';
         } elseif ($now->betweenIncluded($start, $end)) {
             $this->attendanceLabel = 'Belum check-in';
         } else {

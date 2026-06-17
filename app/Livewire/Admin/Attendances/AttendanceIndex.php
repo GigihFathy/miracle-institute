@@ -48,7 +48,7 @@ class AttendanceIndex extends Component
         return [
             'video_session_id' => 'required|exists:video_sessions,id',
             'user_id' => 'required|exists:users,id',
-            'status' => 'required|in:present,late,absent',
+            'status' => 'required|in:present,late,online,absent',
             'check_in_at' => 'nullable|date',
             'ip_address' => 'nullable|string|max:45',
         ];
@@ -87,7 +87,7 @@ class AttendanceIndex extends Component
         $this->editingId = $row->id;
         $this->video_session_id = $row->video_session_id;
         $this->user_id = $row->user_id;
-        $this->status = $row->status;
+        $this->status = $this->normalizeStatus($row->status);
         $this->check_in_at = optional($row->check_in_at)->format('Y-m-d\TH:i');
         $this->ip_address = $row->ip_address;
 
@@ -104,7 +104,7 @@ class AttendanceIndex extends Component
                 'user_id' => $this->user_id,
             ],
             [
-                'status' => $this->status,
+                'status' => $this->normalizeStatus($this->status),
                 'check_in_at' => $this->check_in_at ? Carbon::parse($this->check_in_at) : null,
                 'ip_address' => $this->ip_address,
             ]
@@ -127,7 +127,7 @@ class AttendanceIndex extends Component
         $attendance = Attendance::findOrFail($id);
 
         $attendance->update([
-            'status' => $status,
+            'status' => $this->normalizeStatus($status),
             'check_in_at' => $attendance->check_in_at ?? now(),
         ]);
 
@@ -153,7 +153,14 @@ class AttendanceIndex extends Component
             ->when($this->courseFilter, fn ($q) => $q->whereHas('videoSession.topic', fn ($t) => $t->where('course_id', $this->courseFilter)))
             ->when($this->topicFilter, fn ($q) => $q->whereHas('videoSession', fn ($s) => $s->where('topic_id', $this->topicFilter)))
             ->when($this->sessionFilter, fn ($q) => $q->where('video_session_id', $this->sessionFilter))
-            ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter));
+            ->when($this->statusFilter, function ($q) {
+                if ($this->statusFilter === 'online') {
+                    $q->whereIn('status', ['online', 'absent']);
+                    return;
+                }
+
+                $q->where('status', $this->statusFilter);
+            });
 
         return view('livewire.admin.attendances.index', [
             'rows' => (clone $baseQuery)->latest()->paginate($this->perPage),
@@ -168,7 +175,7 @@ class AttendanceIndex extends Component
                 'total' => (clone $baseQuery)->count(),
                 'present' => (clone $baseQuery)->where('status', 'present')->count(),
                 'late' => (clone $baseQuery)->where('status', 'late')->count(),
-                'absent' => (clone $baseQuery)->where('status', 'absent')->count(),
+                'absent' => (clone $baseQuery)->whereIn('status', ['online', 'absent'])->count(),
             ],
         ])->layout('layouts.admin');
     }
@@ -189,5 +196,10 @@ class AttendanceIndex extends Component
         if (auth()->check()) {
             $this->ip_address = request()->ip();
         }
+    }
+
+    private function normalizeStatus(string $status): string
+    {
+        return $status === 'absent' ? 'online' : $status;
     }
 }

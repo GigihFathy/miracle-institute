@@ -22,7 +22,7 @@ class AttendanceSeeder extends Seeder
 
         $patterns = [
             'disciple@example.test' => ['present', 'present', 'present', 'present', 'present', 'present'],
-            'student@example.test' => ['present', 'present', 'present', 'present', 'late', 'absent'],
+            'student@example.test' => ['present', 'present', 'present', 'present', 'late', 'online'],
         ];
 
         $mentor = User::where('email', 'disciple@example.test')->firstOrFail();
@@ -46,7 +46,7 @@ class AttendanceSeeder extends Seeder
             );
 
             foreach ($otherUsers as $user) {
-                $status = $patterns[$user->email][$index] ?? 'absent';
+                $status = $patterns[$user->email][$index] ?? 'online';
 
                 Attendance::updateOrCreate(
                     ['video_session_id' => $session->id, 'user_id' => $user->id],

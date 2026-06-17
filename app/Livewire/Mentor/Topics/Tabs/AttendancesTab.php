@@ -57,6 +57,11 @@ class AttendancesTab extends Component
                 });
             })
             ->when(filled($this->statusFilter), function ($query) {
+                if ($this->statusFilter === 'online') {
+                    $query->whereIn('attendances.status', ['online', 'absent']);
+                    return;
+                }
+
                 $query->where('attendances.status', $this->statusFilter);
             })
             ->latest('check_in_at')

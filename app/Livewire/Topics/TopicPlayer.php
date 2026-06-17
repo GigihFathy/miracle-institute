@@ -402,7 +402,7 @@ class TopicPlayer extends Component
         $attendanceStats = [
             'present' => $sessionAttendances->where('status', 'present')->count(),
             'late' => $sessionAttendances->where('status', 'late')->count(),
-            'absent' => $sessionAttendances->where('status', 'absent')->count(),
+            'absent' => $sessionAttendances->filter(fn ($attendance) => in_array($attendance->status, ['online', 'absent'], true))->count(),
             'checked_in' => $sessionAttendances->whereIn('status', ['present', 'late'])->count(),
         ];
 

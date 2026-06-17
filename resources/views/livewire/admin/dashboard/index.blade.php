@@ -106,10 +106,10 @@
                 <div class="text-xs text-yellow-600">{{ $attendance['late_pct'] }}%</div>
             </div>
 
-            <div class="rounded-xl border bg-red-50 p-4">
-                <div class="text-sm text-red-600">{{ __('admin.dashboard.attendance.summary.absent') }}</div>
+            <div class="rounded-xl border bg-sky-50 p-4">
+                <div class="text-sm text-sky-600">{{ __('admin.dashboard.attendance.summary.absent') }}</div>
                 <div class="text-2xl font-bold">{{ number_format($attendance['absent'], 0, ',', '.') }}</div>
-                <div class="text-xs text-red-600">{{ $attendance['absent_pct'] }}%</div>
+                <div class="text-xs text-sky-600">{{ $attendance['absent_pct'] }}%</div>
             </div>
         </div>
     </section>
@@ -350,7 +350,7 @@
                         labels: {
                             present: 'Present',
                             late: 'Late',
-                            absent: 'Absent',
+                            absent: 'Online',
                         },
                     };
                 }
@@ -365,7 +365,7 @@
                         labels: {
                             present: el.dataset.labelPresent || 'Present',
                             late: el.dataset.labelLate || 'Late',
-                            absent: el.dataset.labelAbsent || 'Absent',
+                            absent: el.dataset.labelAbsent || 'Online',
                         },
                     };
                 } catch (e) {
@@ -376,7 +376,7 @@
                         labels: {
                             present: 'Present',
                             late: 'Late',
-                            absent: 'Absent',
+                            absent: 'Online',
                         },
                     };
                 }
@@ -416,7 +416,7 @@
                         ],
                         datasets: [{
                             data: [data.present ?? 0, data.late ?? 0, data.absent ?? 0],
-                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                            backgroundColor: ['#10b981', '#f59e0b', '#0ea5e9'],
                             borderWidth: 0,
                         }]
                     },

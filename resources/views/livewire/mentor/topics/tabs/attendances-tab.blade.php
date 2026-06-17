@@ -33,7 +33,7 @@
                 <option value="">{{ __('mentor.topic_tabs.attendances.filters.all_status') }}</option>
                 <option value="present">{{ __('mentor.topic_tabs.attendances.status.present') }}</option>
                 <option value="late">{{ __('mentor.topic_tabs.attendances.status.late') }}</option>
-                <option value="absent">{{ __('mentor.topic_tabs.attendances.status.absent') }}</option>
+                <option value="online">{{ __('mentor.topic_tabs.attendances.status.absent') }}</option>
             </select>
 
             <select

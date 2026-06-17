@@ -38,7 +38,7 @@ class AttendanceObserver
             $issueType = 'late_join';
         }
 
-        if ($attendance->status === 'absent') {
+        if (in_array($attendance->status, ['online', 'absent'], true)) {
             $issueType = 'absent';
         }
 

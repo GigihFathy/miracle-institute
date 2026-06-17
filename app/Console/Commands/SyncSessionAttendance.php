@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 class SyncSessionAttendance extends Command
 {
     protected $signature = 'sessions:sync-attendance';
-    protected $description = 'Auto mark absent attendances and complete topics when sessions end';
+    protected $description = 'Auto mark online attendances and complete topics when sessions end';
 
     public function handle(): int
     {
@@ -42,7 +42,7 @@ class SyncSessionAttendance extends Command
                             'user_id' => $enrollment->user_id,
                         ],
                         [
-                            'status' => 'absent',
+                            'status' => 'online',
                             'check_in_at' => null,
                             'clock_out_at' => null,
                             'ip_address' => null,

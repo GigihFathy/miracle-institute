@@ -426,10 +426,10 @@
                             </div>
                         </div>
                         <div class="rounded-2xl border bg-rose-50 p-4">
-                            <div class="text-xs uppercase tracking-wide text-rose-700">Absent</div>
+                            <div class="text-xs uppercase tracking-wide text-sky-700">Online</div>
                             <div class="mt-2 flex items-end gap-2">
-                                <span class="text-2xl font-bold text-rose-800">{{ $courseRecapSummary['attendance_absent'] ?? 0 }}</span>
-                                <span class="pb-0.5 text-xs font-medium text-rose-700/80">
+                                <span class="text-2xl font-bold text-sky-800">{{ $courseRecapSummary['attendance_absent'] ?? 0 }}</span>
+                                <span class="pb-0.5 text-xs font-medium text-sky-700/80">
                                     ({{ (($courseRecapSummary['attendance_present'] ?? 0) + ($courseRecapSummary['attendance_late'] ?? 0) + ($courseRecapSummary['attendance_absent'] ?? 0)) > 0 ? round((($courseRecapSummary['attendance_absent'] ?? 0) / (($courseRecapSummary['attendance_present'] ?? 0) + ($courseRecapSummary['attendance_late'] ?? 0) + ($courseRecapSummary['attendance_absent'] ?? 0))) * 100) : 0 }}%)
                                 </span>
                             </div>
@@ -446,7 +446,7 @@
                                     <th class="px-4 py-3 font-medium">Status</th>
                                     <th class="px-4 py-3 font-medium">Present</th>
                                     <th class="px-4 py-3 font-medium">Late</th>
-                                    <th class="px-4 py-3 font-medium">Absent</th>
+                                    <th class="px-4 py-3 font-medium">Online</th>
                                     <th class="px-4 py-3 font-medium">Total Kehadiran</th>
                                 </tr>
                             </thead>
@@ -463,7 +463,7 @@
                                         </td>
                                         <td class="px-4 py-3 text-emerald-700">{{ $session['present'] }}</td>
                                         <td class="px-4 py-3 text-amber-700">{{ $session['late'] }}</td>
-                                        <td class="px-4 py-3 text-rose-700">{{ $session['absent'] }}</td>
+                                        <td class="px-4 py-3 text-sky-700">{{ $session['absent'] }}</td>
                                         <td class="px-4 py-3 text-slate-700">{{ $session['attendance_total'] }}</td>
                                     </tr>
                                 @empty

@@ -152,7 +152,7 @@ class AttendanceButton extends Component
             : match ($this->attendance->status) {
                 'present' => 'Present',
                 'late' => 'Late',
-                'absent' => 'Absent',
+                'online', 'absent' => 'Online',
                 default => 'Checked in',
             };
     }

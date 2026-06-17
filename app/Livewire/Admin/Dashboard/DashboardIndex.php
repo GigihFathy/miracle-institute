@@ -48,11 +48,11 @@ class DashboardIndex extends Component
         $attendance = [
             'present' => $attendanceStats['present'] ?? 0,
             'late' => $attendanceStats['late'] ?? 0,
-            'absent' => $attendanceStats['absent'] ?? 0,
+            'absent' => ($attendanceStats['online'] ?? 0) + ($attendanceStats['absent'] ?? 0),
             'total' => $total,
             'present_pct' => $total ? round(($attendanceStats['present'] ?? 0) / $total * 100, 2) : 0,
             'late_pct' => $total ? round(($attendanceStats['late'] ?? 0) / $total * 100, 2) : 0,
-            'absent_pct' => $total ? round(($attendanceStats['absent'] ?? 0) / $total * 100, 2) : 0,
+            'absent_pct' => $total ? round(((($attendanceStats['online'] ?? 0) + ($attendanceStats['absent'] ?? 0)) / $total) * 100, 2) : 0,
         ];
 
         return view('livewire.admin.dashboard.index', [

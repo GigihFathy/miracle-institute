@@ -198,12 +198,12 @@ return [
             'stats' => [
                 'present' => 'Hadir :count',
                 'late' => 'Terlambat :count',
-                'absent' => 'Absen :count',
+                'absent' => 'Online :count',
             ],
             'status' => [
                 'present' => 'Hadir',
                 'late' => 'Terlambat',
-                'absent' => 'Absen',
+                'absent' => 'Online',
             ],
             'table' => [
                 'session' => 'Session',

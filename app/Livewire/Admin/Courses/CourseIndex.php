@@ -200,7 +200,7 @@ class CourseIndex extends Component
                         'status' => $session->status,
                         'present' => $rows->where('status', 'present')->count(),
                         'late' => $rows->where('status', 'late')->count(),
-                        'absent' => $rows->where('status', 'absent')->count(),
+                        'absent' => $rows->whereIn('status', ['online', 'absent'])->count(),
                         'attendance_total' => $rows->count(),
                     ];
                 });
