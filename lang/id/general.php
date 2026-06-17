@@ -173,7 +173,7 @@ return [
                 'description' => 'Kelola course pemuridan, pantau topik pembelajaran, dan bimbing peserta melalui materi yang terstruktur.',
             ],
             'student' => [
-                'title' => 'Bertumbuh melalui pembelajaran pemuridan dan mentoring yang terstruktur.',
+                'title' => 'Bertumbuh melalui pemuridan dan mentoring yang terstruktur.',
                 'description' => 'Pelajari materi pemuridan secara sistematis melalui topik, sesi mentoring, assessment, dan progres pembelajaran.',
             ],
         ],
