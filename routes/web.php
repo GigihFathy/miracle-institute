@@ -86,6 +86,10 @@ Route::get('/en/{path?}', function (Request $request, ?string $path = null) {
     return redirect()->to(($target ?: '/') . ($query ? '?' . $query : ''), 301);
 })->where('path', '.*');
 
+Route::get('/course-thumbnails/{path}', [CourseThumbnailController::class, 'show'])
+    ->where('path', '[A-Za-z0-9._-]+')
+    ->name('course-thumbnails.show');
+
 /*
 |--------------------------------------------------------------------------
 | Non-localized Google OAuth callbacks

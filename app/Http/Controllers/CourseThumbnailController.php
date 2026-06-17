@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CourseThumbnailController extends Controller
 {
@@ -34,5 +35,22 @@ class CourseThumbnailController extends Controller
         }
 
         return back()->with('success', 'Thumbnail berhasil diupload dan masuk ke library sistem.');
+    }
+
+    public function show(string $path): BinaryFileResponse
+    {
+        $relativePath = course_thumbnail_relative_path($path);
+
+        abort_unless($relativePath, 404);
+
+        $fullPath = public_path($relativePath);
+
+        abort_unless(File::exists($fullPath), 404);
+
+        return response()->file($fullPath, [
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+        ]);
     }
 }
