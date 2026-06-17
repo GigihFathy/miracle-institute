@@ -15,18 +15,21 @@ class Register extends Component
     public $email = '';
     public $password = '';
     public $password_confirmation = '';
+    public bool $accept_legal = false;
 
     protected $rules = [
         'name' => 'required|string|min:2|max:35',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8|confirmed',
         'password_confirmation' => 'required|string|min:8',
+        'accept_legal' => 'accepted',
     ];
 
     protected $messages = [
         'name.required' => 'Nama wajib diisi.',
         'email.unique' => 'Email sudah terdaftar.',
         'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        'accept_legal.accepted' => 'Anda wajib menyetujui Terms & Conditions dan Privacy Policy.',
     ];
 
     public function updated($propertyName): void
