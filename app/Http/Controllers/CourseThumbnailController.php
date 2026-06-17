@@ -45,6 +45,10 @@ class CourseThumbnailController extends Controller
 
         $fullPath = public_path($relativePath);
 
+        if (! File::exists($fullPath)) {
+            $fullPath = $this->findClosestThumbnailMatch(basename($relativePath));
+        }
+
         abort_unless(File::exists($fullPath), 404);
 
         return response()->file($fullPath, [
@@ -52,5 +56,53 @@ class CourseThumbnailController extends Controller
             'Pragma' => 'no-cache',
             'Expires' => '0',
         ]);
+    }
+
+    private function findClosestThumbnailMatch(string $requestedFilename): ?string
+    {
+        $directory = public_path('images/thumbnail');
+
+        if (! File::exists($directory)) {
+            return null;
+        }
+
+        $requestedName = pathinfo($requestedFilename, PATHINFO_FILENAME);
+        $requestedExtension = Str::lower(pathinfo($requestedFilename, PATHINFO_EXTENSION));
+        $requestedNormalized = $this->normalizeThumbnailName($requestedName);
+
+        foreach (File::files($directory) as $file) {
+            if (! $file->isFile()) {
+                continue;
+            }
+
+            $extension = Str::lower($file->getExtension());
+
+            if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp'], true)) {
+                continue;
+            }
+
+            $candidateName = pathinfo($file->getFilename(), PATHINFO_FILENAME);
+            $candidateNormalized = $this->normalizeThumbnailName($candidateName);
+
+            if (
+                $candidateNormalized === $requestedNormalized
+                || Str::startsWith($candidateNormalized, $requestedNormalized)
+                || Str::startsWith($requestedNormalized, $candidateNormalized)
+            ) {
+                if ($requestedExtension === '' || $requestedExtension === $extension) {
+                    return $file->getPathname();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizeThumbnailName(string $value): string
+    {
+        return (string) Str::of($value)
+            ->lower()
+            ->replace(['_', '-', ' '], '')
+            ->replaceMatches('/[^a-z0-9]/', '');
     }
 }
