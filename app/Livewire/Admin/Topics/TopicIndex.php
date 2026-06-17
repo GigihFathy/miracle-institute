@@ -111,14 +111,14 @@ class TopicIndex extends Component
     {
         $this->validate();
 
-        $course = Course::with('studyProgram')->findOrFail($this->course_id);
+        $course = Course::findOrFail($this->course_id);
         $topic = $this->editingId ? Topic::findOrFail($this->editingId) : new Topic();
 
         $topic->forceFill([
             'course_id' => $this->course_id,
             'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
             'name' => $this->name,
-            'category' => strtolower($course->studyProgram->title),
+            'category' => Str::slug($course->title),
             'slug' => Str::slug($this->name),
             'description' => $this->description,
             'status' => $this->normalizeStatus($this->status),
@@ -141,7 +141,7 @@ class TopicIndex extends Component
                 'course_id' => $this->course_id,
                 'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
                 'name' => $this->name,
-                'category' => strtolower($course->studyProgram->title),
+                'category' => Str::slug($course->title),
                 'slug' => Str::slug($this->name),
                 'description' => $this->description,
                 'status' => $this->normalizeStatus($this->status),

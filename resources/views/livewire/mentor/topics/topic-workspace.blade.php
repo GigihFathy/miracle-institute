@@ -26,10 +26,6 @@
                 <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">{{ __('mentor.topic_workspace.cards.course') }}</div>
                 <div class="mt-1 font-semibold text-mentor-primary">{{ $topic->course?->title ?? '-' }}</div>
             </div>
-            <div class="mentor-workspace-card p-4">
-                <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">{{ __('mentor.topic_workspace.cards.program') }}</div>
-                <div class="mt-1 font-semibold text-mentor-primary">{{ $topic->course?->studyProgram?->title ?? '-' }}</div>
-            </div>
         </div>
 
         <div class="border-t border-slate-100 px-3 pt-3 sm:px-5">

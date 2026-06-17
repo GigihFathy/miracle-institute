@@ -85,42 +85,6 @@ return [
         ],
     ],
 
-    'study_programs' => [
-        'page_title' => 'Study Program',
-        'page_subtitle' => 'Kelola jalur pembelajaran utama.',
-        'search_placeholder' => 'Cari program...',
-        'per_page' => '{1} :count / halaman|[2,*] :count / halaman',
-        'actions' => [
-            'create' => '+ Program Baru',
-            'edit' => 'Edit',
-            'delete' => 'Hapus',
-            'cancel' => 'Batal',
-            'save' => 'Simpan',
-        ],
-        'table' => [
-            'title' => 'Judul',
-            'status' => 'Status',
-            'action' => 'Aksi',
-        ],
-        'status' => [
-            'active' => 'Aktif',
-            'inactive' => 'Nonaktif',
-        ],
-        'empty' => 'Tidak ada data.',
-        'modal' => [
-            'create_title' => 'Program Baru',
-            'edit_title' => 'Edit Program',
-        ],
-        'form' => [
-            'title_placeholder' => 'Judul',
-            'description_placeholder' => 'Deskripsi',
-        ],
-        'delete' => [
-            'title' => 'Hapus Program',
-            'subtitle' => 'Aksi ini tidak dapat dibatalkan. Anda yakin ingin menghapus program ini?',
-        ],
-    ],
-
     'users' => [
         'page_title' => 'Pengguna',
         'page_subtitle' => 'Daftar pengguna dan role yang mereka miliki.',
@@ -821,7 +785,6 @@ return [
         'panel_title' => 'Panel Admin',
         'administrator' => 'Administrator',
         'dashboard' => 'Dashboard',
-        'study_programs' => 'Study Program',
         'learning' => 'Learning',
         'courses' => 'Course',
         'topics' => 'Topik',

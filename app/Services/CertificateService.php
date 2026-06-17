@@ -121,7 +121,6 @@ class CertificateService
 
         $course->loadMissing([
             'topics.videoSessions',
-            'studyProgram',
         ]);
 
         $user = $certificate->user()->firstOrFail();
@@ -379,7 +378,6 @@ class CertificateService
         return [
             'participant_name' => $user->name,
             'course_title' => $course->title,
-            'program_title' => $course->studyProgram?->title ?? '-',
             'total_topics' => $totalTopics,
         ];
     }

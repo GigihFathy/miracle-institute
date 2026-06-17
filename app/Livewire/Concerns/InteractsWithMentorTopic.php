@@ -11,7 +11,6 @@ trait InteractsWithMentorTopic
     {
         return Topic::query()
             ->with([
-                'course.studyProgram',
                 'course.assessment',
             ])
             ->findOrFail($topicId);

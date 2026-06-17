@@ -18,10 +18,8 @@ use App\Models\Certificate;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
-use App\Models\StudyProgram;
 
 // Policies
-use App\Policies\StudyProgramPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\UserPolicy;
@@ -101,7 +99,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Permission::class, PermissionPolicy::class);
-        Gate::policy(StudyProgram::class, StudyProgramPolicy::class);
 
         /*
         |--------------------------------------------------------------------------

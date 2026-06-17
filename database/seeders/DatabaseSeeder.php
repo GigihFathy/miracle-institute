@@ -21,8 +21,7 @@ class DatabaseSeeder extends Seeder
             $this->seedRolePermissions($roles, $permissions);
 
             $users = $this->seedUsers($roles, $logoAsset, $now);
-            $program = $this->seedStudentStudyProgram($now);
-            $this->seedAdditionalLearningData($program, $users, $courseAsset, $now);
+            $this->seedAdditionalLearningData($users, $courseAsset, $now);
         });
     }
 
@@ -170,24 +169,7 @@ class DatabaseSeeder extends Seeder
         return ['all' => $rows, 'byEmail' => $byEmail, 'byRole' => $byRole];
     }
 
-    private function seedStudentStudyProgram($now): array
-    {
-        $program = [
-            'id' => $this->uuid(),
-            'title' => 'Akademi Pemuridan Inti',
-            'slug' => 'akademi-pemuridan-inti',
-            'description' => 'Program pemuridan yang menolong peserta bertumbuh dalam identitas, karakter, pelayanan, dan pengutusan.',
-            'status' => 'active',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
-
-        DB::table('study_programs')->insert($program);
-
-        return $program;
-    }
-
-    private function seedAdditionalLearningData(array $program, array $users, string $asset, $now): void
+    private function seedAdditionalLearningData(array $users, string $asset, $now): void
     {
         $teacher = $users['byRole']['admin'][0] ?? null;
         $students = $users['byRole']['student'] ?? [];
@@ -262,7 +244,6 @@ class DatabaseSeeder extends Seeder
 
             $courses[] = [
                 'id' => $courseId,
-                'study_program_id' => $program['id'],
                 'title' => $blueprint['title'],
                 'slug' => $blueprint['slug'],
                 'poster' => $asset,

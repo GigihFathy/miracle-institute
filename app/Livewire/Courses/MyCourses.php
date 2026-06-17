@@ -19,7 +19,6 @@ class MyCourses extends Component
     public function render()
     {
         $enrollments = CourseEnrollment::with([
-                'course.studyProgram',
                 'course.topics.materials',
                 'course.topics.sessions',
                 'course.topics.assessments',

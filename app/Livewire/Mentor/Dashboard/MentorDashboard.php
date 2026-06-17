@@ -46,7 +46,7 @@ class MentorDashboard extends Component
             ->pluck('topic_id');
 
         $topicsQuery = Topic::query()
-            ->with(['course.studyProgram'])
+            ->with(['course'])
             ->where(function ($q) use ($userId, $managedTopicIds) {
                 $q->where('teacher_id', $userId);
 
@@ -70,7 +70,6 @@ class MentorDashboard extends Component
 
         $managedCourses = Course::query()
             ->with([
-                'studyProgram',
                 'topics' => function ($query) use ($userId, $managedTopicIds) {
                     $query
                         ->where(function ($topicQuery) use ($userId, $managedTopicIds) {
@@ -96,10 +95,7 @@ class MentorDashboard extends Component
                 $search = trim($this->courseSearch);
 
                 $query->where(function ($courseQuery) use ($search) {
-                    $courseQuery
-                        ->where('title', 'like', '%' . $search . '%')
-                        ->orWhereHas('studyProgram', fn ($programQuery) => $programQuery
-                            ->where('title', 'like', '%' . $search . '%'));
+                    $courseQuery->where('title', 'like', '%' . $search . '%');
                 });
             })
             ->latest()

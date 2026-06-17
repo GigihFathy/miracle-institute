@@ -61,7 +61,7 @@ class MyLearning extends Component
 
         $hasEnrollments = CourseEnrollment::where('user_id', $user->id)->exists();
 
-        $filteredEnrollments = CourseEnrollment::with(['course.studyProgram', 'course.topics'])
+        $filteredEnrollments = CourseEnrollment::with(['course.topics'])
             ->where('user_id', $user->id)
             ->latest()
             ->get()

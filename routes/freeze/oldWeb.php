@@ -68,9 +68,6 @@ Route::middleware(['auth', 'set.active.role'])->group(function () {
         ->middleware(['role:admin'])
         ->group(function () {
             Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
-            // Route::view('/study-programs', 'admin.study-programs.index')->name('study-programs.index');
-            Route::get('/study-programs', \App\Livewire\Admin\StudyPrograms\StudyProgramIndex::class)
-            ->name('study-programs.index');
             // Route::view('/courses', 'admin.courses.index')->name('courses.index');
             Route::get('/courses', \App\Livewire\Admin\Courses\CourseIndex::class);
             // Route::view('/topics', 'admin.topics.index')->name('topics.index');

@@ -5,7 +5,6 @@ namespace App\Livewire\Courses;
 use App\Livewire\Concerns\WithTableState;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
-use App\Models\StudyProgram;
 use App\Services\CourseService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
@@ -15,7 +14,6 @@ class CourseCatalog extends Component
     use WithTableState, AuthorizesRequests;
 
     public string $searchInput = '';
-    public string $studyProgram = '';
     public string $sort = 'newest';
     public bool $showEnrollModal = false;
     public ?string $pendingCourseId = null;
@@ -23,7 +21,6 @@ class CourseCatalog extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'studyProgram' => ['except' => ''],
         'sort' => ['except' => 'newest'],
         'perPage' => ['except' => 12],
     ];
@@ -42,11 +39,6 @@ class CourseCatalog extends Component
     public function updatedSearchInput(): void
     {
         $this->search = trim($this->searchInput);
-        $this->resetPage();
-    }
-
-    public function updatedStudyProgram(): void
-    {
         $this->resetPage();
     }
 
@@ -115,23 +107,16 @@ class CourseCatalog extends Component
                 ->all();
         }
 
-        $query = Course::with('studyProgram')
-            ->withCount('topics')
+        $query = Course::withCount('topics')
             ->where('status', 'active')
             ->when($this->search, function ($q) {
                 $search = '%' . $this->search . '%';
 
                 $q->where(function ($searchQuery) use ($search) {
                     $searchQuery->where('title', 'like', $search)
-                        ->orWhere('description', 'like', $search)
-                        ->orWhereHas('studyProgram', function ($studyProgramQuery) use ($search) {
-                            $studyProgramQuery->where('title', 'like', $search);
-                        });
+                        ->orWhere('description', 'like', $search);
                 });
-            })
-            ->when($this->studyProgram, fn ($q) =>
-                $q->whereHas('studyProgram', fn ($sp) => $sp->where('slug', $this->studyProgram))
-            );
+            });
 
         match ($this->sort) {
             'oldest' => $query->oldest(),
@@ -140,7 +125,6 @@ class CourseCatalog extends Component
 
         return view('livewire.courses.course-catalog', [
             'courses' => $query->paginate($this->perPage),
-            'studyPrograms' => StudyProgram::orderBy('title')->get(),
             'enrolledCourseIds' => $enrolledCourseIds,
         ])->layout('layouts.learning');
     }

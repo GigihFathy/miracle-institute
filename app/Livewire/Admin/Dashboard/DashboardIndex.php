@@ -7,7 +7,6 @@ use App\Models\Topic;
 use App\Models\User;
 use App\Models\Attendance;
 use App\Models\Certificate;
-use App\Models\StudyProgram;
 use App\Models\Assessment;
 use Livewire\Component;
 
@@ -57,7 +56,6 @@ class DashboardIndex extends Component
 
         return view('livewire.admin.dashboard.index', [
             'usersCount' => User::count(),
-            'studyProgramsCount' => StudyProgram::count(),
             'coursesCount' => Course::count(),
             'topicsCount' => Topic::count(),
             'assessmentsCount' => Assessment::count(),
@@ -66,8 +64,7 @@ class DashboardIndex extends Component
             'latestCertificates' => Certificate::with(['user', 'course', 'topic'])
                 ->latest()->take(5)->get(),
 
-            'latestCourses' => Course::with('studyProgram')
-                ->latest()->take(5)->get(),
+            'latestCourses' => Course::latest()->take(5)->get(),
 
             'attendance' => $attendance,
             'upcomingSessions' => $upcomingSessions,

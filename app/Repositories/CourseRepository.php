@@ -9,8 +9,7 @@ class CourseRepository
 {
     public function getPublishedCourses()
     {
-        return Course::with('studyProgram')
-            ->where('status', 'active')
+        return Course::where('status', 'active')
             ->get();
     }
 

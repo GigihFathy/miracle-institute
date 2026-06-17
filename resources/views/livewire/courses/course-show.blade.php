@@ -82,9 +82,6 @@
                 <div class="relative overflow-hidden bg-gradient-to-br from-[var(--mentor-primary)] to-[#0a659b] px-5 py-6 text-white sm:px-7">
                     <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div class="space-y-2">
-                            <div class="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-                                {{ $course->studyProgram?->title }}
-                            </div>
                             <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                 {{ $course->title }}
                             </h1>
@@ -136,9 +133,6 @@
                             </div>
 
                             <div class="space-y-2">
-                                <div class="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-                                    {{ $course->studyProgram?->title }}
-                                </div>
                                 <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                     {{ $course->title }}
                                 </h1>
@@ -238,10 +232,6 @@
                             </div>
 
                             <div class="min-w-0 flex-1">
-                                <div class="truncate text-[10px] uppercase tracking-[0.22em] text-[#004777]/60 sm:text-xs">
-                                    {{ $course->studyProgram?->title }}
-                                </div>
-
                                 <h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight text-[#004777] sm:text-5xl">
                                     {{ $course->title }}
                                 </h1>
@@ -473,8 +463,8 @@
 
                         <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                             <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Program</div>
-                                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $course->studyProgram?->title ?? '-' }}</div>
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Status</div>
+                                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ ucfirst($course->status) }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
                                 <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Topik</div>

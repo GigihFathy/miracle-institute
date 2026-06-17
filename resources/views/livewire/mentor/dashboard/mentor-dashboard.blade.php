@@ -302,7 +302,6 @@
                                             {{ $course->title ?? __('mentor.dashboard.managed_courses.no_course') }}
                                         </h3>
                                         <p class="mt-1 text-xs leading-5 text-slate-500">
-                                            {{ $course->studyProgram?->title ?? '-' }} &middot;
                                             {{ trans_choice('mentor.dashboard.managed_courses.topic_count', $courseTopics->count(), ['count' => $courseTopics->count()]) }}
                                         </p>
                                     </div>

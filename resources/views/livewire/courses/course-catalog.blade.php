@@ -27,12 +27,6 @@
                         </p>
                     </div>
                     <div class="h-12 w-px bg-[#004777]/15 sm:h-14" aria-hidden="true"></div>
-                    <div>
-                        <p class="text-2xl font-bold text-[#35A7FF] sm:text-3xl">{{ $studyPrograms->count() }}</p>
-                        <p class="mt-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:text-xs">
-                            {{ __('general.course_catalog.stats.study_programs') }}
-                        </p>
-                    </div>
                 </div>
             </div>
 
@@ -75,31 +69,6 @@
                 </select>
             </div>
 
-            <div class="-mx-1 mt-5 overflow-x-auto px-1 pb-2">
-                <div class="flex w-max min-w-full flex-nowrap gap-2 md:w-auto md:min-w-0 md:flex-wrap">
-                <button type="button"
-                        wire:click="$set('studyProgram', '')"
-                        @class([
-                            'inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition',
-                            'border-[#004777] bg-[#004777] text-white' => $studyProgram === '',
-                            'border-slate-200 bg-white text-[#004777] hover:border-[#35A7FF] hover:bg-[#eef8ff]' => $studyProgram !== '',
-                        ])>
-                    {{ __('general.course_catalog.filters.all_study_programs') }}
-                </button>
-
-                @foreach($studyPrograms as $sp)
-                    <button type="button"
-                            wire:click="$set('studyProgram', '{{ $sp->slug }}')"
-                            @class([
-                                'inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 py-2 text-sm font-semibold whitespace-nowrap transition',
-                                'border-[#004777] bg-[#004777] text-white' => $studyProgram === $sp->slug,
-                                'border-slate-200 bg-white text-[#004777] hover:border-[#35A7FF] hover:bg-[#eef8ff]' => $studyProgram !== $sp->slug,
-                            ])>
-                        {{ $sp->title }}
-                    </button>
-                @endforeach
-                </div>
-            </div>
         </div>
     </section>
 
@@ -165,9 +134,6 @@
                         </div>
 
                         <div class="flex flex-1 flex-col px-3 pb-3 pt-5">
-                            <p class="text-xs font-bold uppercase tracking-[0.12em] text-[#35A7FF]">
-                                {{ $course->studyProgram?->title }}
-                            </p>
                             <h3 class="mt-2 line-clamp-2 text-xl font-bold leading-snug text-[#0f172a]">
                                 {{ Str::limit($course->title, 80) }}
                             </h3>

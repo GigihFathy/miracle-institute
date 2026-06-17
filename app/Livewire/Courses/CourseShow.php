@@ -72,7 +72,6 @@ class CourseShow extends Component
 
         $this->course = Course::query()
             ->with([
-                'studyProgram',
                 'enrollments.user',
                 'enrollments.topicProgresses',
                 'topics' => function ($q) {

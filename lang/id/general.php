@@ -64,13 +64,6 @@ return [
             'progress' => 'Progres',
         ],
 
-        'study_programs' => [
-            'title' => 'Bertumbuh dalam iman dan menemukan tujuan Tuhan bagi hidupmu',
-            'description' => 'Jelajahi program pemuridan, pengajaran Alkitab, dan jalur pertumbuhan rohani yang dirancang untuk memperkuat hubungan Anda dengan Tuhan.',
-            'scroll_left' => 'Geser kategori ke kiri',
-            'scroll_right' => 'Geser kategori ke kanan',
-        ],
-
         'featured_teachings' => [
             'title' => 'Pengajaran Unggulan',
             'description' => 'Temukan pengajaran yang berdampak dan kelas pemuridan yang disiapkan untuk menguatkan perjalanan iman Anda.',
@@ -180,7 +173,6 @@ return [
 
         'stats' => [
             'available_courses' => 'Course Tersedia',
-            'study_programs' => 'Program Studi',
         ],
 
         'feature_panel' => [
@@ -198,7 +190,6 @@ return [
 
         'filters' => [
             'search_placeholder' => 'Cari course, atau kata kunci...',
-            'all_study_programs' => 'Semua Program Studi',
         ],
 
         'sort' => [

@@ -18,7 +18,6 @@ class TopicWorkspace extends Component
     {
         $this->topic = Topic::query()
             ->with([
-                'course.studyProgram',
                 'course.assessment',
             ])
             ->where('slug', $slug)

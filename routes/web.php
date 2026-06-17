@@ -22,7 +22,6 @@ use App\Livewire\Admin\Permissions\PermissionIndex;
 use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Sessions\VideoSessionIndex;
 use App\Livewire\Admin\Settings\SettingsIndex;
-use App\Livewire\Admin\StudyPrograms\StudyProgramIndex;
 use App\Livewire\Admin\Topics\TopicIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Users\UserRoleManager;
@@ -388,12 +387,6 @@ $registerLocalizedRoutes = function (bool $named): void {
                         Route::get('/dashboard', DashboardIndex::class)
                             ->middleware('permission:view_reports'),
                         'dashboard'
-                    );
-
-                    $nameRoute(
-                        Route::get('/study-programs', StudyProgramIndex::class)
-                            ->middleware('permission:manage_courses'),
-                        'study-programs.index'
                     );
 
                     $nameRoute(
