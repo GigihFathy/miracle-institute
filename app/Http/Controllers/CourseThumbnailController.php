@@ -6,7 +6,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CourseThumbnailController extends Controller
 {
@@ -20,39 +19,20 @@ class CourseThumbnailController extends Controller
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $extension = $file->getClientOriginalExtension();
         $filename = Str::slug($originalName) . '-' . Str::lower(Str::random(6)) . '.' . Str::lower($extension);
+        $targetDirectory = public_path('images/thumbnail');
+        $targetPath = $targetDirectory . DIRECTORY_SEPARATOR . $filename;
 
-        $stored = false;
-        $lastErrorMessage = null;
-
-        foreach (course_thumbnail_path_candidates($filename) as $targetPath) {
-            try {
-                File::ensureDirectoryExists(dirname($targetPath));
-                File::put($targetPath, File::get($file->getRealPath()));
-                $stored = true;
-            } catch (\Throwable $exception) {
-                $lastErrorMessage = $exception->getMessage();
-            }
-        }
-
-        if (! $stored) {
-            report(new \RuntimeException('Gagal menyimpan thumbnail course. ' . ($lastErrorMessage ?: 'Direktori penyimpanan tidak tersedia.')));
+        try {
+            File::ensureDirectoryExists($targetDirectory);
+            File::put($targetPath, File::get($file->getRealPath()));
+        } catch (\Throwable $exception) {
+            report($exception);
 
             return back()->withErrors([
-                'thumbnail' => 'Thumbnail gagal diupload ke server. Periksa permission folder penyimpanan.',
+                'thumbnail' => 'Thumbnail gagal diupload ke public/images/thumbnail. Periksa permission folder server.',
             ])->withInput();
         }
 
         return back()->with('success', 'Thumbnail berhasil diupload dan masuk ke library sistem.');
-    }
-
-    public function show(string $path): BinaryFileResponse
-    {
-        $filePath = course_thumbnail_existing_path($path);
-
-        abort_unless($filePath, 404);
-
-        return response()->file($filePath, [
-            'Cache-Control' => 'public, max-age=3600',
-        ]);
     }
 }

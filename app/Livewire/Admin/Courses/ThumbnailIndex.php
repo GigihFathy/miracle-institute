@@ -20,18 +20,19 @@ class ThumbnailIndex extends Component
 
         if ($usageCount > 0) {
             $this->dispatch('toast', type: 'error', message: "Thumbnail sedang dipakai {$usageCount} course dan tidak bisa dihapus.");
+
             return;
         }
 
-        $deleted = false;
+        $fullPath = public_path($path);
 
-        foreach (course_thumbnail_path_candidates($path) as $fullPath) {
-            if (File::exists($fullPath) && File::delete($fullPath)) {
-                $deleted = true;
-            }
+        if (! File::exists($fullPath)) {
+            $this->dispatch('toast', type: 'error', message: 'File thumbnail tidak ditemukan di server.');
+
+            return;
         }
 
-        if (! $deleted && course_thumbnail_existing_path($path)) {
+        if (! File::delete($fullPath)) {
             $this->dispatch('toast', type: 'error', message: 'Thumbnail gagal dihapus dari server.');
 
             return;
