@@ -31,7 +31,7 @@ services:
     volumes:
       - app-storage:/var/www/html/storage
       - app-cache:/var/www/html/bootstrap/cache
-      - app-thumbnails:/var/www/html/public/images/thumbnail
+      - ./public/images/thumbnail:/var/www/html/public/images/thumbnail
     healthcheck:
       test: ["CMD", "cgi-fcgi", "-bind", "-connect", "127.0.0.1:9000"]
       interval: 30s
@@ -53,7 +53,7 @@ services:
       - "${APP_PORT:-8082}:80"
     volumes:
       - app-storage:/var/www/html/storage:ro
-      - app-thumbnails:/var/www/html/public/images/thumbnail
+      - ./public/images/thumbnail:/var/www/html/public/images/thumbnail:ro
 
   queue-worker:
     image: miracle-institute-app
@@ -82,7 +82,7 @@ services:
     volumes:
       - app-storage:/var/www/html/storage
       - app-cache:/var/www/html/bootstrap/cache
-      - app-thumbnails:/var/www/html/public/images/thumbnail
+      - ./public/images/thumbnail:/var/www/html/public/images/thumbnail
     command: php artisan queue:work database --queue=emails,default --sleep=3 --tries=3 --timeout=120
 
   scheduler:
@@ -112,7 +112,7 @@ services:
     volumes:
       - app-storage:/var/www/html/storage
       - app-cache:/var/www/html/bootstrap/cache
-      - app-thumbnails:/var/www/html/public/images/thumbnail
+      - ./public/images/thumbnail:/var/www/html/public/images/thumbnail
     command: /bin/sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
 
   db:
@@ -136,4 +136,3 @@ volumes:
   db-data:
   app-storage:
   app-cache:
-  app-thumbnails:

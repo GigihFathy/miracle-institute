@@ -184,7 +184,7 @@ if (! function_exists('course_thumbnail_url')) {
             return null;
         }
 
-        return localized_route('course-thumbnails.show', ['path' => basename($relativePath)]);
+        return asset($relativePath);
     }
 }
 
