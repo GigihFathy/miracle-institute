@@ -1,4 +1,4 @@
-@php
+﻿@php
     use Illuminate\Support\Str;
 
     $isMentor = session('active_role') === 'disciples';
@@ -179,9 +179,9 @@
             <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
                 <div class="space-y-3">
                     <div>
-                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran course</h3>
+                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran topik pembelajaran</h3>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Kamu yakin ingin mendaftar ke course
+                            Kamu yakin ingin mendaftar ke topik pembelajaran
                             <span class="font-semibold text-[#004777]">{{ $pendingCourseTitle }}</span>?
                         </p>
                     </div>

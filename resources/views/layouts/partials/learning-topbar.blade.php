@@ -1,4 +1,4 @@
-@php
+﻿@php
     $generalRoutes = [
         ['label' => 'Home', 'route' => 'explore.dashboard'],
         ['label' => __('general.navigation.courses'), 'route' => 'courses.index'],

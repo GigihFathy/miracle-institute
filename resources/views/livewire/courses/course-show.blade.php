@@ -1,4 +1,4 @@
-@php
+﻿@php
     $isMentor = auth()->check() && session('active_role') === 'disciples';
     $isStudent = auth()->check() && session('active_role') === 'student';
     $canTrack = auth()->check() && $enrolled;
@@ -14,12 +14,12 @@
     $topicOffset = ($paginatedTopics->currentPage() - 1) * $paginatedTopics->perPage();
     $mentorTabs = [
         'overview' => 'Ringkasan',
-        'topics' => 'Topik',
+        'topics' => 'Sesi',
         'students' => 'Murid',
     ];
     $studentTabs = [
         'overview' => 'Ringkasan',
-        'topics' => 'Topik',
+        'topics' => 'Sesi',
     ];
     $studentVisibleTabs = $enrolled
         ? $studentTabs
@@ -35,7 +35,7 @@
     $selectedMentorSession = $selectedMentorTopic?->videoSessions->firstWhere('id', $this->selectedMentorSessionId)
         ?? $selectedMentorTopic?->videoSessions->sortByDesc('start_at')->first();
     $selectedMentorSessionScheduleLabel = $selectedMentorSession?->start_at && $selectedMentorSession?->end_at
-        ? 'Sesi: ' . $selectedMentorSession->start_at->format('H:i') . '-' . $selectedMentorSession->end_at->format('H:i') . ' ' . $selectedMentorSession->start_at->format('d M Y')
+        ? 'Pertemuan: ' . $selectedMentorSession->start_at->format('H:i') . '-' . $selectedMentorSession->end_at->format('H:i') . ' ' . $selectedMentorSession->start_at->format('d M Y')
         : null;
     $showMentorZoomButton = filled($selectedMentorSession?->zoom_link)
         && (!$selectedMentorSession?->end_at || now()->lte($selectedMentorSession->end_at));
@@ -59,7 +59,7 @@
     $selectedStudentSession = $selectedStudentSessions->firstWhere('id', $this->selectedStudentSessionId)
         ?? $selectedStudentSessions->sortByDesc('start_at')->first();
     $selectedStudentSessionScheduleLabel = $selectedStudentSession?->start_at && $selectedStudentSession?->end_at
-        ? 'Sesi: ' . $selectedStudentSession->start_at->format('H:i') . ' - ' . $selectedStudentSession->end_at->format('H:i') . ' ' . $selectedStudentSession->start_at->format('d M Y')
+        ? 'Pertemuan: ' . $selectedStudentSession->start_at->format('H:i') . ' - ' . $selectedStudentSession->end_at->format('H:i') . ' ' . $selectedStudentSession->start_at->format('d M Y')
         : null;
     $selectedStudentSessionEndLabel = $selectedStudentSession?->end_at?->format('d M Y H:i');
     $isStudentMaterialLocked = !$selectedStudentSession?->end_at || now()->lt($selectedStudentSession->end_at);
@@ -103,7 +103,7 @@
 
                 <div class="grid grid-cols-1 gap-3 px-5 py-5 text-sm sm:grid-cols-3 sm:px-7">
                     <div class="mentor-workspace-card p-4">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Topik</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Sesi</div>
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $mentoredTopics->count() }}</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
@@ -173,7 +173,7 @@
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $progressPercent }}%</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Topik</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Sesi</div>
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $completedTopicsCount }}/{{ $totalTopicsCount }}</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
@@ -320,7 +320,7 @@
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="mentor-workspace-heading">{{ __('general.course_show.course_topics') }}</h2>
-                            <p class="mentor-workspace-subheading">Pilih topik dan lihat preview materi pembelajaran pada kursus ini.</p>
+                            <p class="mentor-workspace-subheading">Pilih sesi dan lihat preview materi pembelajaran pada topik pembelajaran ini.</p>
                         </div>
                     </div>
 
@@ -337,7 +337,7 @@
 
                         @if($this->upcomingTopicsCount > 0)
                             <div class="shrink-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                                {{ $this->upcomingTopicsCount }} topik lagi akan datang.
+                                {{ $this->upcomingTopicsCount }} sesi lagi akan datang.
                             </div>
                         @endif
                     </div>
@@ -411,7 +411,7 @@
                                                 <div class="rounded-2xl border border-dashed border-amber-200 bg-amber-50 px-4 py-10 text-center">
                                                     <div class="text-sm font-semibold text-amber-700">Materi masih terkunci</div>
                                                     <div class="mt-2 text-sm text-amber-700/90">
-                                                        Materi bisa dibuka setelah sesi selesai{{ $selectedStudentSessionEndLabel ? ' pada ' . $selectedStudentSessionEndLabel : '' }}.
+                                                        Materi bisa dibuka setelah pertemuan selesai{{ $selectedStudentSessionEndLabel ? ' pada ' . $selectedStudentSessionEndLabel : '' }}.
                                                     </div>
                                                 </div>
                                             @elseif($selectedStudentMaterial->type === 'video' && $selectedStudentMaterialPreviewUrl)
@@ -461,7 +461,7 @@
                                         </div>
                                     @else
                                         <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                                    Topik ini belum punya materi.
+                                                    Sesi ini belum punya materi.
                                         </div>
                                     @endif
                                 </div>
@@ -470,7 +470,7 @@
                             <aside class="mentor-workspace-card p-5">
                                 <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Material</div>
                                 <div class="mt-4 rounded-xl bg-[var(--mentor-primary-soft-2)] text-sm text-[var(--mentor-primary)]">
-                                    {{ $selectedStudentSessionScheduleLabel ?? 'Jadwal sesi belum tersedia' }}
+                                    {{ $selectedStudentSessionScheduleLabel ?? 'Jadwal pertemuan belum tersedia' }}
                                 </div>
                                 @if($selectedStudentSession)
                                     <div class="mt-4">
@@ -520,7 +520,7 @@
                     <div class="mentor-workspace-panel">
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
-                                <h2 class="mentor-workspace-heading">Ringkasan Course</h2>
+                                <h2 class="mentor-workspace-heading">Ringkasan Topik pembelajaran</h2>
                                 <p class="mentor-workspace-subheading">
                                     {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
                                 </p>
@@ -537,11 +537,11 @@
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ ucfirst($course->status) }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Topik</div>
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Sesi</div>
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentoredTopics->count() }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Sesi</div>
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Pertemuan</div>
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentorSessionsCount }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
@@ -555,8 +555,8 @@
                 <section class="mentor-workspace-panel">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 class="mentor-workspace-heading">Topik</h2>
-                            <p class="mentor-workspace-subheading">Pilih topik dan lihat preview materi dengan akses cepat ke pengelolaan topik.</p>
+                            <h2 class="mentor-workspace-heading">Sesi</h2>
+                            <p class="mentor-workspace-subheading">Pilih sesi dan lihat preview materi dengan akses cepat ke pengelolaan sesi.</p>
                         </div>
                     </div>
 
@@ -589,7 +589,7 @@
                                     </div>
 
                                     <div class="rounded-xl bg-[var(--mentor-primary-soft-2)] px-4 py-3 text-sm text-[var(--mentor-primary)]">
-                                        {{ $selectedMentorSessionScheduleLabel ?? 'Jadwal sesi belum tersedia' }}
+                                        {{ $selectedMentorSessionScheduleLabel ?? 'Jadwal pertemuan belum tersedia' }}
                                     </div>
 
                                     @if($selectedMentorMaterial)
@@ -615,7 +615,7 @@
                                             </div>
                                         @else
                                             <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                                Topik ini belum punya materi.
+                                                Sesi ini belum punya materi.
                                             </div>
                                         @endif
                                     </div>
@@ -680,7 +680,7 @@
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="mentor-workspace-heading">Murid</h2>
-                            <p class="mentor-workspace-subheading">Daftar peserta kursus dalam tampilan hanya baca.</p>
+                            <p class="mentor-workspace-subheading">Daftar peserta topik pembelajaran dalam tampilan hanya baca.</p>
                         </div>
                     </div>
 
@@ -717,7 +717,7 @@
                                                         ></div>
                                                     </div>
                                                     <div class="mt-2 text-xs font-medium text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                                        {{ $studentProgressPercent }}% · {{ $completedTopicCount }}/{{ $totalTopicsCount }} topik
+                                                        {{ $studentProgressPercent }}% · {{ $completedTopicCount }}/{{ $totalTopicsCount }} sesi
                                                     </div>
                                                 </div>
                                             </td>
@@ -832,9 +832,9 @@
             <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
                 <div class="space-y-3">
                     <div>
-                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran kursus</h3>
+                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran topik pembelajaran</h3>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Kamu yakin ingin mendaftar ke kursus
+                            Kamu yakin ingin mendaftar ke topik pembelajaran
                             <span class="font-semibold text-[#004777]">{{ $course->title }}</span>?
                         </p>
                     </div>
@@ -877,14 +877,14 @@
             <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
                 <div class="space-y-3">
                     <div>
-                        <h3 class="text-xl font-bold text-[#004777]">Akses topik dibatasi</h3>
+                        <h3 class="text-xl font-bold text-[#004777]">Akses sesi dibatasi</h3>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Kamu belum terdaftar di course ini, jadi topik
+                            Kamu belum terdaftar di topik pembelajaran ini, jadi sesi
                             <span class="font-semibold text-[#004777]">{{ $topicAccessWarningName }}</span>
                             belum bisa dibuka.
                         </p>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Silakan daftar ke course ini terlebih dahulu untuk membuka topik pembelajaran.
+                            Silakan daftar ke topik pembelajaran ini terlebih dahulu untuk membuka sesi pembelajaran.
                         </p>
                     </div>
                 </div>
@@ -903,7 +903,7 @@
                         wire:click="confirmEnroll"
                         class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f]"
                     >
-                        Daftar Course
+                        Daftar Topik pembelajaran
                     </button>
                 </div>
             </div>

@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 'facebook' => 'https://facebook.com/edunusa',
                 'instagram' => 'https://instagram.com/edunusa',
                 'youtube' => 'https://youtube.com/@edunusa',
-                'whatsapp' => '+62-812-0000-9001',
+                'email' => 'edu@example.com',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],

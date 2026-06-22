@@ -1,4 +1,4 @@
-<div class="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+﻿<div class="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
     <section class="overflow-hidden rounded-3xl border border-[color:color-mix(in_oklab,#004777_12%,white)] bg-white shadow-[0_20px_50px_color-mix(in_oklab,#004777_8%,transparent)]">
         <div class="relative overflow-hidden bg-gradient-to-br from-[var(--mentor-primary)] to-[#0a659b] px-5 py-6 text-white sm:px-7">
             <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">

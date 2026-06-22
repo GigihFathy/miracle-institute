@@ -1,4 +1,4 @@
-@component('emails.layouts.learning', [
+﻿@component('emails.layouts.learning', [
     'title' => 'Kendala Kehadiran',
     'accent' => '#be123c',
     'accentSoft' => '#fff1f2',
@@ -12,7 +12,7 @@
     </p>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;margin-bottom:22px;">
-        @include('emails.partials.meta-row', ['label' => 'Sesi', 'value' => $attendance->videoSession->title])
+        @include('emails.partials.meta-row', ['label' => 'Pertemuan', 'value' => $attendance->videoSession->title])
         @include('emails.partials.meta-row', ['label' => 'Status', 'value' => ucfirst($attendance->status)])
         @include('emails.partials.meta-row', ['label' => 'Check-in', 'value' => $attendance->check_in_at ? $attendance->check_in_at->format('d M Y H:i') : '-'])
     </table>

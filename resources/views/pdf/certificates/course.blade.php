@@ -1,4 +1,4 @@
-@php
+﻿@php
     use Carbon\Carbon;
 
     $issuedAt = isset($issuedAt) && $issuedAt
@@ -421,7 +421,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Topik</th>
+                            <th>Sesi</th>
                             <th>Hadir/Online</th>
                         </tr>
                     </thead>
@@ -446,7 +446,7 @@
                     @if($achievementSummary['assessment_score'] !== null)
                         dengan nilai asesmen <strong>{{ $achievementSummary['assessment_score'] }}</strong>.
                     @else
-                        dan memenuhi persyaratan kelulusan course.
+                        dan memenuhi persyaratan kelulusan topik pembelajaran.
                     @endif
                 </div>
                 

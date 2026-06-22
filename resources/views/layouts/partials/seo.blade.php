@@ -1,11 +1,11 @@
-@php
+﻿@php
     $appName = config('app.name', 'Miracle Institute');
     $defaultTitle = $appName;
-    $defaultDescription = 'Miracle Institute adalah platform pembelajaran untuk bertumbuh dalam iman melalui kursus, materi, dan sesi belajar yang terarah.';
+    $defaultDescription = 'Miracle Institute adalah platform pembelajaran untuk bertumbuh dalam iman melalui topik pembelajaran, materi, dan pertemuan belajar yang terarah.';
 
     $resolvedTitle = trim((string) ($seoTitle ?? $__env->yieldContent('title', $defaultTitle)));
     $resolvedDescription = trim((string) ($seoDescription ?? $__env->yieldContent('meta_description', $defaultDescription)));
-    $resolvedKeywords = trim((string) ($seoKeywords ?? $__env->yieldContent('meta_keywords', 'Miracle Institute, kursus iman, pembelajaran Kristen, pertumbuhan rohani, belajar Alkitab')));
+    $resolvedKeywords = trim((string) ($seoKeywords ?? $__env->yieldContent('meta_keywords', 'Miracle Institute, topik pembelajaran iman, pembelajaran Kristen, pertumbuhan rohani, belajar Alkitab')));
     $resolvedImage = $seoImage ?? asset('images/banner-seo.png');
     $resolvedUrl = $seoUrl ?? url()->current();
     $resolvedType = $seoType ?? 'website';

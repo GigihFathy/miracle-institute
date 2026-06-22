@@ -1,4 +1,4 @@
-@php
+﻿@php
     $isStudent = auth()->check() && session('active_role') === 'student';
 @endphp
 
@@ -403,7 +403,7 @@
                                 </span>
                             @elseif($attendance && $phase === 'live')
                                 <span class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-medium text-amber-700">
-                                    Clock out tersedia mulai 15 menit sebelum sesi berakhir hingga 2 jam setelah sesi selesai
+                                    Clock out tersedia mulai 15 menit sebelum pertemuan berakhir hingga 2 jam setelah pertemuan selesai
                                 </span>
                             @else
                                 <button

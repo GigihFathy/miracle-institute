@@ -12,17 +12,36 @@ use Livewire\Component;
 
 class DashboardIndex extends Component
 {
-    public int $weeks = 1;
+    public string $fromDate = '';
+    public string $toDate = '';
 
-    public function setWeeks($weeks)
+    public function mount(): void
     {
-        $this->weeks = (int) $weeks;
+        $this->fromDate = now()->startOfMonth()->format('Y-m-d');
+        $this->toDate = now()->format('Y-m-d');
+    }
+
+    public function updatedFromDate(): void
+    {
+        $this->resetErrorBag(['fromDate', 'toDate']);
+        if ($this->fromDate && $this->toDate && $this->fromDate > $this->toDate) {
+            $this->addError('fromDate', 'Tanggal awal tidak boleh melebihi tanggal akhir.');
+        }
+    }
+
+    public function updatedToDate(): void
+    {
+        $this->resetErrorBag(['fromDate', 'toDate']);
+        if ($this->fromDate && $this->toDate && $this->fromDate > $this->toDate) {
+            $this->addError('toDate', 'Tanggal akhir tidak boleh kurang dari tanggal awal.');
+        }
     }
 
     public function render()
     {
         $now = now();
-        $startDate = $now->copy()->subWeeks($this->weeks)->startOfWeek();
+        $startDate = $this->fromDate ? \Carbon\Carbon::parse($this->fromDate)->startOfDay() : now()->startOfMonth()->startOfDay();
+        $endDate = $this->toDate ? \Carbon\Carbon::parse($this->toDate)->endOfDay() : now()->endOfDay();
         $upcomingSessions = \App\Models\VideoSession::with('topic.course')
             ->where('start_at', '>', $now)
             ->orderBy('start_at')
@@ -35,7 +54,7 @@ class DashboardIndex extends Component
             ->take(60)
             ->get();
 
-        $sessionsInRange = \App\Models\VideoSession::whereBetween('start_at', [$startDate, $now])->pluck('id');
+        $sessionsInRange = \App\Models\VideoSession::whereBetween('start_at', [$startDate, $endDate])->pluck('id');
 
         $attendanceStats = Attendance::whereIn('video_session_id', $sessionsInRange)
             ->selectRaw("status, COUNT(*) as total")

@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
     <x-ui.page-header title="{{ __('admin.users.page_title') }}" subtitle="{{ __('admin.users.page_subtitle') }}" />
 
     <div class="rounded-2xl border bg-white p-4">
@@ -133,17 +133,17 @@
                 <div class="overflow-y-auto p-5">
                     @if(empty($studentRecapRows))
                         <div class="rounded-xl border border-dashed border-slate-300 px-5 py-8 text-center text-sm text-slate-500">
-                            Student ini belum mengikuti course apa pun.
+                            Student ini belum mengikuti topik pembelajaran apa pun.
                         </div>
                     @else
                         <div class="grid gap-4 md:grid-cols-3">
                             <div class="rounded-2xl border bg-slate-50 p-4">
-                                <div class="text-xs uppercase tracking-wide text-slate-500">Total Course</div>
+                                <div class="text-xs uppercase tracking-wide text-slate-500">Total Topik pembelajaran</div>
                                 <div class="mt-2 text-2xl font-bold text-slate-900">{{ count($studentRecapRows) }}</div>
                             </div>
 
                             <div class="rounded-2xl border bg-slate-50 p-4">
-                                <div class="text-xs uppercase tracking-wide text-slate-500">Topik Selesai</div>
+                                <div class="text-xs uppercase tracking-wide text-slate-500">Sesi Selesai</div>
                                 <div class="mt-2 text-2xl font-bold text-slate-900">{{ collect($studentRecapRows)->sum('topics_completed') }}</div>
                             </div>
 
@@ -159,7 +159,7 @@
                             <table class="min-w-full text-sm">
                                 <thead class="admin-table-head text-left text-slate-600">
                                     <tr>
-                                        <th class="px-4 py-3 font-medium">Course</th>
+                                        <th class="px-4 py-3 font-medium">Topik pembelajaran</th>
                                         <th class="px-4 py-3 font-medium">Status</th>
                                         <th class="px-4 py-3 font-medium">Progress</th>
                                         <th class="px-4 py-3 font-medium">Kehadiran</th>
@@ -178,7 +178,7 @@
                                                 </span>
                                             </td>
                                             <td class="px-4 py-3">
-                                                <div class="font-medium text-slate-900">{{ $recap['topics_completed'] }} / {{ $recap['topics_total'] }} topik</div>
+                                                <div class="font-medium text-slate-900">{{ $recap['topics_completed'] }} / {{ $recap['topics_total'] }} sesi</div>
                                                 <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
                                                     <div class="h-full rounded-full bg-[#004777]" style="width: {{ $recap['progress_percent'] }}%"></div>
                                                 </div>
@@ -188,7 +188,7 @@
                                                 <div class="text-slate-700">Present: {{ $recap['attendance_present'] }}</div>
                                                 <div class="text-slate-700">Late: {{ $recap['attendance_late'] }}</div>
                                                 <div class="text-slate-700">Online: {{ $recap['attendance_absent'] }}</div>
-                                                <div class="mt-1 text-xs text-slate-500">Total sesi: {{ $recap['sessions_total'] }}</div>
+                                                <div class="mt-1 text-xs text-slate-500">Total pertemuan: {{ $recap['sessions_total'] }}</div>
                                             </td>
                                             <td class="px-4 py-3 text-slate-600">
                                                 <div>{{ $recap['enrolled_at'] }}</div>

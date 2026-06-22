@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
     @if(session('success'))
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-700">
             {{ session('success') }}
@@ -76,7 +76,7 @@
                     >
 
                     <p class="text-xs leading-5 text-slate-500">
-                        Pilih gambar thumbnail baru untuk ditambahkan ke library template kursus.
+                        Pilih gambar thumbnail baru untuk ditambahkan ke library template topik pembelajaran.
                     </p>
 
                     @error('thumbnail')

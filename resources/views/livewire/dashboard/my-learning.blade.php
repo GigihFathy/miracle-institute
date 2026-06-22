@@ -1,4 +1,4 @@
-@php
+﻿@php
     use Illuminate\Support\Str;
 
     $calendarSessionItems = ($calendarSessions ?? collect())->map(function ($session) {
@@ -141,7 +141,7 @@
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-[#004777] sm:text-3xl">{{ __('general.my_learning.sessions.title') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500">Pilih bulan dan tanggal untuk melihat semua sesi pembelajaran yang kamu ikuti.</p>
+                    <p class="mt-1 text-sm text-slate-500">Pilih bulan dan tanggal untuk melihat semua pertemuan pembelajaran yang kamu ikuti.</p>
                 </div>
 
                 <a
@@ -198,7 +198,7 @@
                             <template x-if="sessionCount(day) > 0">
                                 <div class="absolute bottom-2 left-2 right-2 flex items-center justify-start sm:justify-between">
                                     <div class="h-2 w-2 rounded-full bg-blue-500 sm:hidden"></div>
-                                    <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' sesi'"></span>
+                                    <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' pertemuan'"></span>
                                 </div>
                             </template>
                         </button>
@@ -232,11 +232,11 @@
                     </div>
 
                     <div x-show="selectedDate && selectedSessions.length === 0" class="mt-4 text-sm text-slate-500">
-                        Tidak ada sesi pada tanggal ini.
+                        Tidak ada pertemuan pada tanggal ini.
                     </div>
 
                     <div x-show="!selectedDate" class="mt-4 text-sm text-slate-500">
-                        Klik tanggal pada kalender untuk melihat sesi yang berlangsung pada hari itu.
+                        Klik tanggal pada kalender untuk melihat pertemuan yang berlangsung pada hari itu.
                     </div>
                 </div>
             </div>
@@ -248,7 +248,7 @@
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-[#004777] sm:text-3xl">{{ __('general.my_learning.courses.title') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500">Daftar kursus yang sedang kamu ikuti.</p>
+                    <p class="mt-1 text-sm text-slate-500">Daftar topik pembelajaran yang sedang kamu ikuti.</p>
                 </div>
 
                 <a

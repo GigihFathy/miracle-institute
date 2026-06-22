@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
     <x-ui.page-header
         title="{{ __('admin.attendances.page_title') }}"
         subtitle="{{ __('admin.attendances.page_subtitle') }}"
@@ -159,7 +159,7 @@
                     </div>
                 @endif
 
-                <label class="mb-1 block text-xs font-semibold text-slate-600">Sesi <span class="text-rose-500">*</span></label>
+                <label class="mb-1 block text-xs font-semibold text-slate-600">Pertemuan <span class="text-rose-500">*</span></label>
                 <select wire:model="video_session_id" class="w-full rounded-xl border px-4 py-2">
                     <option value="">{{ __('admin.attendances.form.select_session') }}</option>
                     @foreach($sessions as $session)

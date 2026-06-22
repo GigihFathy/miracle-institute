@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
     <x-ui.page-header
         title="{{ __('admin.courses.page_title') }}"
         subtitle="{{ __('admin.courses.page_subtitle') }}"
@@ -129,7 +129,7 @@
                                     wire:click="openRecap('{{ $row->id }}')"
                                     class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-100"
                                 >
-                                    Rekap Course
+                                    Rekap Topik pembelajaran
                                 </button>
 
                                 <div class="my-1 w-full border-t"></div>
@@ -224,7 +224,7 @@
                     <div>
                         <div class="mb-1 flex items-center justify-between gap-3">
                             <label class="block text-xs font-semibold text-slate-600">
-                                Judul Course <span class="text-rose-500">*</span>
+                                Judul Topik pembelajaran <span class="text-rose-500">*</span>
                             </label>
                             <span class="text-[11px] text-slate-400">{{ mb_strlen($title ?? '') }}/150</span>
                         </div>
@@ -271,7 +271,7 @@
                             {{ $this->certificateNumberPreview }}
                         </div>
                         <p class="mt-2 text-[11px] leading-5 text-slate-600">
-                            Preview ini mengikuti format sertifikat kursus yang dipakai sistem saat sertifikat diterbitkan.
+                            Preview ini mengikuti format sertifikat topik pembelajaran yang dipakai sistem saat sertifikat diterbitkan.
                         </p>
                     </div>
 
@@ -348,12 +348,12 @@
 
     @if($showRecapModal && $selectedCourseRecap)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <button type="button" class="absolute inset-0" wire:click="closeRecapModal" aria-label="Tutup rekap kursus"></button>
+            <button type="button" class="absolute inset-0" wire:click="closeRecapModal" aria-label="Tutup rekap topik pembelajaran"></button>
 
             <div class="relative z-10 flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div class="flex items-start justify-between gap-4 border-b p-5">
                     <div>
-                        <h2 class="text-lg font-semibold text-slate-900">Rekap Course</h2>
+                        <h2 class="text-lg font-semibold text-slate-900">Rekap Topik pembelajaran</h2>
                         <p class="mt-1 text-sm text-slate-500">{{ $selectedCourseRecap->title }}</p>
                     </div>
 
@@ -378,7 +378,7 @@
                             </div>
                         </div>
                         <div class="rounded-2xl border bg-slate-50 p-4">
-                            <div class="text-xs uppercase tracking-wide text-slate-500">Total Sesi</div>
+                            <div class="text-xs uppercase tracking-wide text-slate-500">Total Pertemuan</div>
                             <div class="mt-2 text-2xl font-bold text-slate-900">{{ $courseRecapSummary['sessions_total'] ?? 0 }}</div>
                         </div>
                         <div class="rounded-2xl border bg-emerald-50 p-4">
@@ -414,8 +414,8 @@
                         <table class="min-w-full text-sm">
                             <thead class="admin-table-head text-left text-slate-600">
                                 <tr>
-                                    <th class="px-4 py-3 font-medium">Topik</th>
                                     <th class="px-4 py-3 font-medium">Sesi</th>
+                                    <th class="px-4 py-3 font-medium">Pertemuan</th>
                                     <th class="px-4 py-3 font-medium">Jadwal</th>
                                     <th class="px-4 py-3 font-medium">Status</th>
                                     <th class="px-4 py-3 font-medium">Present</th>
@@ -443,7 +443,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="8" class="px-4 py-8 text-center text-slate-500">
-                                            Belum ada sesi pada kursus ini.
+                                            Belum ada pertemuan pada topik pembelajaran ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -465,7 +465,7 @@ function showCourseImagePreview(src, title) {
     if (!modal || !image) return;
 
     image.src = src;
-    image.alt = title || 'Pratinjau gambar kursus';
+    image.alt = title || 'Pratinjau gambar topik pembelajaran';
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.classList.add('overflow-hidden');

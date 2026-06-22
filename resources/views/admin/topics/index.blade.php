@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold">Topics</h1>
-                <p class="text-gray-500">Kelola topic per course, mentor, dan visibility.</p>
+                <p class="text-gray-500">Kelola topic per topik pembelajaran, mentor, dan visibility.</p>
             </div>
             <button class="px-4 py-2 rounded-md bg-black text-white text-sm">
                 + New Topic
@@ -17,7 +17,7 @@
                 <thead class="bg-gray-50 text-left">
                     <tr>
                         <th class="p-4">Name</th>
-                        <th class="p-4">Course</th>
+                        <th class="p-4">Topik pembelajaran</th>
                         <th class="p-4">Teacher</th>
                         <th class="p-4">Visibility</th>
                         <th class="p-4">Action</th>

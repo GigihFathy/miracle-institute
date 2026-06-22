@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
     <x-ui.page-header
         title="{{ __('admin.sessions.page_title') }}"
         subtitle="{{ __('admin.sessions.page_subtitle') }}"
@@ -52,7 +52,7 @@
 
                 <div class="space-y-3">
                     <div class="text-sm font-semibold text-slate-700">
-                        Kehadiran Sesi
+                        Kehadiran Pertemuan
                     </div>
                     <x-ui.table-shell class="table-auto">
                         <thead class="admin-table-head text-left">
@@ -309,7 +309,7 @@
                 </div>
 
                 <div>
-                    <label class="mb-1 block text-xs font-semibold text-slate-600">Judul Sesi <span class="text-rose-500">*</span></label>
+                    <label class="mb-1 block text-xs font-semibold text-slate-600">Judul Pertemuan <span class="text-rose-500">*</span></label>
                     <input wire:model.live="title" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.sessions.form.title_placeholder') }}">
                     @error('title') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                 </div>

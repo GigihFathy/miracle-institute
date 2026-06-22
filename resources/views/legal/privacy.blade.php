@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -49,7 +49,7 @@
                     <li>Negara atau wilayah domisili;</li>
                     <li>Informasi organisasi atau gereja (jika diberikan);</li>
                     <li>Aktivitas pembelajaran;</li>
-                    <li>Riwayat kursus;</li>
+                    <li>Riwayat topik pembelajaran;</li>
                     <li>Nilai dan progres belajar;</li>
                     <li>Data perangkat dan browser;</li>
                     <li>Alamat IP;</li>

@@ -27,18 +27,6 @@
         subtitle="{{ __('admin.dashboard.page_subtitle') }}"
     />
 
-    <div class="flex gap-2 flex-wrap">
-        @foreach([1,2,3,4] as $w)
-            <button
-                wire:click="setWeeks({{ $w }})"
-                class="rounded-xl border px-4 py-2 text-sm
-                    {{ $weeks === $w ? 'border border-[#35A7FF] bg-transparent text-[#004777]' : 'bg-white' }}"
-            >
-                {{ trans_choice('admin.dashboard.filters.weeks', $w, ['count' => $w]) }}
-            </button>
-        @endforeach
-    </div>
-
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="rounded-2xl border bg-white p-5">
             <div class="text-sm text-slate-500">{{ __('admin.dashboard.stats.users.label') }}</div>
@@ -66,13 +54,34 @@
     </div>
 
     <section class="space-y-4 rounded-2xl border bg-white p-5">
-        <div>
-            <h2 class="text-lg font-semibold">
-                {{ trans_choice('admin.dashboard.attendance.title', $weeks, ['weeks' => $weeks]) }}
-            </h2>
-            <p class="text-sm text-slate-500">
-                {{ __('admin.dashboard.attendance.total_records', ['count' => number_format($attendance['total'], 0, ',', '.')]) }}
-            </p>
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h2 class="text-lg font-semibold">{{ __('admin.dashboard.attendance.title') }}</h2>
+                <p class="text-sm text-slate-500">
+                    {{ __('admin.dashboard.attendance.total_records', ['count' => number_format($attendance['total'], 0, ',', '.')]) }}
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-start gap-4">
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs text-slate-500">{{ __('admin.dashboard.filters.from_date') }}</label>
+                    <input
+                        type="date"
+                        wire:model.live="fromDate"
+                        class="rounded-xl border bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand @error('fromDate') border-red-400 @enderror"
+                    >
+                    <span class="block min-h-5 text-xs text-red-500">@error('fromDate') {{ $message }} @enderror</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs text-slate-500">{{ __('admin.dashboard.filters.to_date') }}</label>
+                    <input
+                        type="date"
+                        wire:model.live="toDate"
+                        class="rounded-xl border bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand @error('toDate') border-red-400 @enderror"
+                    >
+                    <span class="block min-h-5 text-xs text-red-500">@error('toDate') {{ $message }} @enderror</span>
+                </div>
+            </div>
         </div>
 
         <div
@@ -163,7 +172,7 @@
                     </template>
                 </div>
 
-                <div class="grid grid-cols-7 gap-2 text-sm">
+                <div class="grid grid-cols-7 gap-1 text-sm sm:gap-2">
                     <template x-for="blank in blanks" :key="`${monthKey}-blank-${blank}`">
                         <div></div>
                     </template>
@@ -177,14 +186,14 @@
                                 : (hasSession(day)
                                     ? 'border-sky-200 bg-sky-50 text-slate-700 hover:border-sky-300 hover:bg-sky-100'
                                     : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-50')"
-                            class="relative h-20 rounded-lg border p-1 text-left transition"
+                            class="relative h-14 rounded-lg border p-1 text-left transition sm:h-20"
                         >
                             <div x-text="day" class="text-xs font-medium"></div>
 
                             <template x-if="sessionCount(day) > 0">
-                                <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-                                    <div class="h-2 w-2 rounded-full bg-blue-500"></div>
-                                    <span class="text-[10px] font-semibold" x-text="sessionCount(day) + ' sesi'"></span>
+                                <div class="absolute bottom-1 left-1 right-1 flex items-center gap-1 sm:bottom-2 sm:left-2 sm:right-2">
+                                    <div class="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 sm:h-2 sm:w-2"></div>
+                                    <span class="hidden truncate text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' sesi'"></span>
                                 </div>
                             </template>
                         </button>
@@ -194,7 +203,7 @@
                 <div class="border-t border-slate-200 pt-4">
                     <div class="flex items-center justify-between gap-3">
                         <div>
-                            <div class="text-sm font-semibold text-slate-800">Sesi pada tanggal terpilih</div>
+                            <div class="text-sm font-semibold text-slate-800">Pertemuan pada tanggal terpilih</div>
                             <div class="text-xs text-slate-500" x-text="selectedLabel"></div>
                         </div>
                         <button
@@ -227,19 +236,17 @@
                     </div>
 
                     <div x-show="selectedDate && selectedSessions.length === 0" class="mt-4 text-sm text-slate-500">
-                        Tidak ada sesi pada tanggal ini.
+                        Tidak ada pertemuan pada tanggal ini.
                     </div>
 
                     <div x-show="!selectedDate" class="mt-4 text-sm text-slate-500">
-                        Klik tanggal pada kalender untuk melihat sesi yang berlangsung pada hari itu.
+                        Klik tanggal pada kalender untuk melihat pertemuan yang berlangsung pada hari itu.
                     </div>
                 </div>
             </div>
         </section>
     </div>
-</div>
-
-@push('scripts')
+    <div wire:ignore>
     <script>
         function calendarComponent(sessions, weekdays, monthNames) {
             return {
@@ -447,4 +454,5 @@
             }
         })();
     </script>
-@endpush
+    </div>
+</div>

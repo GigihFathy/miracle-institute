@@ -1,6 +1,6 @@
-<section class="mentor-workspace-panel">
+﻿<section class="mentor-workspace-panel">
     <h2 class="mentor-workspace-heading">Assessment</h2>
-    <p class="mentor-workspace-subheading">Ringkasan singkat assessment pada course ini.</p>
+    <p class="mentor-workspace-subheading">Ringkasan singkat assessment pada topik pembelajaran ini.</p>
 
     @if($assessment)
         <div class="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-4">

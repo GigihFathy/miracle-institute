@@ -1,11 +1,11 @@
-@component('emails.layouts.learning', [
+﻿@component('emails.layouts.learning', [
     'title' => 'Assessment Tersedia',
     'accent' => '#b45309',
     'accentSoft' => '#fffbeb',
     'badge' => 'ASSESSMENT',
     'icon' => '📝',
     'heroTitle' => 'Assessment sudah dibuka',
-    'heroText' => 'Seluruh topik sudah selesai dan assessment kini tersedia untuk dikerjakan.'
+    'heroText' => 'Seluruh sesi sudah selesai dan assessment kini tersedia untuk dikerjakan.'
 ])
     <p style="margin:0 0 16px 0;font-size:15px;line-height:1.8;color:#334155;">
         Halo <strong>{{ $notifiable->name }}</strong>, Anda sudah dapat mulai mengerjakan assessment berikut.

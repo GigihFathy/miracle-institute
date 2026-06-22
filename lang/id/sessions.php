@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
 
@@ -11,16 +11,16 @@ return [
 
     'button' => [
         'upcoming' => 'Belum Dimulai',
-        'live' => 'Gabung Sesi',
+        'live' => 'Gabung Pertemuan',
         'ended' => 'Selesai',
         'invalid' => 'Tidak Tersedia',
     ],
 
     'countdown' => [
-        'invalid' => 'Jadwal sesi belum lengkap.',
+        'invalid' => 'Jadwal pertemuan belum lengkap.',
         'starts_in' => 'Dimulai dalam :duration',
         'ends_in' => 'Berakhir dalam :duration',
-        'completed' => 'Sesi selesai',
+        'completed' => 'Pertemuan selesai',
     ],
 
 ];

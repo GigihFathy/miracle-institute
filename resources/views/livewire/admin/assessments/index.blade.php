@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
     <x-ui.page-header
         title="{{ __('admin.assessments.page_title') }}"
         subtitle="{{ __('admin.assessments.page_subtitle') }}"
@@ -141,7 +141,7 @@
                 </x-ui.table-shell>
             @else
                 <div class="rounded-2xl border border-dashed bg-slate-50 p-6 text-slate-600">
-                    Belum ada assessment untuk kursus ini.
+                    Belum ada assessment untuk topik pembelajaran ini.
                 </div>
             @endif
         </div>
@@ -187,7 +187,7 @@
                     @else
                         <div class="space-y-1">
                             <label class="mb-1 block text-xs font-semibold text-slate-600">
-                                Course <span class="text-rose-500">*</span>
+                                Topik pembelajaran <span class="text-rose-500">*</span>
                             </label>
                             <select wire:model="course_id" class="w-full rounded-xl border px-4 py-2">
                             <option value="">{{ __('admin.assessments.form.select_course') }}</option>

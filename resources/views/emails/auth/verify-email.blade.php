@@ -1,4 +1,4 @@
-@component('emails.layouts.learning', [
+﻿@component('emails.layouts.learning', [
     'title' => 'Verifikasi Akun',
 ])
     <p style="margin:0 0 16px 0;">
@@ -10,7 +10,7 @@
     </p>
 
     <p style="margin:0 0 16px 0;">
-        Setelah verifikasi berhasil, Anda bisa masuk ke dashboard, mengikuti course, dan menerima reminder sesi dengan normal.
+        Setelah verifikasi berhasil, Anda bisa masuk ke dashboard, mengikuti topik pembelajaran, dan menerima reminder pertemuan dengan normal.
     </p>
 
     @component('emails.components.button', ['url' => $verificationUrl, 'color' => '#004777'])

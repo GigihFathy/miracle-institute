@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-2xl font-bold">Certificates</h1>
-                <p class="text-gray-500">Pantau penerbitan sertifikat topic dan course.</p>
+                <p class="text-gray-500">Pantau penerbitan sertifikat topic dan topik pembelajaran.</p>
             </div>
             <button class="px-4 py-2 rounded-md bg-black text-white text-sm">
                 Refresh

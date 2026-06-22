@@ -1,4 +1,4 @@
-@php
+﻿@php
     use Illuminate\Support\Str;
 
     $calendarSessionItems = ($calendarSessions ?? collect())->map(function ($session) {
@@ -187,7 +187,7 @@
                                 <template x-if="sessionCount(day) > 0">
                                     <div class="absolute bottom-2 left-2 right-2 flex items-center justify-start sm:justify-between">
                                         <div class="h-2 w-2 rounded-full bg-blue-500 sm:hidden"></div>
-                                        <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' sesi'"></span>
+                                        <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' pertemuan'"></span>
                                     </div>
                                 </template>
                             </button>
