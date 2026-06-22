@@ -429,7 +429,7 @@ class TopicPlayer extends Component
             'present' => $sessionAttendances->where('status', 'present')->count(),
             'late' => $sessionAttendances->where('status', 'late')->count(),
             'absent' => $sessionAttendances->filter(fn ($attendance) => in_array($attendance->status, ['online', 'absent'], true))->count(),
-            'checked_in' => $sessionAttendances->whereIn('status', ['present', 'late'])->count(),
+            'checked_in' => $sessionAttendances->where('status', 'present')->count(),
         ];
 
         $completionSnapshot = [
@@ -530,7 +530,7 @@ class TopicPlayer extends Component
             return $materials->mapWithKeys(fn ($m) => [(string) $m->id => 'locked_time'])->all();
         }
 
-        $attended = $sessionAttendances->whereIn('status', ['present', 'late', 'online'])->isNotEmpty();
+        $attended = $sessionAttendances->where('status', 'present')->isNotEmpty();
 
         $completedIds = $materialProgresses->where('status', 'completed')->pluck('material_id')->flip();
 
@@ -574,7 +574,7 @@ class TopicPlayer extends Component
         $attended = Attendance::query()
             ->where('user_id', auth()->id())
             ->whereIn('video_session_id', $sessionIds)
-            ->whereIn('status', ['present', 'late', 'online'])
+            ->where('status', 'present')
             ->exists();
 
         if ($attended) {
@@ -609,7 +609,7 @@ class TopicPlayer extends Component
         $attended = Attendance::query()
             ->where('user_id', auth()->id())
             ->whereIn('video_session_id', $sessionIds)
-            ->whereIn('status', ['present', 'late', 'online'])
+            ->where('status', 'present')
             ->exists();
 
         if (! $attended) {
