@@ -30,7 +30,6 @@ class DatabaseSeeder extends Seeder
             'sessions',
             'topics',
             'courses',
-            'study_programs',
             'articles',
             'article_images',
             'tutorial_videos',
@@ -45,7 +44,6 @@ class DatabaseSeeder extends Seeder
             Auth\RolePermissionSeeder::class,
             Auth\UserSeeder::class,
 
-            Learning\StudyProgramSeeder::class,
             Learning\CourseSeeder::class,
             Learning\TopicSeeder::class,
             Learning\VideoSessionSeeder::class,

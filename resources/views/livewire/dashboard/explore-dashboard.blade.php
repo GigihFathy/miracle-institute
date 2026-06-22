@@ -1,5 +1,4 @@
 @php
-    $studyProgramCount = $studyPrograms->count();
     $featuredCount = $featured->count();
 @endphp
 
@@ -219,10 +218,10 @@
                             if ($courseImage) {
                                 if (\Illuminate\Support\Str::startsWith($courseImage, ['http://', 'https://'])) {
                                     $courseImageSrc = $courseImage;
-                                } elseif (\Illuminate\Support\Str::startsWith($courseImage, 'images/')) {
-                                    $courseImageSrc = asset($courseImage);
+                                } elseif ($thumbnailUrl = course_thumbnail_url($courseImage)) {
+                                    $courseImageSrc = $thumbnailUrl;
                                 } else {
-                                    $courseImageSrc = asset('images/thumbnail/' . $courseImage);
+                                    $courseImageSrc = course_thumbnail_url($courseImage);
                                 }
                             }
                         @endphp
@@ -238,7 +237,6 @@
                             @endif
 
                             <div class="px-3 pb-3 pt-5">
-                                <p class="text-xs font-semibold uppercase tracking-wide text-[#35A7FF]">{{ $course->studyProgram?->title }}</p>
                                 <h3 class="mt-2 text-lg font-bold leading-snug text-[#0f172a]">{{ \Illuminate\Support\Str::limit($course->title, 80) }}</h3>
                                 <p class="mt-2 text-sm text-slate-500">
                                     {{ $course->instructor?->name ?? $course->author ?? __('general.explore_dashboard.defaults.instructor') }}

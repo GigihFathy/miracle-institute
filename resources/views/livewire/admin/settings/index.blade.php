@@ -81,9 +81,9 @@
 
             <div>
                 <label class="mb-1 block text-xs font-semibold text-slate-600">
-                    {{ __('admin.settings.form.whatsapp') }}
+                    {{ __('admin.settings.form.email') }}
                 </label>
-                <input wire:model="whatsapp" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.settings.form.whatsapp') }}">
+                <input wire:model="email" type="email" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.settings.form.email') }}">
             </div>
         </div>
 
@@ -129,8 +129,7 @@
         <div class="mt-6 flex flex-col sm:flex-row items-center gap-4 border-t pt-5">
             @if($isGoogleConnected)
                 <button 
-                    wire:click="disconnectGoogle" 
-                    wire:confirm="{{ __('admin.settings.drive.confirm_disconnect') }}"
+                    wire:click="openDisconnectGoogleModal"
                     class="rounded-xl border border-red-200 bg-white px-5 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 focus:ring-4 focus:ring-red-100 transition-all w-full sm:w-auto"
                 >
                     {{ __('admin.settings.actions.disconnect_google') }}
@@ -159,4 +158,47 @@
             <span class="mt-1 block font-mono text-[11px] text-slate-800">{{ config('services.google.redirect') }}</span>
         </div>
     </div>
+
+    @if($showDisconnectGoogleModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+            <button type="button" class="absolute inset-0" wire:click="closeDisconnectGoogleModal" aria-label="Tutup modal"></button>
+
+            <div class="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900">Putuskan Integrasi Cloud Storage (Google Drive)</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                        Untuk keamanan, masukkan password default sebelum memutus koneksi Google Drive.
+                    </p>
+                </div>
+
+                <div class="mt-5">
+                    <label class="mb-2 block text-sm font-medium text-slate-700">Password default</label>
+                    <input
+                        type="password"
+                        wire:model.defer="disconnectGooglePassword"
+                        class="w-full rounded-xl border px-4 py-2.5"
+                        placeholder="Masukkan password"
+                    >
+                    @error('disconnectGooglePassword') <p class="mt-2 text-sm text-rose-600">{{ $message }}</p> @enderror
+                </div>
+
+                <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                    <button
+                        type="button"
+                        wire:click="closeDisconnectGoogleModal"
+                        class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="disconnectGoogle"
+                        class="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700"
+                    >
+                        Putuskan Koneksi
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

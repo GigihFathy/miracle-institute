@@ -10,8 +10,7 @@ class LandingPage extends Component
 {
     public function render()
     {
-        $courses = Course::with('studyProgram')
-            ->where('status', 'active')
+        $courses = Course::where('status', 'active')
             ->latest()
             ->take(6)
             ->get();

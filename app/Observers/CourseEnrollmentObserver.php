@@ -30,7 +30,7 @@ class CourseEnrollmentObserver
                     'user_id' => $enrollment->user_id,
                 ],
                 [
-                    'status' => 'absent',
+                    'status' => 'online',
                     'check_in_at' => null,
                     'clock_out_at' => null,
                     'ip_address' => null,

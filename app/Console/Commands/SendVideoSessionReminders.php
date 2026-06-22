@@ -14,7 +14,7 @@ class SendVideoSessionReminders extends Command
 
     public function handle(): int
     {
-        $windowStart = now()->addDays(3);
+        $windowStart = now()->addDays(2);
         $windowEnd = $windowStart->copy()->addMinute();
 
         $sessions = VideoSession::query()

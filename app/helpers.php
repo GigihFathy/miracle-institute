@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Facades\File;
 
 spl_autoload_register(static function (string $class): void {
     static $vendorPath = null;
@@ -112,5 +113,104 @@ if (! function_exists('localized_route')) {
         unset($parameters['locale']);
 
         return route($routeName, $parameters, $absolute);
+    }
+}
+
+if (! function_exists('course_thumbnail_relative_path')) {
+    function course_thumbnail_relative_path(?string $path): ?string
+    {
+        $path = trim((string) $path);
+
+        if ($path === '') {
+            return null;
+        }
+
+        $filename = basename(str_replace('\\', '/', $path));
+
+        if ($filename === '' || $filename === '.' || $filename === '..') {
+            return null;
+        }
+
+        return 'images/thumbnail/' . $filename;
+    }
+}
+
+if (! function_exists('course_thumbnail_directories')) {
+    function course_thumbnail_directories(): array
+    {
+        return [
+            public_path('images/thumbnail'),
+        ];
+    }
+}
+
+if (! function_exists('course_thumbnail_path_candidates')) {
+    function course_thumbnail_path_candidates(?string $path): array
+    {
+        $relativePath = course_thumbnail_relative_path($path);
+
+        if (! $relativePath) {
+            return [];
+        }
+
+        $filename = basename($relativePath);
+
+        return array_values(array_unique(array_map(
+            static fn (string $directory): string => rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename,
+            course_thumbnail_directories()
+        )));
+    }
+}
+
+if (! function_exists('course_thumbnail_existing_path')) {
+    function course_thumbnail_existing_path(?string $path): ?string
+    {
+        foreach (course_thumbnail_path_candidates($path) as $candidate) {
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+}
+
+if (! function_exists('course_thumbnail_url')) {
+    function course_thumbnail_url(?string $path): ?string
+    {
+        $relativePath = course_thumbnail_relative_path($path);
+
+        if (! $relativePath) {
+            return null;
+        }
+
+        return asset($relativePath);
+    }
+}
+
+if (! function_exists('course_thumbnail_files')) {
+    function course_thumbnail_files(): array
+    {
+        $files = [];
+
+        foreach (course_thumbnail_directories() as $directory) {
+            if (! File::exists($directory)) {
+                continue;
+            }
+
+            foreach (File::files($directory) as $file) {
+                if (! $file->isFile()) {
+                    continue;
+                }
+
+                $filename = $file->getFilename();
+
+                if (! array_key_exists($filename, $files) || $file->getMTime() > $files[$filename]->getMTime()) {
+                    $files[$filename] = $file;
+                }
+            }
+        }
+
+        return array_values($files);
     }
 }

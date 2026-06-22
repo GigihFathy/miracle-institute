@@ -8,9 +8,9 @@ use App\Models\Attendance;
 use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\Material;
-use App\Models\StudyProgram;
 use App\Models\Topic;
 use App\Models\VideoSession;
+use App\Services\LearningAccessRequirementService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Livewire\Component;
@@ -26,16 +26,14 @@ class CourseIndex extends Component
     public array $thumbnails = [];
 
     public ?string $editingId = null;
-    public string $study_program_id = '';
     public string $title = '';
     public string $slug = '';
     public string $poster = '';
     public string $certificate_course_number = '';
     public string $certificate_prefix_code = '';
     public string $description = '';
-    public string $status = 'active';
+    public string $status = 'inactive';
 
-    public string $studyProgramFilter = '';
     public string $statusFilter = '';
     public ?Course $selectedCourseRecap = null;
     public array $courseRecapSummary = [];
@@ -43,7 +41,6 @@ class CourseIndex extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'studyProgramFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
         'perPage' => ['except' => 10],
     ];
@@ -51,7 +48,6 @@ class CourseIndex extends Component
     protected function rules(): array
     {
         return [
-            'study_program_id' => 'required|exists:study_programs,id',
             'title' => 'required|string|max:150',
             'slug' => 'required|string|max:255',
             'poster' => 'nullable|string|max:255',
@@ -82,7 +78,6 @@ class CourseIndex extends Component
         $row = Course::findOrFail($id);
 
         $this->editingId = $row->id;
-        $this->study_program_id = $row->study_program_id;
         $this->title = $row->title;
         $this->slug = $row->slug;
         $this->poster = $row->poster;
@@ -98,10 +93,31 @@ class CourseIndex extends Component
     {
         $this->validate();
 
+        $course = $this->editingId ? Course::findOrFail($this->editingId) : new Course();
+
+        $course->forceFill([
+            'title' => $this->title,
+            'slug' => Str::slug($this->title),
+            'poster' => $this->poster,
+            'certificate_course_number' => (int) $this->certificate_course_number,
+            'certificate_prefix_code' => Str::upper(trim($this->certificate_prefix_code)),
+            'description' => $this->description,
+            'status' => $this->status,
+        ]);
+
+        if ($this->status === 'active') {
+            try {
+                app(LearningAccessRequirementService::class)->ensureCourseCanBeActivated($course);
+            } catch (\RuntimeException $e) {
+                $this->addError('status', $e->getMessage());
+
+                return;
+            }
+        }
+
         Course::updateOrCreate(
             ['id' => $this->editingId],
             [
-                'study_program_id' => $this->study_program_id,
                 'title' => $this->title,
                 'slug' => Str::slug($this->title),
                 'poster' => $this->poster,
@@ -149,7 +165,6 @@ class CourseIndex extends Component
     public function openRecap(string $id): void
     {
         $course = Course::with([
-            'studyProgram',
             'topics.videoSessions',
             'enrollments',
             'certificates' => fn ($query) => $query->where('status', 'issued'),
@@ -176,7 +191,7 @@ class CourseIndex extends Component
                         'status' => $session->status,
                         'present' => $rows->where('status', 'present')->count(),
                         'late' => $rows->where('status', 'late')->count(),
-                        'absent' => $rows->where('status', 'absent')->count(),
+                        'absent' => $rows->whereIn('status', ['online', 'absent'])->count(),
                         'attendance_total' => $rows->count(),
                     ];
                 });
@@ -218,17 +233,14 @@ class CourseIndex extends Component
 
     public function render()
     {
-        $rows = Course::with('studyProgram')
-            ->withCount(['topics', 'enrollments', 'certificates'])
+        $rows = Course::withCount(['topics', 'enrollments', 'certificates'])
             ->when($this->search, fn ($q) => $q->where('title', 'like', "%{$this->search}%"))
-            ->when($this->studyProgramFilter, fn ($q) => $q->where('study_program_id', $this->studyProgramFilter))
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->latest()
             ->paginate($this->perPage);
 
         return view('livewire.admin.courses.index', [
             'rows' => $rows,
-            'studyPrograms' => StudyProgram::orderBy('title')->get(),
             'stats' => [
                 'courses' => Course::count(),
                 'topics' => Topic::count(),
@@ -244,7 +256,6 @@ class CourseIndex extends Component
     {
         $this->reset([
             'editingId',
-            'study_program_id',
             'title',
             'slug',
             'poster',
@@ -254,23 +265,22 @@ class CourseIndex extends Component
             'status',
         ]);
 
-        $this->status = 'active';
+        $this->status = 'inactive';
         $this->resetValidation();
     }
 
     private function loadThumbnails(): void
     {
-        $dir = public_path('images/thumbnail');
-
-        if (!File::exists($dir)) {
-            $this->thumbnails = [];
-            return;
-        }
-
-        $files = collect(File::files($dir))
+        $files = collect(course_thumbnail_files())
             ->filter(fn ($file) => in_array(Str::lower($file->getExtension()), ['jpg', 'jpeg', 'png', 'webp'], true))
             ->sortByDesc(fn ($file) => $file->getMTime())
             ->values();
+
+        if ($files->isEmpty()) {
+            $this->thumbnails = [];
+
+            return;
+        }
 
         $this->thumbnails = $files
             ->map(fn ($file) => 'images/thumbnail/' . $file->getFilename())

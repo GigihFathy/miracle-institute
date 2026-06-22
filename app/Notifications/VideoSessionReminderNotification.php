@@ -37,7 +37,7 @@ class VideoSessionReminderNotification extends Notification implements ShouldQue
     {
         return [
             'video_session_id' => $this->session->id,
-            'message' => 'Sesi pertemuan akan dimulai dalam 3 hari.',
+            'message' => 'Sesi pertemuan akan dimulai dalam 2 hari.',
         ];
     }
 }

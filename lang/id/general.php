@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
     'explore_dashboard' => [
@@ -20,10 +20,10 @@ return [
                 'welcome_back' => 'Selamat kembali di perjalanan rohani Anda',
                 'keep_growing' => 'terus bertumbuh dalam iman',
                 'description' => 'Lanjutkan perjalanan pemuridan Anda, pelajari kebenaran Firman Tuhan, dan alami pertumbuhan rohani yang nyata setiap hari.',
-                'courses' => 'Kelas',
+                'courses' => 'Topik pembelajaran',
                 'completed' => 'Selesai',
                 'progress' => 'Progres',
-                'explore_classes' => 'Jelajahi Kelas',
+                'explore_classes' => 'Jelajahi Topik pembelajaran',
                 'my_journey' => 'Perjalanan Saya',
                 'featured_program' => 'Program Unggulan',
                 'featured_program_description' => 'Bertumbuh makin dalam di dalam Kristus melalui pembelajaran Alkitab yang transformatif',
@@ -40,20 +40,20 @@ return [
             'learn' => [
                 'title' => 'Belajar dengan',
                 'highlight' => 'tujuan.',
-                'description' => 'Jelajahi course dan pengajaran praktis yang dirancang untuk mengubah pengetahuan menjadi hikmat sehari-hari.',
+                'description' => 'Jelajahi topik pembelajaran dan pengajaran praktis yang dirancang untuk mengubah pengetahuan menjadi hikmat sehari-hari.',
                 'image_alt' => 'Buku dan kaca pembesar yang melambangkan pembelajaran',
             ],
             'connect' => [
-                'title' => 'Ikuti sesi untuk',
-                'highlight' => 'setiap topik.',
-                'description' => 'Hidupkan pembelajaran melalui sesi terjadwal yang membuka ruang percakapan untuk setiap topik.',
-                'image_alt' => 'Kalender yang melambangkan jadwal sesi topik',
+                'title' => 'Ikuti pertemuan untuk',
+                'highlight' => 'setiap sesi.',
+                'description' => 'Hidupkan pembelajaran melalui pertemuan terjadwal yang membuka ruang percakapan untuk setiap sesi.',
+                'image_alt' => 'Kalender yang melambangkan jadwal pertemuan sesi',
             ],
             'achieve' => [
                 'title' => 'Dapatkan',
                 'highlight' => 'sertifikat Anda.',
-                'description' => 'Rayakan komitmen Anda dengan sertifikat yang mengakui setiap course yang berhasil diselesaikan.',
-                'image_alt' => 'Sertifikat yang melambangkan penyelesaian course',
+                'description' => 'Rayakan komitmen Anda dengan sertifikat yang mengakui setiap topik pembelajaran yang berhasil diselesaikan.',
+                'image_alt' => 'Sertifikat yang melambangkan penyelesaian topik pembelajaran',
             ],
         ],
 
@@ -64,16 +64,9 @@ return [
             'progress' => 'Progres',
         ],
 
-        'study_programs' => [
-            'title' => 'Bertumbuh dalam iman dan menemukan tujuan Tuhan bagi hidupmu',
-            'description' => 'Jelajahi program pemuridan, pengajaran Alkitab, dan jalur pertumbuhan rohani yang dirancang untuk memperkuat hubungan Anda dengan Tuhan.',
-            'scroll_left' => 'Geser kategori ke kiri',
-            'scroll_right' => 'Geser kategori ke kanan',
-        ],
-
         'featured_teachings' => [
             'title' => 'Pengajaran Unggulan',
-            'description' => 'Temukan pengajaran yang berdampak dan kelas pemuridan yang disiapkan untuk menguatkan perjalanan iman Anda.',
+            'description' => 'Temukan pengajaran yang berdampak dan topik pembelajaran pemuridan yang disiapkan untuk menguatkan perjalanan iman Anda.',
             'open' => 'Buka',
             'premium' => 'Premium',
             'bestseller' => 'Terlaris',
@@ -112,57 +105,57 @@ return [
     'my_learning' => [
         'page_title' => 'Pembelajaran Saya',
         'overview_title' => 'Ringkasan Pembelajaran Saya',
-        'overview_description' => 'Lanjutkan perjalanan belajarmu dan pantau kursus yang diikuti serta sertifikat yang sudah didapat.',
+        'overview_description' => 'Lanjutkan perjalanan belajarmu dan pantau topik pembelajaran yang diikuti serta sertifikat yang sudah didapat.',
 
         'metrics' => [
-            'courses_enrolled' => 'Kursus Diikuti',
-            'courses_enrolled_hint' => 'Kursus yang sedang Anda ikuti',
-            'topics_completed' => 'Topik Diselesaikan',
-            'topics_completed_hint' => 'Topik yang telah Anda selesaikan',
+            'courses_enrolled' => 'Topik pembelajaran Diikuti',
+            'courses_enrolled_hint' => 'Topik pembelajaran yang sedang Anda ikuti',
+            'topics_completed' => 'Sesi Diselesaikan',
+            'topics_completed_hint' => 'Sesi yang telah Anda selesaikan',
             'certificates' => 'Sertifikat',
             'certificates_hint' => 'Sertifikat yang sudah Anda dapatkan',
         ],
 
         'tabs' => [
             'aria_label' => 'Bagian pembelajaran',
-            'courses' => 'Kursus',
-            'session' => 'Sesi',
+            'courses' => 'Topik pembelajaran',
+            'session' => 'Pertemuan',
             'certificate' => 'Sertifikat',
         ],
 
         'courses' => [
-            'title' => 'Kursus yang sedang berjalan',
-            'search_placeholder' => 'Cari kursus...',
+            'title' => 'Topik pembelajaran yang sedang berjalan',
+            'search_placeholder' => 'Cari topik pembelajaran...',
             'filters' => [
                 'all' => 'Semua',
                 'in_progress' => 'Sedang Berjalan',
                 'completed' => 'Selesai',
             ],
-            'no_description' => 'Tidak ada deskripsi yang tersedia untuk kursus ini.',
-            'progress_text' => ':completed / :total topik diselesaikan',
+            'no_description' => 'Tidak ada deskripsi yang tersedia untuk topik pembelajaran ini.',
+            'progress_text' => ':completed / :total sesi diselesaikan',
             'reset_filters' => 'Reset Filter',
-            'browse_courses' => 'Telusuri Kursus',
+            'browse_courses' => 'Telusuri Topik pembelajaran',
             'empty' => [
-                'filtered_title' => 'Tidak ada kursus yang cocok',
-                'filtered_description' => 'Coba ubah kata kunci pencarian atau filter progress agar kursusnya muncul kembali.',
-                'no_courses_title' => 'Belum ada kursus',
-                'no_courses_description' => 'Kamu belum mengikuti kursus apa pun.',
+                'filtered_title' => 'Tidak ada topik pembelajaran yang cocok',
+                'filtered_description' => 'Coba ubah kata kunci pencarian atau filter progress agar topik pembelajarannya muncul kembali.',
+                'no_courses_title' => 'Belum ada topik pembelajaran',
+                'no_courses_description' => 'Kamu belum mengikuti topik pembelajaran apa pun.',
             ],
         ],
 
         'sessions' => [
-            'title' => 'Sesi Mendatang',
-            'empty' => 'Tidak ada sesi terjadwal.',
+            'title' => 'Pertemuan Mendatang',
+            'empty' => 'Tidak ada pertemuan terjadwal.',
         ],
 
         'certificates' => [
             'title' => 'Sertifikat',
-            'default_course_certificate' => 'Sertifikat Kursus',
+            'default_course_certificate' => 'Sertifikat Topik pembelajaran',
             'number_label' => 'Nomor Sertifikat',
             'issued_label' => 'Diterbitkan',
             'download' => 'Unduh Sertifikat',
             'empty_title' => 'Belum Ada Sertifikat',
-            'empty_description' => 'Sertifikat akan tersedia setelah kamu menyelesaikan kursus.',
+            'empty_description' => 'Sertifikat akan tersedia setelah kamu menyelesaikan topik pembelajaran.',
         ],
     ],
 
@@ -170,25 +163,24 @@ return [
         'hero' => [
             'mentor' => [
                 'title' => 'Bimbing, mentor, dan awasi perjalanan belajar pemuridan.',
-                'description' => 'Kelola course pemuridan, pantau topik pembelajaran, dan bimbing peserta melalui materi yang terstruktur.',
+                'description' => 'Kelola topik pembelajaran pemuridan, pantau sesi pembelajaran, dan bimbing peserta melalui materi yang terstruktur.',
             ],
             'student' => [
-                'title' => 'Bertumbuh melalui pembelajaran pemuridan dan mentoring yang terstruktur.',
-                'description' => 'Pelajari materi pemuridan secara sistematis melalui topik, sesi mentoring, assessment, dan progres pembelajaran.',
+                'title' => 'Bertumbuh melalui pemuridan dan mentoring yang terstruktur.',
+                'description' => 'Pelajari materi pemuridan secara sistematis melalui sesi, pertemuan mentoring, assessment, dan progres pembelajaran.',
             ],
         ],
 
         'stats' => [
-            'available_courses' => 'Course Tersedia',
-            'study_programs' => 'Program Studi',
+            'available_courses' => 'Topik pembelajaran Tersedia',
         ],
 
         'feature_panel' => [
             'title' => 'Pembelajaran berpusat pada pertumbuhan rohani, mentoring, dan konsistensi.',
-            'description' => 'Setiap course dirancang untuk membantu peserta memahami materi pemuridan secara bertahap melalui pembelajaran terstruktur dan pendampingan mentor.',
+            'description' => 'Setiap topik pembelajaran dirancang untuk membantu peserta memahami materi pemuridan secara bertahap melalui pembelajaran terstruktur dan pendampingan mentor.',
             'structured' => [
                 'label' => 'Terstruktur',
-                'value' => 'Topik Pembelajaran',
+                'value' => 'Sesi Pembelajaran',
             ],
             'guided' => [
                 'label' => 'Dipandu',
@@ -197,8 +189,7 @@ return [
         ],
 
         'filters' => [
-            'search_placeholder' => 'Cari course, atau kata kunci...',
-            'all_study_programs' => 'Semua Program Studi',
+            'search_placeholder' => 'Cari topik pembelajaran, atau kata kunci...',
         ],
 
         'sort' => [
@@ -206,15 +197,15 @@ return [
             'oldest' => 'Terlama',
             'latest' => 'Terbaru',
             'title' => 'Judul',
-            'topics' => 'Topik Terbanyak',
+            'topics' => 'Sesi Terbanyak',
         ],
 
         'defaults' => [
-            'no_description' => 'Tidak ada deskripsi yang tersedia untuk course ini.',
+            'no_description' => 'Tidak ada deskripsi yang tersedia untuk topik pembelajaran ini.',
         ],
 
         'badges' => [
-            'topics' => '{0} Tidak ada topik|{1} :count Topik|[2,*] :count Topik',
+            'topics' => '{0} Tidak ada sesi|{1} :count Sesi|[2,*] :count Sesi',
             'enrolled' => 'Terdaftar',
         ],
 
@@ -225,30 +216,30 @@ return [
         ],
 
         'empty' => [
-            'title' => 'Course tidak ditemukan',
+            'title' => 'Topik pembelajaran tidak ditemukan',
             'description' => 'Coba ubah filter atau kata kunci.',
         ],
     ],
 
     'topbar_search' => [
-        'placeholder' => 'Cari course...',
+        'placeholder' => 'Cari topik pembelajaran...',
         'submit' => 'Cari',
         'preview_title' => 'Hasil yang cocok',
-        'empty' => 'Tidak ada course yang cocok. Coba kata kunci lain.',
+        'empty' => 'Tidak ada topik pembelajaran yang cocok. Coba kata kunci lain.',
         'view_all_results' => 'Lihat semua hasil untuk ":query"',
-        'all_courses' => 'semua course',
-        'default_program' => 'Course',
+        'all_courses' => 'semua topik pembelajaran',
+        'default_program' => 'Topik pembelajaran',
     ],
 
     'course_show' => [
         'login_to_track' => 'Masuk untuk Mulai Belajar',
         'enrolled' => 'Terdaftar',
-        'enroll' => 'Daftar Course',
+        'enroll' => 'Daftar Topik pembelajaran',
         'processing' => 'Memproses...',
         'mentor_mode' => 'Mode Mentor',
         'guest_notice' => 'Masuk untuk menyimpan progres belajar, mengerjakan assessment, dan mengakses sertifikat saat sudah tersedia.',
 
-        'course_access' => 'Progres Kursus',
+        'course_access' => 'Progres Topik pembelajaran',
         'course_access_description' => 'Pantau kesiapan assessment dan sertifikat dari sini.',
 
         'assessment_label' => 'Assessment',
@@ -258,13 +249,13 @@ return [
         'locked' => 'Belum Tersedia',
         'not_published' => 'Belum Dipublikasikan',
         'unlocked' => 'Siap Dikerjakan',
-        'complete_topics_first' => 'Selesaikan semua topik terlebih dahulu',
-        'assessment_unavailable' => 'Assessment belum tersedia untuk course ini.',
+        'complete_topics_first' => 'Selesaikan semua sesi terlebih dahulu',
+        'assessment_unavailable' => 'Assessment belum tersedia untuk topik pembelajaran ini.',
         'certificate_unavailable' => 'Sertifikat akan muncul setelah seluruh syarat terpenuhi.',
-        'certificate_ready' => 'Sertifikat course Anda siap diklaim.',
+        'certificate_ready' => 'Sertifikat topik pembelajaran Anda siap diklaim.',
         'certificate_issued_description' => 'Sertifikat sudah tersedia dan bisa langsung diunduh.',
-        'assessment_ready_description' => 'Semua topik selesai. Kamu sudah bisa mengerjakan assessment.',
-        'assessment_pending_description' => 'Selesaikan semua topik agar assessment bisa dibuka.',
+        'assessment_ready_description' => 'Semua sesi selesai. Kamu sudah bisa mengerjakan assessment.',
+        'assessment_pending_description' => 'Selesaikan semua sesi agar assessment bisa dibuka.',
         'assessment_passed_badge' => 'Lulus',
         'assessment_passed_description' => 'Assessment sudah selesai dan kamu sudah memenuhi nilai kelulusan.',
         'assessment_completed_cta' => 'Assessment Selesai',
@@ -274,9 +265,9 @@ return [
         'download_certificate' => 'Unduh Sertifikat',
         'claim_certificate' => 'Klaim Sertifikat',
         'continue_learning' => 'Lanjut Belajar',
-        'course_overview' => 'Ringkasan course',
-        'course_overview_description' => 'Ikuti topik pembelajaran secara berurutan, lanjutkan ke assessment, lalu klaim sertifikat saat semua syarat terpenuhi.',
-        'topics_stat' => 'Topik',
+        'course_overview' => 'Ringkasan topik pembelajaran',
+        'course_overview_description' => 'Ikuti sesi pembelajaran secara berurutan, lanjutkan ke assessment, lalu klaim sertifikat saat semua syarat terpenuhi.',
+        'topics_stat' => 'Sesi',
         'progress_stat' => 'Progres',
         'assessment_stat' => 'Assessment',
         'completed_progress' => ':percent% selesai',
@@ -284,8 +275,8 @@ return [
         'assessment_pending' => 'Menunggu progres',
         'assessment_completed' => 'Selesai',
 
-        'course_topics' => 'Topik Kursus',
-        'topics_count' => '{0} Tidak Ada Topik|{1} :count Topik|[2,*] :count Topik',
+        'course_topics' => 'Sesi Topik pembelajaran',
+        'topics_count' => '{0} Tidak Ada Sesi|{1} :count Sesi|[2,*] :count Sesi',
         'completed_count' => ':count Selesai',
 
         'status' => [
@@ -296,27 +287,27 @@ return [
             'not_started' => 'Belum Dimulai',
         ],
 
-        'session_label' => 'Sesi :status',
-        'no_session' => 'Tidak Ada Sesi',
+        'session_label' => 'Pertemuan :status',
+        'no_session' => 'Tidak Ada Pertemuan',
         'session_status' => [
             'completed' => 'Selesai',
             'ongoing' => 'Berlangsung',
             'scheduled' => 'Terjadwal',
             'cancelled' => 'Dibatalkan',
-            'none' => 'Tidak Ada Sesi',
+            'none' => 'Tidak Ada Pertemuan',
         ],
 
-        'login_to_access_topic' => 'Login untuk membuka topik',
-        'open_topic' => 'Pelajari Topik',
-        'topic_description_fallback' => 'Deskripsi topik akan tampil di sini setelah materi course dilengkapi.',
+        'login_to_access_topic' => 'Login untuk membuka sesi',
+        'open_topic' => 'Pelajari Sesi',
+        'topic_description_fallback' => 'Deskripsi sesi akan tampil di sini setelah materi topik pembelajaran dilengkapi.',
         'topic_cta_guest' => 'Masuk untuk Belajar',
-        'topic_cta_enrolled' => 'Buka Topik',
+        'topic_cta_enrolled' => 'Buka Sesi',
 
         'mentored_topics' => [
-            'title' => 'Topik yang Dimentori',
-            'description' => 'Topik tempat Anda menjadi Owner atau Collaborator.',
-            'empty_title' => 'Tidak ada topik yang dikelola',
-            'empty_description' => 'Anda belum ditetapkan sebagai Owner atau Collaborator pada topik mana pun di course ini.',
+            'title' => 'Sesi yang Dimentori',
+            'description' => 'Sesi tempat Anda menjadi Owner atau Collaborator.',
+            'empty_title' => 'Tidak ada sesi yang dikelola',
+            'empty_description' => 'Anda belum ditetapkan sebagai Owner atau Collaborator pada sesi mana pun di topik pembelajaran ini.',
         ],
 
         'role' => [
@@ -335,7 +326,7 @@ return [
             'instructions' => 'Instruksi',
         ],
 
-        'locked_until_complete' => 'Assessment akan tersedia setelah semua topik selesai',
+        'locked_until_complete' => 'Assessment akan tersedia setelah semua sesi selesai',
         'close' => 'Tutup',
     ],
 
@@ -344,7 +335,7 @@ return [
         'stats' => [
             'materials' => 'Materi',
             'attendance_records' => 'Catatan Kehadiran',
-            'sessions' => 'Sesi',
+            'sessions' => 'Pertemuan',
             'progress' => 'Progres',
         ],
 
@@ -354,13 +345,13 @@ return [
 
         'tabs' => [
             'materials' => 'Materi',
-            'sessions' => 'Sesi',
+            'sessions' => 'Pertemuan',
         ],
 
         'actions' => [
-            'attend_to_complete' => 'Ikuti sesi untuk menyelesaikan',
+            'attend_to_complete' => 'Ikuti pertemuan untuk menyelesaikan',
             'complete_unit' => 'Selesaikan Unit',
-            'locked_tooltip' => 'Tombol akan aktif setelah sesi berakhir',
+            'locked_tooltip' => 'Tombol akan aktif setelah pertemuan berakhir',
             'cancel' => 'Batal',
             'confirm' => 'Konfirmasi',
             'close' => 'Tutup',
@@ -373,7 +364,7 @@ return [
 
         'materials' => [
             'title' => 'Materi',
-            'subtitle' => 'Semua materi dalam topik ini dikumpulkan di satu tempat.',
+            'subtitle' => 'Semua materi dalam sesi ini dikumpulkan di satu tempat.',
             'thumbnail_alt' => 'Thumbnail :name',
             'doc_thumbnail_alt' => 'Thumbnail dokumen',
             'document_label' => 'Dokumen',
@@ -391,15 +382,15 @@ return [
             ],
             'empty' => [
                 'title' => 'Belum ada materi tersedia',
-                'description' => 'Mentor belum menyiapkan materi untuk topik ini.',
+                'description' => 'Mentor belum menyiapkan materi untuk sesi ini.',
             ],
             'no_materials' => [
                 'title' => 'Belum ada materi tersedia',
-                'description' => 'Mentor belum menyiapkan materi untuk topik ini.',
+                'description' => 'Mentor belum menyiapkan materi untuk sesi ini.',
             ],
             'complete_modal' => [
                 'title' => 'Tandai material selesai?',
-                'description' => 'Material :name akan ditandai selesai. Progress topik akan diperbarui otomatis.',
+                'description' => 'Material :name akan ditandai selesai. Progress sesi akan diperbarui otomatis.',
             ],
             'type_label' => 'Tipe: :type',
             'completed_badge' => 'MATERIAL SELESAI',
@@ -407,14 +398,14 @@ return [
         ],
 
         'sessions' => [
-            'title' => 'Sesi',
-            'subtitle' => 'Cek jadwal sesi dan join hanya saat window sesi aktif.',
+            'title' => 'Pertemuan',
+            'subtitle' => 'Cek jadwal pertemuan dan join hanya saat window pertemuan aktif.',
             'status_label' => 'Status:',
             'check_in' => 'Check in',
             'check_out' => 'Check out',
             'read_only' => 'Review saja',
             'join_modal' => [
-                'title' => 'Gabung Sesi',
+                'title' => 'Gabung Pertemuan',
                 'subtitle' => 'Student akan dicatat ke attendance sebelum diarahkan ke meeting.',
             ],
             'meta' => [
@@ -427,8 +418,8 @@ return [
             'clock_in_deadline' => 'Batas clock-in: :time',
             'join_and_log' => 'Gabung & Catat Kehadiran',
             'empty' => [
-                'title' => 'Belum ada sesi terjadwal',
-                'description' => 'Mentor belum menjadwalkan sesi untuk topik ini.',
+                'title' => 'Belum ada pertemuan terjadwal',
+                'description' => 'Mentor belum menjadwalkan pertemuan untuk sesi ini.',
             ],
             'states' => [
                 'upcoming' => 'Terjadwal',
@@ -441,7 +432,7 @@ return [
             ],
             'actions' => [
                 'not_started' => 'Belum Dimulai',
-                'join_session' => 'Gabung Sesi',
+                'join_session' => 'Gabung Pertemuan',
                 'completed' => 'Selesai',
                 'unavailable' => 'Tidak Tersedia',
             ],
@@ -451,8 +442,8 @@ return [
                 'minutes' => ':count menit',
                 'seconds' => ':count detik',
             ],
-            'countdown_invalid' => 'Jadwal sesi belum lengkap.',
-            'completed_label' => 'Sesi selesai',
+            'countdown_invalid' => 'Jadwal pertemuan belum lengkap.',
+            'completed_label' => 'Pertemuan selesai',
             'starts_in' => 'Mulai dalam',
             'ends_in' => 'Berakhir dalam',
         ],
@@ -480,7 +471,7 @@ return [
 
     'navigation' => [
         'dashboard' => 'Dashboard',
-        'courses' => 'Course',
+        'courses' => 'Topik pembelajaran',
         'articles' => 'Artikel',
         'my_learning' => 'Pembelajaran Saya',
         'certificates' => 'Sertifikat',
@@ -494,7 +485,7 @@ return [
         ],
         'contact' => [
             'title' => 'Kontak',
-            'whatsapp' => 'WhatsApp',
+            'email' => 'Email',
             'instagram' => 'Instagram',
         ],
         'social' => [
@@ -578,10 +569,10 @@ return [
 
     'assessment_taker' => [
         'defaults' => [
-            'course_assessment' => 'Assessment Course',
+            'course_assessment' => 'Assessment Topik pembelajaran',
         ],
         'intro' => [
-            'description' => 'Assessment ini menjadi syarat kelulusan course setelah seluruh topik selesai dipelajari. Anda dapat mengulang sampai mencapai passing grade.',
+            'description' => 'Assessment ini menjadi syarat kelulusan topik pembelajaran setelah seluruh sesi selesai dipelajari. Anda dapat mengulang sampai mencapai passing grade.',
         ],
         'meta' => [
             'attempt' => 'Attempt #:no',
@@ -633,8 +624,8 @@ return [
     'assessment_result' => [
         'title' => 'Hasil Assessment',
         'default_title' => 'Assessment',
-        'course' => 'Course: :course',
-        'course_attempt' => 'Course: :course · Attempt #:no',
+        'course' => 'Topik pembelajaran: :course',
+        'course_attempt' => 'Topik pembelajaran: :course · Attempt #:no',
         'status' => [
             'passed' => 'LULUS',
             'failed' => 'TIDAK LULUS',
@@ -651,8 +642,8 @@ return [
         'notice' => [
             'passed' => 'Kelulusan assessment tercapai.',
             'failed' => 'Assessment belum lulus.',
-            'passed_description' => 'Selamat, Anda telah lulus assessment dan menyelesaikan course ini. Sertifikat Anda kini telah tersedia.',
-            'failed_description' => 'Anda dapat mengulang assessment sampai lulus. Remedial attempt tersedia tanpa batas selama course masih aktif.',
+            'passed_description' => 'Selamat, Anda telah lulus assessment dan menyelesaikan topik pembelajaran ini. Sertifikat Anda kini telah tersedia.',
+            'failed_description' => 'Anda dapat mengulang assessment sampai lulus. Remedial attempt tersedia tanpa batas selama topik pembelajaran masih aktif.',
         ],
         'certificate' => [
             'title' => 'Sertifikat',
@@ -669,13 +660,13 @@ return [
     'session_join_button' => [
         'status' => 'Status:',
         'clock_in_deadline' => 'Batas clock-in',
-        'schedule_incomplete' => 'Jadwal sesi belum lengkap.',
+        'schedule_incomplete' => 'Jadwal pertemuan belum lengkap.',
         'attendance' => 'Attendance',
         'check_in' => 'Check in',
         'check_out' => 'Check out',
         'attendance_completed' => 'Attendance completed.',
         'actions' => [
-            'join_session' => 'Gabung Sesi',
+            'join_session' => 'Gabung Pertemuan',
             'clock_out' => 'Clock Out',
         ],
     ],
@@ -684,7 +675,7 @@ return [
         'stats' => [
             'materials' => 'Materi',
             'attendance_records' => 'Catatan Kehadiran',
-            'sessions' => 'Sesi',
+            'sessions' => 'Pertemuan',
             'progress' => 'Progres',
         ],
         'progress' => [
@@ -692,12 +683,12 @@ return [
         ],
         'tabs' => [
             'materials' => 'Materi',
-            'sessions' => 'Sesi',
+            'sessions' => 'Pertemuan',
         ],
         'actions' => [
-            'attend_to_complete' => 'Ikuti sesi untuk menyelesaikan',
+            'attend_to_complete' => 'Ikuti pertemuan untuk menyelesaikan',
             'complete_unit' => 'Selesaikan Unit',
-            'locked_tooltip' => 'Tombol akan aktif setelah sesi berakhir',
+            'locked_tooltip' => 'Tombol akan aktif setelah pertemuan berakhir',
             'cancel' => 'Batal',
             'confirm' => 'Konfirmasi',
             'close' => 'Tutup',
@@ -708,7 +699,7 @@ return [
         ],
         'materials' => [
             'title' => 'Materi',
-            'subtitle' => 'Semua materi dalam topik ini dikumpulkan di satu tempat.',
+            'subtitle' => 'Semua materi dalam sesi ini dikumpulkan di satu tempat.',
             'thumbnail_alt' => 'Thumbnail :name',
             'doc_thumbnail_alt' => 'Thumbnail dokumen',
             'document_label' => 'Dokumen',
@@ -726,29 +717,29 @@ return [
             ],
             'empty' => [
                 'title' => 'Belum ada materi tersedia',
-                'description' => 'Mentor belum menyiapkan materi untuk topik ini.',
+                'description' => 'Mentor belum menyiapkan materi untuk sesi ini.',
             ],
             'no_materials' => [
                 'title' => 'Belum ada materi tersedia',
-                'description' => 'Mentor belum menyiapkan materi untuk topik ini.',
+                'description' => 'Mentor belum menyiapkan materi untuk sesi ini.',
             ],
             'complete_modal' => [
                 'title' => 'Tandai material selesai?',
-                'description' => 'Material :name akan ditandai selesai. Progress topik akan diperbarui otomatis.',
+                'description' => 'Material :name akan ditandai selesai. Progress sesi akan diperbarui otomatis.',
             ],
             'type_label' => 'Tipe: :type',
             'completed_badge' => 'MATERIAL SELESAI',
             'mark_complete' => 'Selesai',
         ],
         'sessions' => [
-            'title' => 'Sesi',
-            'subtitle' => 'Cek jadwal sesi dan join hanya saat window sesi aktif.',
+            'title' => 'Pertemuan',
+            'subtitle' => 'Cek jadwal pertemuan dan join hanya saat window pertemuan aktif.',
             'status_label' => 'Status:',
             'check_in' => 'Check in',
             'check_out' => 'Check out',
             'read_only' => 'Review saja',
             'join_modal' => [
-                'title' => 'Gabung Sesi',
+                'title' => 'Gabung Pertemuan',
                 'subtitle' => 'Student akan dicatat ke attendance sebelum diarahkan ke meeting.',
             ],
             'meta' => [
@@ -761,8 +752,8 @@ return [
             'clock_in_deadline' => 'Batas clock-in: :time',
             'join_and_log' => 'Gabung & Catat Kehadiran',
             'empty' => [
-                'title' => 'Belum ada sesi terjadwal',
-                'description' => 'Mentor belum menjadwalkan sesi untuk topik ini.',
+                'title' => 'Belum ada pertemuan terjadwal',
+                'description' => 'Mentor belum menjadwalkan pertemuan untuk sesi ini.',
             ],
             'states' => [
                 'upcoming' => 'Terjadwal',
@@ -775,7 +766,7 @@ return [
             ],
             'actions' => [
                 'not_started' => 'Belum Dimulai',
-                'join_session' => 'Gabung Sesi',
+                'join_session' => 'Gabung Pertemuan',
                 'completed' => 'Selesai',
                 'unavailable' => 'Tidak Tersedia',
             ],
@@ -784,8 +775,8 @@ return [
                 'minutes' => ':count menit',
                 'seconds' => ':count detik',
             ],
-            'countdown_invalid' => 'Jadwal sesi belum lengkap.',
-            'completed_label' => 'Sesi selesai',
+            'countdown_invalid' => 'Jadwal pertemuan belum lengkap.',
+            'completed_label' => 'Pertemuan selesai',
             'starts_in' => 'Mulai dalam',
             'ends_in' => 'Berakhir dalam',
         ],
@@ -793,7 +784,7 @@ return [
 
     'navigation' => [
         'dashboard' => 'Dashboard',
-        'courses' => 'Course',
+        'courses' => 'Topik pembelajaran',
         'articles' => 'Artikel',
         'my_learning' => 'Pembelajaran Saya',
         'login' => 'Masuk',

@@ -20,7 +20,7 @@
 
     @if($selectedCourse)
         <div class="rounded-2xl border bg-white p-4">
-            <div class="text-xs text-slate-500">Kursus Terpilih</div>
+            <div class="text-xs text-slate-500">Topik pembelajaran Terpilih</div>
             <div class="mt-1 text-lg font-semibold text-slate-900">{{ $selectedCourse->title }}</div>
         </div>
     @endif
@@ -140,7 +140,7 @@
                             <div class="text-xs text-slate-500">{{ $row->category }}</div>
                         </td>
 
-                        <td class="whitespace-nowrap px-4 py-3">{{ $row->teacher?->full_name }}</td>
+                        <td class="whitespace-nowrap px-4 py-3">{{ $row->teacher?->full_name ?? '-' }}</td>
                         <td class="whitespace-nowrap px-4 py-3">{{ $row->sort_order }}</td>
 
                         <td class="px-4 py-3 text-xs text-slate-500">
@@ -223,6 +223,13 @@
         </div>
 
         <div>{{ $rows->links() }}</div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-xs leading-6 text-slate-600">
+            <p class="font-semibold text-[#004777]">Keterangan status sesi</p>
+            <p><span class="font-semibold">Belum diterbitkan</span> berarti sesi masih tahap persiapan dan belum tampil untuk murid.</p>
+            <p><span class="font-semibold">Diterbitkan</span> berarti sesi sudah aktif dan bisa diakses murid jika syarat aksesnya sudah terpenuhi.</p>
+            <p><span class="font-semibold">Diarsipkan</span> berarti sesi tidak lagi dipakai di alur belajar aktif, tetapi datanya masih disimpan.</p>
+        </div>
     </section>
 
     @if($showModal)
@@ -265,7 +272,7 @@
 
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Pengajar <span class="text-rose-500">*</span>
+                            Pengajar
                         </label>
                         <select wire:model="teacher_id" class="w-full rounded-xl border px-4 py-2">
                             <option value="">{{ __('admin.topics.form.select_teacher') }}</option>
@@ -279,7 +286,7 @@
                     <div>
                         <div class="mb-1 flex items-center justify-between gap-3">
                             <label class="block text-xs font-semibold text-slate-600">
-                                Nama Topik <span class="text-rose-500">*</span>
+                                Nama Sesi <span class="text-rose-500">*</span>
                             </label>
                             <span class="text-[11px] text-slate-400">{{ mb_strlen($name ?? '') }}/70</span>
                         </div>
@@ -288,17 +295,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <div>
-                            <label class="mb-1 block text-xs font-semibold text-slate-600">
-                                Visibilitas <span class="text-rose-500">*</span>
-                            </label>
-                            <select wire:model="visibility" class="w-full rounded-xl border px-4 py-2">
-                                <option value="Public">{{ __('admin.topics.visibility.public') }}</option>
-                                <option value="Private">{{ __('admin.topics.visibility.private') }}</option>
-                            </select>
-                            @error('visibility') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-                        </div>
-
                         <div>
                             <label class="mb-1 block text-xs font-semibold text-slate-600">
                                 Status <span class="text-rose-500">*</span>
@@ -312,13 +308,28 @@
                         </div>
                     </div>
 
+                    <details class="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-xs text-slate-600">
+                        <summary class="cursor-pointer list-none font-semibold text-[#004777]">
+                            <span class="flex items-center justify-between gap-3">
+                                <span>Catatan penggunaan status</span>
+                                <span class="text-[11px] font-medium text-slate-500">Lihat detail</span>
+                            </span>
+                        </summary>
+
+                        <div class="mt-3 space-y-2 leading-6">
+                            <p><span class="font-semibold">Belum diterbitkan</span> dipakai saat sesi masih disusun dan belum siap dilihat murid.</p>
+                            <p><span class="font-semibold">Diterbitkan</span> dipakai saat sesi sudah siap diakses murid. Sesi hanya bisa diterbitkan jika sudah punya minimal 1 pertemuan.</p>
+                            <p><span class="font-semibold">Diarsipkan</span> dipakai saat sesi lama sudah tidak ingin ditampilkan ke alur belajar aktif, tetapi datanya tetap disimpan untuk referensi.</p>
+                        </div>
+                    </details>
+
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Nomor Urut Topik
+                            Nomor Urut Sesi
                         </label>
                         <input wire:model="sort_order" type="number" min="1" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.sort_order_placeholder') }}">
                         <p class="mt-1 text-[11px] leading-relaxed text-slate-500">
-                            Menentukan posisi topik di dalam kursus. Saat membuat topik baru, sistem otomatis mengisi nomor urut berikutnya berdasarkan topik terakhir di kursus ini.
+                            Menentukan posisi sesi di dalam topik pembelajaran. Saat membuat sesi baru, sistem otomatis mengisi nomor urut berikutnya berdasarkan sesi terakhir di topik pembelajaran ini.
                         </p>
                         @error('sort_order') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>

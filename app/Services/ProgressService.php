@@ -138,7 +138,7 @@ class ProgressService
 
             if ($attendance && in_array($attendance->status, ['present', 'late'], true)) {
                 $isSatisfied = true;
-            } elseif ($sessionEnded && $attendance && $attendance->status === 'absent') {
+            } elseif ($sessionEnded && $attendance && in_array($attendance->status, ['online', 'absent'], true)) {
                 $isSatisfied = true;
             } elseif ($sessionEnded &&!$attendance) {
                 $isSatisfied = true;
@@ -322,7 +322,7 @@ class ProgressService
             Attendance::query()->create([
                 'user_id' => $userId,
                 'video_session_id' => $session->id,
-                'status' => 'absent',
+                'status' => 'online',
                 'check_in_at' => null,
                 'clock_out_at' => null,
                 'ip_address' => request()->ip(),

@@ -105,7 +105,7 @@
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-slate-600"
                         >
                     @else
-                        <label class="mb-1 block text-xs font-semibold text-slate-600">Topik <span class="text-rose-500">*</span></label>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">Sesi <span class="text-rose-500">*</span></label>
                         <select wire:model.live="topic_id" class="w-full rounded-xl border px-4 py-2">
                             <option value="">{{ __('admin.materials.form.select_topic') }}</option>
                             @foreach($topics as $t)
@@ -177,7 +177,7 @@
                         <input wire:model.live="sort_order" type="number" min="1"
                             class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.materials.form.sort_order_placeholder') }}">
                         <p class="mt-1 text-[11px] leading-relaxed text-slate-500">
-                            Menentukan posisi material di dalam topik. Saat membuat material baru, sistem otomatis mengisi nomor urut berikutnya dari material terakhir pada topik yang dipilih.
+                            Menentukan posisi material di dalam sesi. Saat membuat material baru, sistem otomatis mengisi nomor urut berikutnya dari material terakhir pada sesi yang dipilih.
                         </p>
                         @error('sort_order') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>

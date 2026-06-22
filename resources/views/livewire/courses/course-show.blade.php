@@ -4,7 +4,7 @@
     $canTrack = auth()->check() && $enrolled;
 
     $topicsToRender = $paginatedTopics;
-    $totalTopicsCount = $course->topics->count();
+    $totalTopicsCount = $studentTopics->count();
     $completedTopicsCount = $this->completedTopicsCount ?? 0;
     $progressPercent = $totalTopicsCount > 0 ? (int) round(($completedTopicsCount / $totalTopicsCount) * 100) : 0;
     $hasPassedAssessment = $this->hasPassedAssessment;
@@ -14,13 +14,16 @@
     $topicOffset = ($paginatedTopics->currentPage() - 1) * $paginatedTopics->perPage();
     $mentorTabs = [
         'overview' => 'Ringkasan',
-        'topics' => 'Topik',
-        'students' => 'Siswa',
+        'topics' => 'Sesi',
+        'students' => 'Murid',
     ];
     $studentTabs = [
         'overview' => 'Ringkasan',
-        'topics' => 'Topik',
+        'topics' => 'Sesi',
     ];
+    $studentVisibleTabs = $enrolled
+        ? $studentTabs
+        : ['overview' => $studentTabs['overview']];
     $mentorTopicsToRender = $paginatedTopics;
     $mentorStudentsCount = $mentorStudents->count();
     $mentorMaterialsCount = $mentoredTopics->sum(fn ($topic) => $topic->materials_count ?? $topic->materials->count());
@@ -29,23 +32,34 @@
     $selectedMentorMaterials = $selectedMentorTopic?->materials->sortBy('sort_order')->values() ?? collect();
     $selectedMentorMaterial = $selectedMentorMaterials->firstWhere('id', $this->selectedMentorMaterialId) ?? $selectedMentorMaterials->first();
     $selectedMentorMaterialPreviewUrl = app(\App\Services\Materials\MaterialAssetService::class)->resolvePreviewUrl($selectedMentorMaterial);
-    $selectedMentorSession = $selectedMentorTopic?->videoSessions->sortByDesc('start_at')->first();
+    $selectedMentorSession = $selectedMentorTopic?->videoSessions->firstWhere('id', $this->selectedMentorSessionId)
+        ?? $selectedMentorTopic?->videoSessions->sortByDesc('start_at')->first();
     $selectedMentorSessionScheduleLabel = $selectedMentorSession?->start_at && $selectedMentorSession?->end_at
-        ? 'Sesi: ' . $selectedMentorSession->start_at->format('H:i') . '-' . $selectedMentorSession->end_at->format('H:i') . ' ' . $selectedMentorSession->start_at->format('d M Y')
+        ? 'Pertemuan: ' . $selectedMentorSession->start_at->format('H:i') . '-' . $selectedMentorSession->end_at->format('H:i') . ' ' . $selectedMentorSession->start_at->format('d M Y')
         : null;
     $showMentorZoomButton = filled($selectedMentorSession?->zoom_link)
         && (!$selectedMentorSession?->end_at || now()->lte($selectedMentorSession->end_at));
     $studentTopicsToRender = $paginatedTopics;
     $selectedStudentTopic = $studentTopicsToRender->firstWhere('id', $this->selectedStudentTopicId)
-        ?? $course->topics->firstWhere('id', $this->selectedStudentTopicId)
+        ?? $studentTopics->firstWhere('id', $this->selectedStudentTopicId)
         ?? $studentTopicsToRender->first()
-        ?? $course->topics->first();
+        ?? $studentTopics->first();
     $selectedStudentMaterials = $selectedStudentTopic?->materials->sortBy('sort_order')->values() ?? collect();
     $selectedStudentMaterial = $selectedStudentMaterials->firstWhere('id', $this->selectedStudentMaterialId) ?? $selectedStudentMaterials->first();
     $selectedStudentMaterialPreviewUrl = app(\App\Services\Materials\MaterialAssetService::class)->resolvePreviewUrl($selectedStudentMaterial);
-    $selectedStudentSession = $selectedStudentTopic?->videoSessions->sortByDesc('start_at')->first();
+    $selectedStudentMaterialProgress = $selectedStudentMaterial ? ($this->materialProgressMap[$selectedStudentMaterial->id] ?? 'not_started') : 'not_started';
+    $selectedStudentYoutubeId = $selectedStudentMaterial && $selectedStudentMaterial->type === 'video'
+        ? app(\App\Services\Materials\YoutubeService::class)->extractVideoId((string) $selectedStudentMaterial->external_url)
+        : null;
+    $isSelectedStudentTrackableVideo = $selectedStudentMaterial?->type === 'video' && filled($selectedStudentYoutubeId);
+    $selectedStudentVideoUnlocked = $selectedStudentMaterial
+        ? ($this->videoCompletionUnlocked[$selectedStudentMaterial->id] ?? false)
+        : false;
+    $selectedStudentSessions = $selectedStudentTopic?->videoSessions->filter(fn ($session) => $session->status !== 'draft')->values() ?? collect();
+    $selectedStudentSession = $selectedStudentSessions->firstWhere('id', $this->selectedStudentSessionId)
+        ?? $selectedStudentSessions->sortByDesc('start_at')->first();
     $selectedStudentSessionScheduleLabel = $selectedStudentSession?->start_at && $selectedStudentSession?->end_at
-        ? 'Sesi: ' . $selectedStudentSession->start_at->format('H:i') . ' - ' . $selectedStudentSession->end_at->format('H:i') . ' ' . $selectedStudentSession->start_at->format('d M Y')
+        ? 'Pertemuan: ' . $selectedStudentSession->start_at->format('H:i') . ' - ' . $selectedStudentSession->end_at->format('H:i') . ' ' . $selectedStudentSession->start_at->format('d M Y')
         : null;
     $selectedStudentSessionEndLabel = $selectedStudentSession?->end_at?->format('d M Y H:i');
     $isStudentMaterialLocked = !$selectedStudentSession?->end_at || now()->lt($selectedStudentSession->end_at);
@@ -58,10 +72,8 @@
     if ($poster) {
         if (\Illuminate\Support\Str::startsWith($poster, ['http://', 'https://'])) {
             $posterSrc = $poster;
-        } elseif (file_exists(public_path($poster))) {
-            $posterSrc = asset($poster);
-        } elseif (file_exists(public_path('storage/' . $poster))) {
-            $posterSrc = asset('storage/' . $poster);
+        } elseif ($thumbnailUrl = course_thumbnail_url($poster)) {
+            $posterSrc = $thumbnailUrl;
         }
     }
 @endphp
@@ -79,9 +91,6 @@
                 <div class="relative overflow-hidden bg-gradient-to-br from-[var(--mentor-primary)] to-[#0a659b] px-5 py-6 text-white sm:px-7">
                     <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div class="space-y-2">
-                            <div class="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-                                {{ $course->studyProgram?->title }}
-                            </div>
                             <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                 {{ $course->title }}
                             </h1>
@@ -94,7 +103,7 @@
 
                 <div class="grid grid-cols-1 gap-3 px-5 py-5 text-sm sm:grid-cols-3 sm:px-7">
                     <div class="mentor-workspace-card p-4">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Topik</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Sesi</div>
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $mentoredTopics->count() }}</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
@@ -102,7 +111,7 @@
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $mentorMaterialsCount }}</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Siswa</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Murid</div>
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $mentorStudentsCount }}</div>
                     </div>
                 </div>
@@ -133,15 +142,24 @@
                             </div>
 
                             <div class="space-y-2">
-                                <div class="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-                                    {{ $course->studyProgram?->title }}
-                                </div>
                                 <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                     {{ $course->title }}
                                 </h1>
                                 <p class="max-w-3xl text-sm leading-6 text-white/75">
                                     {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
                                 </p>
+
+                                @if(!$enrolled)
+                                    <div class="pt-2">
+                                        <button
+                                            type="button"
+                                            wire:click="confirmEnroll"
+                                            class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-[#004777] transition hover:bg-slate-100"
+                                        >
+                                            Daftar sekarang
+                                        </button>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -155,7 +173,7 @@
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $progressPercent }}%</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Topik</div>
+                        <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Sesi</div>
                         <div class="mt-1 font-semibold text-mentor-primary">{{ $completedTopicsCount }}/{{ $totalTopicsCount }}</div>
                     </div>
                     <div class="mentor-workspace-card p-4">
@@ -199,7 +217,7 @@
 
                 <div class="border-t border-slate-100 px-3 pt-3 sm:px-5">
                     <div class="flex gap-2 overflow-x-auto">
-                        @foreach($studentTabs as $key => $label)
+                        @foreach($studentVisibleTabs as $key => $label)
                             <button type="button"
                                     wire:click="setTopicTab('{{ $key }}')"
                                     class="mentor-tab-button whitespace-nowrap {{ $activeTab === $key ? 'mentor-tab-button-active' : '' }}">
@@ -235,10 +253,6 @@
                             </div>
 
                             <div class="min-w-0 flex-1">
-                                <div class="truncate text-[10px] uppercase tracking-[0.22em] text-[#004777]/60 sm:text-xs">
-                                    {{ $course->studyProgram?->title }}
-                                </div>
-
                                 <h1 class="mt-2 text-3xl font-bold leading-tight tracking-tight text-[#004777] sm:text-5xl">
                                     {{ $course->title }}
                                 </h1>
@@ -306,18 +320,26 @@
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h2 class="mentor-workspace-heading">{{ __('general.course_show.course_topics') }}</h2>
-                            <p class="mentor-workspace-subheading">Pilih topik dan lihat preview materi pembelajaran pada kursus ini.</p>
+                            <p class="mentor-workspace-subheading">Pilih sesi dan lihat preview materi pembelajaran pada topik pembelajaran ini.</p>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex gap-3 overflow-x-auto pb-1">
-                        @foreach($studentTopicsToRender as $topic)
-                            <button type="button"
-                                    wire:click="selectStudentTopic('{{ $topic->id }}')"
-                                    class="shrink-0 rounded-2xl border px-4 py-3 text-left transition {{ (string) ($selectedStudentTopic?->id) === (string) $topic->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-white text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
-                                <div class="text-sm font-semibold">{{ $topic->name }}</div>
-                            </button>
-                        @endforeach
+                    <div class="mt-6 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                        <div class="flex gap-3 overflow-x-auto pb-1">
+                            @foreach($studentTopicsToRender as $topic)
+                                <button type="button"
+                                        wire:click="selectStudentTopic('{{ $topic->id }}')"
+                                        class="shrink-0 rounded-2xl border px-4 py-3 text-left transition {{ (string) ($selectedStudentTopic?->id) === (string) $topic->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-white text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
+                                    <div class="text-sm font-semibold">{{ $topic->name }}</div>
+                                </button>
+                            @endforeach
+                        </div>
+
+                        @if($this->upcomingTopicsCount > 0)
+                            <div class="shrink-0 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                                {{ $this->upcomingTopicsCount }} sesi lagi akan datang.
+                            </div>
+                        @endif
                     </div>
 
                     @if($paginatedTopics->hasPages())
@@ -329,7 +351,18 @@
                     @if($selectedStudentTopic)
                         <div class="mt-6 grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
                             <div class="mentor-workspace-card p-5">
-                                <div class="flex flex-col gap-4">
+                                <div
+                                    class="flex flex-col gap-4"
+                                    @if($selectedStudentMaterial && !$isStudentMaterialLocked && $isSelectedStudentTrackableVideo && $selectedStudentMaterialProgress !== 'completed')
+                                        x-data="courseShowVideoProgressTracker({
+                                            materialId: @js((string) $selectedStudentMaterial->id),
+                                            youtubeId: @js($selectedStudentYoutubeId),
+                                            requiredPercent: 70,
+                                            initiallyUnlocked: @js($selectedStudentVideoUnlocked),
+                                        })"
+                                        x-init="init()"
+                                    @endif
+                                >
                                     <div>
                                         <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedStudentTopic->name }}</h3>
                                         <p class="mt-1 text-sm leading-6 text-[color:color-mix(in_oklab,#004777_70%,white)]">
@@ -339,18 +372,79 @@
 
                                     @if($selectedStudentMaterial)
                                         <div class="space-y-4">
+                                            <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                                                <div>
+                                                    <div class="text-base font-semibold text-[var(--mentor-primary)]">{{ $selectedStudentMaterial->name }}</div>
+                                                    <div class="mt-1 text-xs uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">
+                                                        {{ strtoupper($selectedStudentMaterial->type) }}
+                                                        ·
+                                                        {{ $selectedStudentMaterialProgress === 'completed' ? 'Selesai' : ($selectedStudentMaterialProgress === 'in_progress' ? 'Sedang dipelajari' : 'Belum selesai') }}
+                                                    </div>
+                                                </div>
+
+                                                @if(!$isStudentMaterialLocked)
+                                                    @if($selectedStudentMaterialProgress === 'completed')
+                                                        <span class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+                                                            <span>✓</span>
+                                                            Material selesai
+                                                        </span>
+                                                    @else
+                                                        <button
+                                                            type="button"
+                                                            wire:click="markStudentMaterialComplete('{{ $selectedStudentMaterial->id }}')"
+                                                            wire:loading.attr="disabled"
+                                                            wire:target="markStudentMaterialComplete('{{ $selectedStudentMaterial->id }}')"
+                                                            @if($isSelectedStudentTrackableVideo)
+                                                                x-bind:disabled="!isUnlocked"
+                                                                x-bind:class="!isUnlocked ? 'cursor-not-allowed opacity-50' : ''"
+                                                            @endif
+                                                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:opacity-70"
+                                                        >
+                                                            <span>✓</span>
+                                                            Tandai selesai
+                                                        </button>
+                                                    @endif
+                                                @endif
+                                            </div>
+
                                             @if($isStudentMaterialLocked)
                                                 <div class="rounded-2xl border border-dashed border-amber-200 bg-amber-50 px-4 py-10 text-center">
                                                     <div class="text-sm font-semibold text-amber-700">Materi masih terkunci</div>
                                                     <div class="mt-2 text-sm text-amber-700/90">
-                                                        Materi bisa dibuka setelah sesi selesai{{ $selectedStudentSessionEndLabel ? ' pada ' . $selectedStudentSessionEndLabel : '' }}.
+                                                        Materi bisa dibuka setelah pertemuan selesai{{ $selectedStudentSessionEndLabel ? ' pada ' . $selectedStudentSessionEndLabel : '' }}.
                                                     </div>
                                                 </div>
                                             @elseif($selectedStudentMaterial->type === 'video' && $selectedStudentMaterialPreviewUrl)
+                                                @if($isSelectedStudentTrackableVideo && $selectedStudentMaterialProgress !== 'completed')
+                                                    <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#eef8ff] p-4 text-sm text-[#004777]">
+                                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                                            <div>
+                                                                <div class="font-semibold">Tonton minimal 70% video untuk mengaktifkan tombol selesai.</div>
+                                                                <div class="mt-1 text-xs text-slate-600" x-show="!isUnlocked">
+                                                                    Sisa waktu tonton:
+                                                                    <span class="font-semibold text-[#004777]" x-text="formattedRemaining"></span>
+                                                                </div>
+                                                                <div class="mt-1 text-xs text-emerald-700" x-show="isUnlocked">
+                                                                    Durasi tonton sudah memenuhi syarat. Material sekarang bisa diselesaikan.
+                                                                </div>
+                                                            </div>
+                                                            <div class="shrink-0 rounded-full border border-[#35A7FF]/20 bg-white px-3 py-1 text-xs font-semibold text-[#004777]">
+                                                                <span x-text="progressLabel"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                                                            <div class="h-full rounded-full bg-[#35A7FF] transition-all duration-500" x-bind:style="`width: ${progressPercent}%`"></div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+
                                                 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
                                                     <iframe
+                                                        id="course-show-video-player-{{ $selectedStudentMaterial->id }}"
                                                         src="{{ $selectedStudentMaterialPreviewUrl }}"
                                                         class="aspect-video w-full"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                        referrerpolicy="strict-origin-when-cross-origin"
                                                         allowfullscreen
                                                     ></iframe>
                                                 </div>
@@ -367,7 +461,7 @@
                                         </div>
                                     @else
                                         <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                                    Topik ini belum punya materi.
+                                                    Sesi ini belum punya materi.
                                         </div>
                                     @endif
                                 </div>
@@ -376,16 +470,14 @@
                             <aside class="mentor-workspace-card p-5">
                                 <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">Material</div>
                                 <div class="mt-4 rounded-xl bg-[var(--mentor-primary-soft-2)] text-sm text-[var(--mentor-primary)]">
-                                    {{ $selectedStudentSessionScheduleLabel ?? 'Jadwal sesi belum tersedia' }}
+                                    {{ $selectedStudentSessionScheduleLabel ?? 'Jadwal pertemuan belum tersedia' }}
                                 </div>
-                                @if($showStudentZoomButton)
-                                    <div class="mt-4 flex flex-col gap-3">
-                                        <a href="{{ $selectedStudentSession->zoom_link }}"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="admin-neutral-button inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm">
-                                            Buka Zoom
-                                        </a>
+                                @if($selectedStudentSession)
+                                    <div class="mt-4">
+                                        <livewire:sessions.join-session-button
+                                            :video-session-id="$selectedStudentSession->id"
+                                            :key="'course-show-session-' . $selectedStudentSession->id"
+                                        />
                                     </div>
                                 @endif
 
@@ -393,6 +485,9 @@
                                     <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">List Materi ({{ $selectedStudentTopic->materials_count ?? $selectedStudentTopic->materials->count() }})</div>
                                     <div class="mt-3 space-y-2">
                                         @forelse($selectedStudentMaterials as $material)
+                                            @php
+                                                $materialProgressStatus = $this->materialProgressMap[$material->id] ?? 'not_started';
+                                            @endphp
                                             <button type="button"
                                                     wire:key="student-material-{{ $material->id }}"
                                                     @if(!$isStudentMaterialLocked) wire:click="selectStudentMaterial('{{ $material->id }}')" @endif
@@ -402,6 +497,9 @@
                                                 </div>
                                                 <div class="mt-1 text-xs {{ (string) ($selectedStudentMaterial?->id) === (string) $material->id ? 'text-white/75' : '' }}">
                                                     {{ strtoupper($material->type) }} · {{ ucfirst($material->status) }}{{ $isStudentMaterialLocked ? ' · Terkunci' : '' }}
+                                                </div>
+                                                <div class="mt-2 text-[11px] font-semibold {{ (string) ($selectedStudentMaterial?->id) === (string) $material->id ? 'text-white' : 'text-emerald-700' }}">
+                                                    {{ $materialProgressStatus === 'completed' ? '✓ Selesai' : ($materialProgressStatus === 'in_progress' ? 'Sedang dipelajari' : 'Belum selesai') }}
                                                 </div>
                                             </button>
                                         @empty
@@ -422,7 +520,7 @@
                     <div class="mentor-workspace-panel">
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                             <div>
-                                <h2 class="mentor-workspace-heading">Ringkasan Kursus</h2>
+                                <h2 class="mentor-workspace-heading">Ringkasan Topik pembelajaran</h2>
                                 <p class="mentor-workspace-subheading">
                                     {{ $course->description ?: __('general.course_catalog.defaults.no_description') }}
                                 </p>
@@ -435,19 +533,19 @@
 
                         <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                             <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Program</div>
-                                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $course->studyProgram?->title ?? '-' }}</div>
-                            </div>
-                            <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Topik</div>
-                                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentoredTopics->count() }}</div>
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Status</div>
+                                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ ucfirst($course->status) }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
                                 <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Sesi</div>
+                                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentoredTopics->count() }}</div>
+                            </div>
+                            <div class="mentor-workspace-card p-4">
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Pertemuan</div>
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentorSessionsCount }}</div>
                             </div>
                             <div class="mentor-workspace-card p-4">
-                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Siswa</div>
+                                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">Murid</div>
                                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">{{ $mentorStudentsCount }}</div>
                             </div>
                         </div>
@@ -457,8 +555,8 @@
                 <section class="mentor-workspace-panel">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 class="mentor-workspace-heading">Topik</h2>
-                            <p class="mentor-workspace-subheading">Pilih topik dan lihat preview materi dengan akses cepat ke pengelolaan topik.</p>
+                            <h2 class="mentor-workspace-heading">Sesi</h2>
+                            <p class="mentor-workspace-subheading">Pilih sesi dan lihat preview materi dengan akses cepat ke pengelolaan sesi.</p>
                         </div>
                     </div>
 
@@ -491,7 +589,7 @@
                                     </div>
 
                                     <div class="rounded-xl bg-[var(--mentor-primary-soft-2)] px-4 py-3 text-sm text-[var(--mentor-primary)]">
-                                        {{ $selectedMentorSessionScheduleLabel ?? 'Jadwal sesi belum tersedia' }}
+                                        {{ $selectedMentorSessionScheduleLabel ?? 'Jadwal pertemuan belum tersedia' }}
                                     </div>
 
                                     @if($selectedMentorMaterial)
@@ -517,7 +615,7 @@
                                             </div>
                                         @else
                                             <div class="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                                Topik ini belum punya materi.
+                                                Sesi ini belum punya materi.
                                             </div>
                                         @endif
                                     </div>
@@ -530,6 +628,12 @@
                                            class="admin-primary-button inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm">
                                             Kelola
                                         </a>
+                                        @if($assessment && (string) $assessment->teacher_id === (string) auth()->id())
+                                            <a href="{{ localized_route('mentor.assessments.index', ['courseFilter' => $course->id]) }}"
+                                               class="admin-neutral-button inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm">
+                                                Kelola Assessment
+                                            </a>
+                                        @endif
                                         @if($showMentorZoomButton)
                                             <a href="{{ $selectedMentorSession->zoom_link }}"
                                                target="_blank"
@@ -575,8 +679,8 @@
                 <section class="mentor-workspace-panel">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 class="mentor-workspace-heading">Siswa</h2>
-                            <p class="mentor-workspace-subheading">Daftar peserta kursus dalam tampilan hanya baca.</p>
+                            <h2 class="mentor-workspace-heading">Murid</h2>
+                            <p class="mentor-workspace-subheading">Daftar peserta topik pembelajaran dalam tampilan hanya baca.</p>
                         </div>
                     </div>
 
@@ -585,7 +689,7 @@
                             <table class="min-w-full text-sm">
                                 <thead class="bg-[var(--mentor-primary)]">
                                     <tr class="text-left">
-                                        <th class="px-5 py-4 font-bold text-white">Siswa</th>
+                                        <th class="px-5 py-4 font-bold text-white">Murid</th>
                                         <th class="px-5 py-4 font-bold text-white">Email</th>
                                         <th class="px-5 py-4 font-bold text-white">Progres</th>
                                         <th class="px-5 py-4 font-bold text-white">Enrolled</th>
@@ -613,7 +717,7 @@
                                                         ></div>
                                                     </div>
                                                     <div class="mt-2 text-xs font-medium text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                                        {{ $studentProgressPercent }}% · {{ $completedTopicCount }}/{{ $totalTopicsCount }} topik
+                                                        {{ $studentProgressPercent }}% · {{ $completedTopicCount }}/{{ $totalTopicsCount }} sesi
                                                     </div>
                                                 </div>
                                             </td>
@@ -728,9 +832,9 @@
             <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
                 <div class="space-y-3">
                     <div>
-                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran kursus</h3>
+                        <h3 class="text-xl font-bold text-[#004777]">Konfirmasi pendaftaran topik pembelajaran</h3>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Kamu yakin ingin mendaftar ke kursus
+                            Kamu yakin ingin mendaftar ke topik pembelajaran
                             <span class="font-semibold text-[#004777]">{{ $course->title }}</span>?
                         </p>
                     </div>
@@ -773,14 +877,14 @@
             <div class="relative z-10 w-full max-w-md rounded-[1rem] border border-slate-200 bg-white p-6 shadow-2xl">
                 <div class="space-y-3">
                     <div>
-                        <h3 class="text-xl font-bold text-[#004777]">Akses topik dibatasi</h3>
+                        <h3 class="text-xl font-bold text-[#004777]">Akses sesi dibatasi</h3>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Kamu belum terdaftar di course ini, jadi topik
+                            Kamu belum terdaftar di topik pembelajaran ini, jadi sesi
                             <span class="font-semibold text-[#004777]">{{ $topicAccessWarningName }}</span>
                             belum bisa dibuka.
                         </p>
                         <p class="mt-2 text-sm leading-6 text-slate-600">
-                            Silakan daftar ke course ini terlebih dahulu untuk membuka topik pembelajaran.
+                            Silakan daftar ke topik pembelajaran ini terlebih dahulu untuk membuka sesi pembelajaran.
                         </p>
                     </div>
                 </div>
@@ -799,10 +903,195 @@
                         wire:click="confirmEnroll"
                         class="inline-flex items-center justify-center rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f]"
                     >
-                        Daftar Kursus
+                        Daftar Topik pembelajaran
                     </button>
                 </div>
             </div>
         </div>
     @endif
 </div>
+
+@once
+    @push('scripts')
+        <script>
+            (() => {
+                let youtubeApiReadyPromise;
+
+                function loadYoutubeApi() {
+                    if (window.YT && window.YT.Player) {
+                        return Promise.resolve(window.YT);
+                    }
+
+                    if (youtubeApiReadyPromise) {
+                        return youtubeApiReadyPromise;
+                    }
+
+                    youtubeApiReadyPromise = new Promise((resolve) => {
+                        const previousHandler = window.onYouTubeIframeAPIReady;
+
+                        window.onYouTubeIframeAPIReady = () => {
+                            previousHandler?.();
+                            resolve(window.YT);
+                        };
+
+                        const script = document.createElement('script');
+                        script.src = 'https://www.youtube.com/iframe_api';
+                        script.async = true;
+                        document.head.appendChild(script);
+                    });
+
+                    return youtubeApiReadyPromise;
+                }
+
+                window.courseShowVideoProgressTracker = function courseShowVideoProgressTracker(config) {
+                    return {
+                        materialId: config.materialId,
+                        youtubeId: config.youtubeId,
+                        requiredPercent: config.requiredPercent ?? 70,
+                        isUnlocked: !!config.initiallyUnlocked,
+                        player: null,
+                        playerState: -1,
+                        timer: null,
+                        lastTickAt: null,
+                        durationSeconds: 0,
+                        watchedSeconds: 0,
+                        progressPercent: config.initiallyUnlocked ? 100 : 0,
+                        progressLabel: config.initiallyUnlocked ? '70% terpenuhi' : '0% dari target',
+                        formattedRemaining: '--:--',
+
+                        async init() {
+                            this.updateProgressUi();
+
+                            if (!this.youtubeId || this.isUnlocked) {
+                                return;
+                            }
+
+                            const yt = await loadYoutubeApi();
+                            const elementId = `course-show-video-player-${this.materialId}`;
+                            const iframe = document.getElementById(elementId);
+
+                            if (!iframe) {
+                                return;
+                            }
+
+                            this.player = new yt.Player(elementId, {
+                                events: {
+                                    onReady: (event) => this.handleReady(event),
+                                    onStateChange: (event) => this.handleStateChange(event),
+                                },
+                            });
+                        },
+
+                        handleReady(event) {
+                            const duration = Number(event.target.getDuration?.() || 0);
+
+                            if (duration > 0) {
+                                this.durationSeconds = duration;
+                            }
+
+                            this.updateProgressUi();
+                        },
+
+                        handleStateChange(event) {
+                            this.playerState = event.data;
+
+                            if (event.data === window.YT.PlayerState.PLAYING) {
+                                this.startTimer();
+                                return;
+                            }
+
+                            this.stopTimer();
+                        },
+
+                        startTimer() {
+                            if (this.timer || this.isUnlocked) {
+                                return;
+                            }
+
+                            this.lastTickAt = Date.now();
+                            this.timer = window.setInterval(() => this.tick(), 500);
+                        },
+
+                        stopTimer() {
+                            if (this.timer) {
+                                window.clearInterval(this.timer);
+                                this.timer = null;
+                            }
+
+                            this.lastTickAt = null;
+                        },
+
+                        tick() {
+                            if (this.isUnlocked || this.playerState !== window.YT.PlayerState.PLAYING) {
+                                return;
+                            }
+
+                            const now = Date.now();
+
+                            if (this.lastTickAt === null) {
+                                this.lastTickAt = now;
+                                return;
+                            }
+
+                            const elapsedSeconds = Math.max(0, (now - this.lastTickAt) / 1000);
+                            this.lastTickAt = now;
+                            this.watchedSeconds += elapsedSeconds;
+                            this.updateProgressUi();
+
+                            if (this.progressPercent >= 100) {
+                                this.finishThreshold();
+                            }
+                        },
+
+                        updateProgressUi() {
+                            const requiredSeconds = this.getRequiredSeconds();
+                            const consumed = this.isUnlocked
+                                ? requiredSeconds
+                                : Math.min(this.watchedSeconds, requiredSeconds);
+                            const remaining = Math.max(0, requiredSeconds - consumed);
+                            const percent = requiredSeconds > 0
+                                ? Math.min(100, Math.round((consumed / requiredSeconds) * 100))
+                                : 0;
+
+                            this.progressPercent = percent;
+                            this.progressLabel = this.isUnlocked
+                                ? '70% terpenuhi'
+                                : `${percent}% dari target`;
+                            this.formattedRemaining = this.formatDuration(remaining);
+                        },
+
+                        getRequiredSeconds() {
+                            if (this.durationSeconds <= 0 && this.player?.getDuration) {
+                                this.durationSeconds = Number(this.player.getDuration() || 0);
+                            }
+
+                            return this.durationSeconds > 0
+                                ? this.durationSeconds * (this.requiredPercent / 100)
+                                : 0;
+                        },
+
+                        async finishThreshold() {
+                            if (this.isUnlocked) {
+                                return;
+                            }
+
+                            this.isUnlocked = true;
+                            this.stopTimer();
+                            this.updateProgressUi();
+
+                            await this.$wire.unlockStudentVideoCompletion(this.materialId);
+                        },
+
+                        formatDuration(totalSeconds) {
+                            const safeSeconds = Math.max(0, Math.ceil(totalSeconds));
+                            const minutes = Math.floor(safeSeconds / 60);
+                            const seconds = safeSeconds % 60;
+
+                            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        },
+                    };
+                };
+            })();
+        </script>
+    @endpush
+@endonce

@@ -1,21 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CertificateDownloadController;
+use App\Http\Controllers\CertificateController;
 use App\Livewire\Frontend\LandingPage;
-use App\Livewire\Dashboard\StudentDashboard;
+use App\Livewire\Dashboard\MyLearning;
 use App\Livewire\Courses\CourseCatalog;
 use App\Livewire\Courses\CourseShow;
 use App\Livewire\Topics\TopicPlayer;
 use App\Livewire\Sessions\AttendanceButton;
 use App\Livewire\Assessments\AssessmentTaker;
-use App\Livewire\Certificates\CertificatePanel;
+
+// Archived route snapshot. Keep references aligned with current classes to avoid stale IDE errors.
 
 Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'set.active.role'])->group(function () {
 
-    Route::get('/certificates/{certificate}/download', CertificateDownloadController::class)
+    Route::get('/certificates/{certificateId}/download', [CertificateController::class, 'download'])
     ->name('certificates.download');
 
     Route::get('/dashboard', function () {
@@ -29,8 +30,7 @@ Route::middleware(['auth', 'set.active.role'])->group(function () {
     })->name('dashboard');
 
     Route::middleware(['role:student,disciples'])->group(function () {
-        // Route::get('/learning', StudentDashboard::class)->name('learning.dashboard');
-        Route::get('/learning', \App\Livewire\Dashboard\StudentDashboard::class)
+        Route::get('/learning', MyLearning::class)
         ->name('learning.dashboard');
 
         // Route::get('/courses', CourseCatalog::class)->name('courses.index');
@@ -57,7 +57,8 @@ Route::middleware(['auth', 'set.active.role'])->group(function () {
         ->middleware('assessment.access:assessment')
         ->name('assessments.take');
 
-        Route::get('/certificates', CertificatePanel::class)->name('certificates.index');
+        // Archived note: certificate panel no longer exists as a standalone page.
+        // Certificates are now accessed from My Learning / download routes.
 
         Route::view('/articles', 'articles.index')->name('articles.index');
     });
@@ -67,9 +68,6 @@ Route::middleware(['auth', 'set.active.role'])->group(function () {
         ->middleware(['role:admin'])
         ->group(function () {
             Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
-            // Route::view('/study-programs', 'admin.study-programs.index')->name('study-programs.index');
-            Route::get('/study-programs', \App\Livewire\Admin\StudyPrograms\StudyProgramIndex::class)
-            ->name('study-programs.index');
             // Route::view('/courses', 'admin.courses.index')->name('courses.index');
             Route::get('/courses', \App\Livewire\Admin\Courses\CourseIndex::class);
             // Route::view('/topics', 'admin.topics.index')->name('topics.index');

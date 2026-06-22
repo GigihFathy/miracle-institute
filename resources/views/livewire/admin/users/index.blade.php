@@ -27,10 +27,11 @@
             <table class="table-fixed w-full min-w-full text-sm">
                 <thead class="admin-table-head text-left text-slate-600">
                     <tr>
-                        <th class="w-1/4 px-4 py-3 font-medium">{{ __('admin.users.table.name') }}</th>
-                        <th class="w-1/4 px-4 py-3 font-medium">{{ __('admin.users.table.email') }}</th>
-                        <th class="w-1/3 px-4 py-3 font-medium">{{ __('admin.users.table.roles') }}</th>
-                        <th class="w-1/6 px-4 py-3 text-right font-medium">{{ __('admin.users.table.action') }}</th>
+                        <th class="w-[22%] px-4 py-3 font-medium">{{ __('admin.users.table.name') }}</th>
+                        <th class="w-[22%] px-4 py-3 font-medium">{{ __('admin.users.table.email') }}</th>
+                        <th class="w-[28%] px-4 py-3 font-medium">{{ __('admin.users.table.roles') }}</th>
+                        <th class="w-[12%] px-4 py-3 font-medium">{{ __('admin.users.table.status') }}</th>
+                        <th class="w-[16%] px-4 py-3 text-right font-medium">{{ __('admin.users.table.action') }}</th>
                     </tr>
                 </thead>
 
@@ -57,6 +58,18 @@
                                 </div>
                             </td>
 
+                            <td class="px-4 py-3">
+                                @if($row->is_active)
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
+                                        {{ __('admin.users.status.active') }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 ring-1 ring-red-200">
+                                        {{ __('admin.users.status.inactive') }}
+                                    </span>
+                                @endif
+                            </td>
+
                             <td class="px-4 py-3 text-right">
                                 <div class="flex justify-end gap-2">
                                     @if($row->roles->contains('name', 'student'))
@@ -75,6 +88,33 @@
                                             </button>
                                             <span class="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-sky-200 bg-white px-2 py-1 text-[11px] font-medium text-sky-700 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
                                                 Rekap Student
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    @if($row->id !== auth()->id())
+                                        <div class="relative group">
+                                            <button
+                                                type="button"
+                                                wire:click="toggleActive('{{ $row->id }}')"
+                                                wire:confirm="{{ $row->is_active ? __('admin.users.actions.deactivate') . ' ' . $row->full_name . '?' : __('admin.users.actions.activate') . ' ' . $row->full_name . '?' }}"
+                                                class="inline-flex h-9 w-9 items-center justify-center rounded-lg border transition {{ $row->is_active ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
+                                                aria-label="{{ $row->is_active ? __('admin.users.actions.deactivate') : __('admin.users.actions.activate') }}"
+                                            >
+                                                @if($row->is_active)
+                                                    {{-- Nonaktifkan: icon ban/block --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                                    </svg>
+                                                @else
+                                                    {{-- Aktifkan: icon check-circle --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+                                                @endif
+                                            </button>
+                                            <span class="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border bg-white px-2 py-1 text-[11px] font-medium opacity-0 transition group-hover:opacity-100 {{ $row->is_active ? 'border-red-200 text-red-600' : 'border-emerald-200 text-emerald-700' }}">
+                                                {{ $row->is_active ? __('admin.users.actions.deactivate') : __('admin.users.actions.activate') }}
                                             </span>
                                         </div>
                                     @endif
@@ -133,17 +173,17 @@
                 <div class="overflow-y-auto p-5">
                     @if(empty($studentRecapRows))
                         <div class="rounded-xl border border-dashed border-slate-300 px-5 py-8 text-center text-sm text-slate-500">
-                            Student ini belum mengikuti course apa pun.
+                            Student ini belum mengikuti topik pembelajaran apa pun.
                         </div>
                     @else
                         <div class="grid gap-4 md:grid-cols-3">
                             <div class="rounded-2xl border bg-slate-50 p-4">
-                                <div class="text-xs uppercase tracking-wide text-slate-500">Total Course</div>
+                                <div class="text-xs uppercase tracking-wide text-slate-500">Total Topik pembelajaran</div>
                                 <div class="mt-2 text-2xl font-bold text-slate-900">{{ count($studentRecapRows) }}</div>
                             </div>
 
                             <div class="rounded-2xl border bg-slate-50 p-4">
-                                <div class="text-xs uppercase tracking-wide text-slate-500">Topik Selesai</div>
+                                <div class="text-xs uppercase tracking-wide text-slate-500">Sesi Selesai</div>
                                 <div class="mt-2 text-2xl font-bold text-slate-900">{{ collect($studentRecapRows)->sum('topics_completed') }}</div>
                             </div>
 
@@ -159,7 +199,7 @@
                             <table class="min-w-full text-sm">
                                 <thead class="admin-table-head text-left text-slate-600">
                                     <tr>
-                                        <th class="px-4 py-3 font-medium">Course</th>
+                                        <th class="px-4 py-3 font-medium">Topik pembelajaran</th>
                                         <th class="px-4 py-3 font-medium">Status</th>
                                         <th class="px-4 py-3 font-medium">Progress</th>
                                         <th class="px-4 py-3 font-medium">Kehadiran</th>
@@ -178,7 +218,7 @@
                                                 </span>
                                             </td>
                                             <td class="px-4 py-3">
-                                                <div class="font-medium text-slate-900">{{ $recap['topics_completed'] }} / {{ $recap['topics_total'] }} topik</div>
+                                                <div class="font-medium text-slate-900">{{ $recap['topics_completed'] }} / {{ $recap['topics_total'] }} sesi</div>
                                                 <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-200">
                                                     <div class="h-full rounded-full bg-[#004777]" style="width: {{ $recap['progress_percent'] }}%"></div>
                                                 </div>
@@ -187,8 +227,8 @@
                                             <td class="px-4 py-3">
                                                 <div class="text-slate-700">Present: {{ $recap['attendance_present'] }}</div>
                                                 <div class="text-slate-700">Late: {{ $recap['attendance_late'] }}</div>
-                                                <div class="text-slate-700">Absent: {{ $recap['attendance_absent'] }}</div>
-                                                <div class="mt-1 text-xs text-slate-500">Total sesi: {{ $recap['sessions_total'] }}</div>
+                                                <div class="text-slate-700">Online: {{ $recap['attendance_absent'] }}</div>
+                                                <div class="mt-1 text-xs text-slate-500">Total pertemuan: {{ $recap['sessions_total'] }}</div>
                                             </td>
                                             <td class="px-4 py-3 text-slate-600">
                                                 <div>{{ $recap['enrolled_at'] }}</div>

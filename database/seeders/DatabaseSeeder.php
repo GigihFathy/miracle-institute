@@ -13,15 +13,15 @@ class DatabaseSeeder extends Seeder
     {
         DB::transaction(function () {
             $now = now();
-            $asset = 'images/logo.png';
+            $logoAsset = 'images/logo.png';
+            $courseAsset = 'images/thumbnail/thumbnail_dove.png';
 
-            $this->seedCompany($asset, $now);
+            $this->seedCompany($logoAsset, $now);
             [$permissions, $roles] = $this->seedPermissionsAndRoles($now);
             $this->seedRolePermissions($roles, $permissions);
 
-            $users = $this->seedUsers($roles, $asset, $now);
-            $program = $this->seedStudentStudyProgram($now);
-            $this->seedAdditionalLearningData($program, $users, $asset, $now);
+            $users = $this->seedUsers($roles, $logoAsset, $now);
+            $this->seedAdditionalLearningData($users, $courseAsset, $now);
         });
     }
 
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
                 'facebook' => 'https://facebook.com/edunusa',
                 'instagram' => 'https://instagram.com/edunusa',
                 'youtube' => 'https://youtube.com/@edunusa',
-                'whatsapp' => '+62-812-0000-9001',
+                'email' => 'edu@example.com',
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
@@ -121,8 +121,8 @@ class DatabaseSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $profiles[] = [
-                'name' => "Siswa {$i}",
-                'email' => "siswa{$i}@example.test",
+                'name' => "Murid {$i}",
+                'email' => "murid{$i}@example.test",
                 'gender' => $i % 2 === 0 ? 'female' : 'male',
                 'phone' => sprintf('+62-811-1000-%04d', $i),
                 'dob' => now()->subYears(18 + $i)->format('Y-m-d'),
@@ -169,24 +169,7 @@ class DatabaseSeeder extends Seeder
         return ['all' => $rows, 'byEmail' => $byEmail, 'byRole' => $byRole];
     }
 
-    private function seedStudentStudyProgram($now): array
-    {
-        $program = [
-            'id' => $this->uuid(),
-            'title' => 'Program Siswa Tambahan',
-            'slug' => 'program-siswa-tambahan',
-            'description' => 'Program pembelajaran untuk data siswa dan course tambahan.',
-            'status' => 'active',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
-
-        DB::table('study_programs')->insert($program);
-
-        return $program;
-    }
-
-    private function seedAdditionalLearningData(array $program, array $users, string $asset, $now): void
+    private function seedAdditionalLearningData(array $users, string $asset, $now): void
     {
         $teacher = $users['byRole']['admin'][0] ?? null;
         $students = $users['byRole']['student'] ?? [];
@@ -201,63 +184,153 @@ class DatabaseSeeder extends Seeder
         $enrollments = [];
         $attendances = [];
 
-        for ($i = 1; $i <= 10; $i++) {
+        $courseBlueprints = [
+            [
+                'title' => 'Pemuridan Dasar Kristus',
+                'slug' => 'pemuridan-dasar-kristus',
+                'description' => 'Mengenal panggilan menjadi murid Kristus, dasar pertobatan, dan hidup yang berakar dalam Injil.',
+                'prefix' => 'PDM',
+                'number' => 101,
+                'topics' => [
+                    'Identitas Murid Kristus',
+                    'Pertobatan dan Kelahiran Baru',
+                    'Dasar Hidup Dalam Injil',
+                ],
+            ],
+            [
+                'title' => 'Formasi Karakter Murid',
+                'slug' => 'formasi-karakter-murid',
+                'description' => 'Membangun karakter murid yang setia melalui disiplin rohani, ketaatan, dan integritas hidup.',
+                'prefix' => 'FKM',
+                'number' => 102,
+                'topics' => [
+                    'Disiplin Rohani Sehari-hari',
+                    'Ketaatan Dalam Hal Kecil',
+                    'Integritas dan Kekudusan',
+                ],
+            ],
+            [
+                'title' => 'Pemuridan Dalam Komunitas',
+                'slug' => 'pemuridan-dalam-komunitas',
+                'description' => 'Belajar bertumbuh bersama, saling menggembalakan, dan membangun relasi yang sehat dalam tubuh Kristus.',
+                'prefix' => 'PDK',
+                'number' => 103,
+                'topics' => [
+                    'Hidup Dalam Persekutuan',
+                    'Saling Menasehati Dalam Kasih',
+                    'Melayani Bersama Sebagai Tubuh Kristus',
+                ],
+            ],
+            [
+                'title' => 'Pemuridan dan Pengutusan',
+                'slug' => 'pemuridan-dan-pengutusan',
+                'description' => 'Menyiapkan murid untuk bersaksi, memuridkan orang lain, dan hidup sebagai terang di tengah dunia.',
+                'prefix' => 'PDP',
+                'number' => 104,
+                'topics' => [
+                    'Hati Seorang Pengutus',
+                    'Murid yang Bersaksi',
+                    'Memuridkan Generasi Berikutnya',
+                ],
+                'future_sessions' => 2,
+            ],
+        ];
+
+        $assessmentPayloads = [];
+
+        foreach ($courseBlueprints as $courseIndex => $blueprint) {
             $courseId = $this->uuid();
-            $topicId = $this->uuid();
-            $sessionId = $this->uuid();
-            $courseCreatedAt = $now->copy()->subDays(20 - $i);
-            $sessionStart = $now->copy()->subDays($i)->setTime(19, 0);
-            $sessionEnd = $sessionStart->copy()->addMinutes(90);
+            $courseCreatedAt = $now->copy()->subDays(40 - ($courseIndex * 4));
 
             $courses[] = [
                 'id' => $courseId,
-                'study_program_id' => $program['id'],
-                'title' => "Course Tambahan {$i}",
-                'slug' => "course-tambahan-{$i}",
+                'title' => $blueprint['title'],
+                'slug' => $blueprint['slug'],
                 'poster' => $asset,
-                'description' => "Course tambahan {$i} untuk kebutuhan data dummy siswa, topik, sesi, dan kehadiran.",
+                'description' => $blueprint['description'],
                 'status' => 'active',
+                'certificate_course_number' => $blueprint['number'],
+                'certificate_prefix_code' => $blueprint['prefix'],
                 'created_at' => $courseCreatedAt,
                 'updated_at' => $now,
             ];
 
-            $topics[] = [
-                'id' => $topicId,
-                'course_id' => $courseId,
-                'teacher_id' => $teacher['id'],
-                'name' => "Topik Utama {$i}",
-                'slug' => "topik-utama-{$i}",
-                'category' => 'general',
-                'description' => "Topik utama untuk Course Tambahan {$i}.",
-                'poster' => $asset,
-                'visibility' => 'public',
-                'status' => 'published',
-                'sort_order' => 1,
-                'created_at' => $courseCreatedAt,
-                'updated_at' => $now,
-            ];
+            foreach ($blueprint['topics'] as $topicIndex => $topicName) {
+                $topicId = $this->uuid();
+                $topicCreatedAt = $courseCreatedAt->copy()->addDays($topicIndex);
+                $pastStart = $now->copy()->subDays(($courseIndex * 6) + ($topicIndex + 2))->setTime(19, 0);
+                $pastEnd = $pastStart->copy()->addMinutes(90);
 
-            $sessions[] = [
-                'id' => $sessionId,
-                'topic_id' => $topicId,
-                'title' => "Sesi Live {$i}",
-                'zoom_link' => "https://zoom.example.test/course-{$i}",
-                'record_link' => null,
-                'start_at' => $sessionStart,
-                'end_at' => $sessionEnd,
-                'reminder_sent_at' => $sessionStart->copy()->subMinutes(30),
-                'status' => 'completed',
-                'created_at' => $courseCreatedAt,
-                'updated_at' => $now,
-            ];
+                $topics[] = [
+                    'id' => $topicId,
+                    'course_id' => $courseId,
+                    'teacher_id' => $teacher['id'],
+                    'name' => $topicName,
+                    'slug' => Str::slug($topicName . '-' . ($courseIndex + 1)),
+                    'category' => 'pemuridan',
+                    'description' => 'Topik pemuridan yang menolong peserta memahami dan mempraktikkan ' . strtolower($topicName) . '.',
+                    'poster' => $asset,
+                    'visibility' => 'public',
+                    'status' => 'published',
+                    'sort_order' => $topicIndex + 1,
+                    'created_at' => $topicCreatedAt,
+                    'updated_at' => $now,
+                ];
 
-            foreach ($students as $index => $student) {
-                $enrollmentId = $this->uuid();
-                $checkInAt = $sessionStart->copy()->addMinutes(($index % 3) * 5);
-                $clockOutAt = $sessionEnd->copy()->subMinutes(10 - ($index % 3));
+                $sessions[] = [
+                    'id' => $this->uuid(),
+                    'topic_id' => $topicId,
+                    'title' => 'Sesi ' . $topicName,
+                    'zoom_link' => 'https://zoom.example.test/' . $blueprint['slug'] . '-topic-' . ($topicIndex + 1),
+                    'record_link' => null,
+                    'start_at' => $pastStart,
+                    'end_at' => $pastEnd,
+                    'reminder_sent_at' => $pastStart->copy()->subMinutes(30),
+                    'status' => 'completed',
+                    'created_at' => $topicCreatedAt,
+                    'updated_at' => $now,
+                ];
 
+                foreach ($students as $studentIndex => $student) {
+                    $attendanceStatus = $studentIndex % 4 === 0 ? 'late' : 'present';
+                    $attendances[] = [
+                        'id' => $this->uuid(),
+                        'video_session_id' => $sessions[array_key_last($sessions)]['id'],
+                        'user_id' => $student['id'],
+                        'status' => $attendanceStatus,
+                        'check_in_at' => $pastStart->copy()->addMinutes(($studentIndex % 3) * 4),
+                        'clock_out_at' => $pastEnd->copy()->subMinutes($studentIndex % 3),
+                        'ip_address' => '127.0.0.1',
+                        'created_at' => $pastStart,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            if (($blueprint['future_sessions'] ?? 0) > 0) {
+                $targetTopicId = $topics[array_key_last($topics)]['id'];
+
+                for ($futureIndex = 1; $futureIndex <= $blueprint['future_sessions']; $futureIndex++) {
+                    $futureStart = $now->copy()->addDays($futureIndex + 2)->setTime(19, 0);
+                    $sessions[] = [
+                        'id' => $this->uuid(),
+                        'topic_id' => $targetTopicId,
+                        'title' => 'Sesi Lanjutan Pengutusan ' . $futureIndex,
+                        'zoom_link' => 'https://zoom.example.test/' . $blueprint['slug'] . '-future-' . $futureIndex,
+                        'record_link' => null,
+                        'start_at' => $futureStart,
+                        'end_at' => $futureStart->copy()->addMinutes(90),
+                        'reminder_sent_at' => null,
+                        'status' => 'scheduled',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            }
+
+            foreach ($students as $studentIndex => $student) {
                 $enrollments[] = [
-                    'id' => $enrollmentId,
+                    'id' => $this->uuid(),
                     'user_id' => $student['id'],
                     'course_id' => $courseId,
                     'status' => 'active',
@@ -266,19 +339,13 @@ class DatabaseSeeder extends Seeder
                     'created_at' => $courseCreatedAt,
                     'updated_at' => $now,
                 ];
-
-                $attendances[] = [
-                    'id' => $this->uuid(),
-                    'video_session_id' => $sessionId,
-                    'user_id' => $student['id'],
-                    'status' => $index % 4 === 0 ? 'late' : 'present',
-                    'check_in_at' => $checkInAt,
-                    'clock_out_at' => $clockOutAt,
-                    'ip_address' => '127.0.0.1',
-                    'created_at' => $sessionStart,
-                    'updated_at' => $now,
-                ];
             }
+
+            $assessmentPayloads[] = [
+                'course_id' => $courseId,
+                'course_title' => $blueprint['title'],
+                'created_at' => $courseCreatedAt->copy()->addDays(5),
+            ];
         }
 
         DB::table('courses')->insert($courses);
@@ -286,190 +353,84 @@ class DatabaseSeeder extends Seeder
         DB::table('video_sessions')->insert($sessions);
         DB::table('course_enrollments')->insert($enrollments);
         DB::table('attendances')->insert($attendances);
-
-        $this->seedAssessmentDemoCourse($program, $teacher, $asset, $now);
-        $this->seedUpcomingSessionsForDifferentCourses($program, $teacher, $asset, $now);
+        $this->seedAssessmentsForCourses($assessmentPayloads, $now);
     }
 
-    private function seedAssessmentDemoCourse(array $program, array $teacher, string $asset, $now): void
+    private function seedAssessmentsForCourses(array $assessmentPayloads, $now): void
     {
-        $courseId = $this->uuid();
-        $topicId = $this->uuid();
-        $sessionId = $this->uuid();
-        $assessmentId = $this->uuid();
-        $createdAt = $now->copy()->subDays(3);
-
-        DB::table('courses')->insert([
-            'id' => $courseId,
-            'study_program_id' => $program['id'],
-            'title' => 'Kursus Demo Assessment',
-            'slug' => 'kursus-demo-assessment',
-            'poster' => $asset,
-            'description' => 'Kursus demo dengan satu assessment sederhana dan satu sesi kosong untuk kebutuhan pengujian.',
-            'status' => 'active',
-            'created_at' => $createdAt,
-            'updated_at' => $now,
-        ]);
-
-        DB::table('topics')->insert([
-            'id' => $topicId,
-            'course_id' => $courseId,
-            'teacher_id' => $teacher['id'],
-            'name' => 'Topik Demo Assessment',
-            'slug' => 'topik-demo-assessment',
-            'category' => 'general',
-            'description' => 'Topik sederhana untuk menguji assessment dan sesi tanpa materi.',
-            'poster' => $asset,
-            'visibility' => 'public',
-            'status' => 'published',
-            'sort_order' => 1,
-            'created_at' => $createdAt,
-            'updated_at' => $now,
-        ]);
-
-        DB::table('video_sessions')->insert([
-            'id' => $sessionId,
-            'topic_id' => $topicId,
-            'title' => 'Sesi Kosong Demo',
-            'zoom_link' => 'https://zoom.example.test/demo-assessment-session',
-            'record_link' => null,
-            'start_at' => $now->copy()->subDays(1)->setTime(19, 0),
-            'end_at' => $now->copy()->subDays(1)->setTime(20, 0),
-            'reminder_sent_at' => $now->copy()->subDays(1)->setTime(18, 30),
-            'status' => 'completed',
-            'created_at' => $createdAt,
-            'updated_at' => $now,
-        ]);
-
-        DB::table('assessments')->insert([
-            'id' => $assessmentId,
-            'course_id' => $courseId,
-            'title' => 'Assessment Dasar Demo',
-            'passing_grade' => 70,
-            'randomize_questions' => false,
-            'question_limit' => 10,
-            'status' => 'active',
-            'created_at' => $createdAt,
-            'updated_at' => $now,
-        ]);
-
+        $assessments = [];
         $questions = [];
         $questionOptions = [];
 
-        for ($i = 1; $i <= 10; $i++) {
-            $questionId = $this->uuid();
-
-            $questions[] = [
-                'id' => $questionId,
-                'assessment_id' => $assessmentId,
-                'question_type' => 'mcq',
-                'question' => "Pertanyaan demo nomor {$i}: apa fungsi assessment sederhana ini?",
-                'correct_text_answer' => null,
-                'explanation' => "Soal demo nomor {$i} dipakai untuk menguji alur assessment dasar.",
-                'sort_order' => $i,
-                'created_at' => $createdAt,
+        foreach ($assessmentPayloads as $courseIndex => $payload) {
+            $assessmentId = $this->uuid();
+            $assessments[] = [
+                'id' => $assessmentId,
+                'course_id' => $payload['course_id'],
+                'title' => 'Assessment ' . $payload['course_title'],
+                'passing_grade' => 70,
+                'randomize_questions' => false,
+                'question_limit' => 5,
+                'status' => 'active',
+                'created_at' => $payload['created_at'],
                 'updated_at' => $now,
             ];
 
-            $questionOptions[] = [
-                'id' => $this->uuid(),
-                'question_id' => $questionId,
-                'option_text' => "Jawaban benar untuk soal demo {$i}",
-                'is_correct' => true,
-                'sort_order' => 1,
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
-            $questionOptions[] = [
-                'id' => $this->uuid(),
-                'question_id' => $questionId,
-                'option_text' => "Pilihan pengalih A untuk soal demo {$i}",
-                'is_correct' => false,
-                'sort_order' => 2,
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
-            $questionOptions[] = [
-                'id' => $this->uuid(),
-                'question_id' => $questionId,
-                'option_text' => "Pilihan pengalih B untuk soal demo {$i}",
-                'is_correct' => false,
-                'sort_order' => 3,
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
-            $questionOptions[] = [
-                'id' => $this->uuid(),
-                'question_id' => $questionId,
-                'option_text' => "Pilihan pengalih C untuk soal demo {$i}",
-                'is_correct' => false,
-                'sort_order' => 4,
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
+            for ($questionNumber = 1; $questionNumber <= 5; $questionNumber++) {
+                $questionId = $this->uuid();
+                $questions[] = [
+                    'id' => $questionId,
+                    'assessment_id' => $assessmentId,
+                    'question_type' => 'mcq',
+                    'question' => 'Dalam ' . $payload['course_title'] . ', apa inti pemuridan pada soal nomor ' . $questionNumber . '?',
+                    'correct_text_answer' => null,
+                    'explanation' => 'Peserta diharapkan memahami prinsip pemuridan yang diajarkan di course ini.',
+                    'sort_order' => $questionNumber,
+                    'created_at' => $payload['created_at'],
+                    'updated_at' => $now,
+                ];
+
+                $questionOptions[] = [
+                    'id' => $this->uuid(),
+                    'question_id' => $questionId,
+                    'option_text' => 'Hidup taat kepada Kristus dan memuridkan orang lain.',
+                    'is_correct' => true,
+                    'sort_order' => 1,
+                    'created_at' => $payload['created_at'],
+                    'updated_at' => $now,
+                ];
+                $questionOptions[] = [
+                    'id' => $this->uuid(),
+                    'question_id' => $questionId,
+                    'option_text' => 'Berfokus pada pengetahuan tanpa ketaatan.',
+                    'is_correct' => false,
+                    'sort_order' => 2,
+                    'created_at' => $payload['created_at'],
+                    'updated_at' => $now,
+                ];
+                $questionOptions[] = [
+                    'id' => $this->uuid(),
+                    'question_id' => $questionId,
+                    'option_text' => 'Menjalani iman sendirian tanpa komunitas.',
+                    'is_correct' => false,
+                    'sort_order' => 3,
+                    'created_at' => $payload['created_at'],
+                    'updated_at' => $now,
+                ];
+                $questionOptions[] = [
+                    'id' => $this->uuid(),
+                    'question_id' => $questionId,
+                    'option_text' => 'Menghindari pertumbuhan dan pengutusan.',
+                    'is_correct' => false,
+                    'sort_order' => 4,
+                    'created_at' => $payload['created_at'],
+                    'updated_at' => $now,
+                ];
+            }
         }
 
+        DB::table('assessments')->insert($assessments);
         DB::table('questions')->insert($questions);
         DB::table('question_options')->insert($questionOptions);
-    }
-
-    private function seedUpcomingSessionsForDifferentCourses(array $program, array $teacher, string $asset, $now): void
-    {
-        $courses = [];
-        $topics = [];
-        $sessions = [];
-
-        for ($i = 1; $i <= 10; $i++) {
-            $courseId = $this->uuid();
-            $topicId = $this->uuid();
-            $startAt = $now->copy()->addDays($i + 1)->setTime(19, 0);
-            $createdAt = $now->copy()->subDays(2);
-
-            $courses[] = [
-                'id' => $courseId,
-                'study_program_id' => $program['id'],
-                'title' => "Kursus Jadwal Mendatang {$i}",
-                'slug' => "kursus-jadwal-mendatang-{$i}",
-                'poster' => $asset,
-                'description' => "Kursus dummy {$i} untuk kebutuhan sesi masa depan.",
-                'status' => 'active',
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
-
-            $topics[] = [
-                'id' => $topicId,
-                'course_id' => $courseId,
-                'teacher_id' => $teacher['id'],
-                'name' => "Topik Jadwal Mendatang {$i}",
-                'slug' => "topik-jadwal-mendatang-{$i}",
-                'category' => 'general',
-                'description' => "Topik untuk sesi mendatang {$i}.",
-                'poster' => $asset,
-                'visibility' => 'public',
-                'status' => 'published',
-                'sort_order' => 1,
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
-
-            $sessions[] = [
-                'id' => $this->uuid(),
-                'topic_id' => $topicId,
-                'title' => "Sesi Mendatang {$i}",
-                'zoom_link' => "https://zoom.example.test/upcoming-session-{$i}",
-                'record_link' => null,
-                'start_at' => $startAt,
-                'end_at' => $startAt->copy()->addMinutes(90),
-                'reminder_sent_at' => null,
-                'status' => 'scheduled',
-                'created_at' => $createdAt,
-                'updated_at' => $now,
-            ];
-        }
-
-        DB::table('courses')->insert($courses);
-        DB::table('topics')->insert($topics);
-        DB::table('video_sessions')->insert($sessions);
     }
 }

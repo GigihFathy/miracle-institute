@@ -86,13 +86,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
 COPY --from=assets /app/public/build ./public/build
+RUN mkdir -p /opt/app-defaults/thumbnails \
+    && if [ -d public/images/thumbnail ]; then cp -a public/images/thumbnail/. /opt/app-defaults/thumbnails/ 2>/dev/null || true; fi
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY docker/php/conf.d/production.ini /usr/local/etc/php/conf.d/production.ini
 COPY docker/php/conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
-    && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache public/images/thumbnail \
+    && chown -R www-data:www-data storage bootstrap/cache public/images/thumbnail
 
 EXPOSE 9000
 

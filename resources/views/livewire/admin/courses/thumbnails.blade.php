@@ -76,7 +76,7 @@
                     >
 
                     <p class="text-xs leading-5 text-slate-500">
-                        Pilih gambar thumbnail baru untuk ditambahkan ke library template kursus.
+                        Pilih gambar thumbnail baru untuk ditambahkan ke library template topik pembelajaran.
                     </p>
 
                     @error('thumbnail')
@@ -106,7 +106,7 @@
             @forelse($thumbnails as $thumbnail)
                 <div class="overflow-hidden rounded-2xl border bg-white">
                     <img
-                        src="{{ asset($thumbnail['path']) }}"
+                        src="{{ course_thumbnail_url($thumbnail['path']) }}"
                         alt="{{ $thumbnail['name'] }}"
                         class="h-44 w-full object-cover"
                     >

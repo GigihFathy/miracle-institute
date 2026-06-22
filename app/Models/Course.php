@@ -15,11 +15,6 @@ class Course extends Model
 
     protected $guarded = [];
 
-    public function studyProgram()
-    {
-        return $this->belongsTo(StudyProgram::class);
-    }
-
     public function topics()
     {
         return $this->hasMany(Topic::class);

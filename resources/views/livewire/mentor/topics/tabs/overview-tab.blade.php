@@ -32,7 +32,7 @@
             </div> --}}
         </div>
 
-        <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <div class="mentor-workspace-card p-4">
                 <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">
                     {{ __('mentor.topic_tabs.overview.cards.category') }}
@@ -40,16 +40,6 @@
 
                 <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">
                     {{ strtoupper($topic->category ?? '-') }}
-                </div>
-            </div>
-
-            <div class="mentor-workspace-card p-4">
-                <div class="text-xs font-medium uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_50%,white)]">
-                    {{ __('mentor.topic_tabs.overview.cards.visibility') }}
-                </div>
-
-                <div class="mt-2 text-sm font-semibold text-[var(--mentor-primary)]">
-                    {{ strtoupper($topic->visibility) }}
                 </div>
             </div>
 

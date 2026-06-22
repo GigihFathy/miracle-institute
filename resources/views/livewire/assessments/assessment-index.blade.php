@@ -6,7 +6,7 @@
                     Assessment Center
                 </div>
                 <h1 class="mt-2 text-2xl font-bold tracking-tight text-mentor-primary sm:text-3xl">
-                    Assessment untuk course yang sedang kamu pelajari
+                    Assessment untuk topik pembelajaran yang sedang kamu pelajari
                 </h1>
                 <p class="mt-3 max-w-3xl text-sm leading-6 text-[color:color-mix(in_oklab,#004777_72%,white)]">
                     Lihat assessment yang tersedia, cek attempt terakhir, lalu lanjutkan saat kamu sudah siap.
@@ -99,7 +99,7 @@
                 </h3>
 
                 <p class="mt-2 text-sm text-[color:color-mix(in_oklab,#004777_72%,white)]">
-                    Tidak ada assessment yang cocok dengan course yang kamu ikuti.
+                    Tidak ada assessment yang cocok dengan topik pembelajaran yang kamu ikuti.
                 </p>
             </div>
         @endforelse

@@ -18,6 +18,7 @@ class JoinSessionButton extends Component
     public string $stateLabel = 'Scheduled';
     public string $stateBadgeClass = 'bg-slate-100 text-slate-700';
     public string $attendanceBadgeClass = 'bg-slate-100 text-slate-700';
+    public string $attendanceLabel = 'Belum check-in';
 
     public bool $canJoin = false;
     public bool $canClockOut = false;
@@ -63,7 +64,7 @@ class JoinSessionButton extends Component
             $this->attendanceBadgeClass = match ($this->attendance->status) {
                 'present' => 'bg-emerald-100 text-emerald-700',
                 'late' => 'bg-amber-100 text-amber-700',
-                'absent' => 'bg-rose-100 text-rose-700',
+                'online', 'absent' => 'bg-sky-100 text-sky-700',
                 default => 'bg-slate-100 text-slate-700',
             };
         }
@@ -77,6 +78,22 @@ class JoinSessionButton extends Component
         $this->canClockOut = (bool) $this->attendance
             && ! $this->attendance->clock_out_at
             && $now->betweenIncluded($clockOutWindowStart, $clockOutWindowEnd);
+
+        if ($this->attendance) {
+            $this->attendanceLabel = match ($this->attendance->status) {
+                'present' => 'Hadir',
+                'late' => 'Terlambat',
+                'online', 'absent' => 'Online',
+                default => 'Sudah check-in',
+            };
+        } elseif ($now->gt($end)) {
+            $this->attendanceBadgeClass = 'bg-sky-100 text-sky-700';
+            $this->attendanceLabel = 'Online';
+        } elseif ($now->betweenIncluded($start, $end)) {
+            $this->attendanceLabel = 'Belum check-in';
+        } else {
+            $this->attendanceLabel = 'Belum dibuka';
+        }
     }
 
     public function joinSession()
@@ -89,6 +106,13 @@ class JoinSessionButton extends Component
         }
 
         return redirect()->route('sessions.join', ['videoSession' => $this->session->id]);
+    }
+
+    public function canRejoin(): bool
+    {
+        return $this->canJoin
+            && (bool) $this->attendance
+            && ! $this->attendance->clock_out_at;
     }
 
     public function clockOut(): void

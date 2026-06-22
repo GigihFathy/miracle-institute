@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Topic;
+use App\Services\LearningAccessRequirementService;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -28,6 +29,12 @@ class EnsureTopicAccess
 
         if (in_array($activeRole, ['admin', 'disciples'], true)) {
             return $next($request);
+        }
+
+        $requirements = app(LearningAccessRequirementService::class);
+
+        if (! $requirements->topicIsPublished($topic) || ! $requirements->topicHasStudentAccessRequirements($topic)) {
+            abort(403, 'Topik ini belum aktif untuk murid.');
         }
 
         $enrolled = $request->user()

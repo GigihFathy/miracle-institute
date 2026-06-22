@@ -20,13 +20,22 @@ class ThumbnailIndex extends Component
 
         if ($usageCount > 0) {
             $this->dispatch('toast', type: 'error', message: "Thumbnail sedang dipakai {$usageCount} course dan tidak bisa dihapus.");
+
             return;
         }
 
         $fullPath = public_path($path);
 
-        if (File::exists($fullPath)) {
-            File::delete($fullPath);
+        if (! File::exists($fullPath)) {
+            $this->dispatch('toast', type: 'error', message: 'File thumbnail tidak ditemukan di server.');
+
+            return;
+        }
+
+        if (! File::delete($fullPath)) {
+            $this->dispatch('toast', type: 'error', message: 'Thumbnail gagal dihapus dari server.');
+
+            return;
         }
 
         $this->dispatch('toast', type: 'success', message: 'Thumbnail berhasil dihapus.');
@@ -34,14 +43,13 @@ class ThumbnailIndex extends Component
 
     public function render()
     {
-        $dir = public_path('images/thumbnail');
         $usageMap = Course::query()
             ->selectRaw('poster, COUNT(*) as aggregate')
             ->whereNotNull('poster')
             ->groupBy('poster')
             ->pluck('aggregate', 'poster');
 
-        $thumbnails = collect(File::exists($dir) ? File::files($dir) : [])
+        $thumbnails = collect(course_thumbnail_files())
             ->filter(fn ($file) => in_array(Str::lower($file->getExtension()), ['jpg', 'jpeg', 'png', 'webp'], true))
             ->sortByDesc(fn ($file) => $file->getMTime())
             ->map(function ($file) use ($usageMap) {

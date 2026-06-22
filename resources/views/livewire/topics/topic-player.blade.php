@@ -98,37 +98,68 @@
 
                     @php
                         $isActive = $activeMaterial?->id === $material->id;
+                        $materialAccess = $canStudentInteract ? ($materialAccessMap[(string)$material->id] ?? 'accessible') : 'accessible';
+                        $isLocked = $materialAccess !== 'accessible';
                     @endphp
 
-                    <button
-                        type="button"
-                        wire:key="material-card-{{ $material->id }}"
-                        wire:click="selectMaterial(@js($material->id))"
-                        wire:loading.attr="disabled"
-                        wire:target="selectMaterial"
-                        class="w-full min-w-0 overflow-hidden rounded-xl border text-left transition disabled:opacity-70
-                        {{ $isActive ? 'border-[#004777] bg-[#004777] text-white' : 'border-slate-200 bg-white hover:border-[#35A7FF]' }}"
-                    >
-                        <div class="px-4 py-3">
-                            <div class="flex items-center justify-between gap-3">
-                                <div class="flex min-w-0 items-center gap-3">
-                                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $isActive ? 'bg-white/15 text-white' : 'bg-[#eef8ff] text-[#004777]' }}">
-                                        {{ $loop->iteration }}
-                                    </span>
-
-                                    <div class="min-w-0 break-words text-sm font-semibold">
-                                        {{ $material->name }}
+                    @if($isLocked)
+                        <div
+                            wire:key="material-card-{{ $material->id }}"
+                            class="w-full min-w-0 cursor-not-allowed overflow-hidden rounded-xl border border-slate-200 bg-slate-50"
+                        >
+                            <div class="px-4 py-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="flex min-w-0 items-center gap-3">
+                                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </span>
+                                        <div class="min-w-0 break-words text-sm font-semibold text-slate-400">
+                                            {{ $material->name }}
+                                        </div>
                                     </div>
-
+                                    <span class="shrink-0 rounded-full bg-slate-200 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                                        {{ strtoupper($material->type) }}
+                                    </span>
                                 </div>
-
-                                <span class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide
-                                    {{ $isActive ? 'bg-white/10 text-white' : 'bg-[#35A7FF]/10 text-[#004777]/80' }}">
-                                    {{ strtoupper($material->type) }}
-                                </span>
+                                <p class="mt-2 text-xs text-slate-400">
+                                    @if($materialAccess === 'locked_time')
+                                        Tersedia setelah pertemuan berlangsung.
+                                    @else
+                                        Selesaikan video terlebih dahulu.
+                                    @endif
+                                </p>
                             </div>
                         </div>
-                    </button>
+                    @else
+                        <button
+                            type="button"
+                            wire:key="material-card-{{ $material->id }}"
+                            wire:click="selectMaterial(@js($material->id))"
+                            wire:loading.attr="disabled"
+                            wire:target="selectMaterial"
+                            class="w-full min-w-0 overflow-hidden rounded-xl border text-left transition disabled:opacity-70
+                            {{ $isActive ? 'border-[#004777] bg-[#004777] text-white' : 'border-slate-200 bg-white hover:border-[#35A7FF]' }}"
+                        >
+                            <div class="px-4 py-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="flex min-w-0 items-center gap-3">
+                                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold {{ $isActive ? 'bg-white/15 text-white' : 'bg-[#eef8ff] text-[#004777]' }}">
+                                            {{ $loop->iteration }}
+                                        </span>
+                                        <div class="min-w-0 break-words text-sm font-semibold">
+                                            {{ $material->name }}
+                                        </div>
+                                    </div>
+                                    <span class="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide
+                                        {{ $isActive ? 'bg-white/10 text-white' : 'bg-[#35A7FF]/10 text-[#004777]/80' }}">
+                                        {{ strtoupper($material->type) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </button>
+                    @endif
 
                     @if($loop->last)
                         </div>
@@ -162,14 +193,34 @@
                             && $activeMaterial->type === 'video'
                             && filled($youtubeId);
                         $videoCompletionIsUnlocked = $videoCompletionUnlocked[(string) $activeMaterial->id] ?? false;
+                        $activeMaterialAccess = $canStudentInteract ? ($materialAccessMap[(string)$activeMaterial->id] ?? 'accessible') : 'accessible';
+                        $activeMaterialLocked = $activeMaterialAccess !== 'accessible';
                     @endphp
+
+                    @if($activeMaterialLocked)
+                        <div class="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 px-6 py-16 text-center">
+                            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-slate-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <h3 class="mt-4 font-semibold text-slate-700">Materi Terkunci</h3>
+                            <p class="mt-1 max-w-xs text-sm text-slate-500">
+                                @if($activeMaterialAccess === 'locked_time')
+                                    Materi hanya bisa diakses setelah waktu pertemuan berlangsung.
+                                @else
+                                    Tonton video terlebih dahulu untuk membuka materi ini.
+                                @endif
+                            </p>
+                        </div>
+                    @else
 
                     <div
                         @if($isTrackableVideo && $canMarkComplete && $activeMaterialProgress?->status !== 'completed')
                             x-data="topicVideoProgressTracker({
                                 materialId: @js((string) $activeMaterial->id),
                                 youtubeId: @js($youtubeId),
-                                requiredPercent: 70,
+                                requiredPercent: 80,
                                 initiallyUnlocked: @js($videoCompletionIsUnlocked),
                                 autoCompleteEnabled: @js($canMarkComplete),
                             })"
@@ -216,7 +267,7 @@
                         <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#eef8ff] p-4 text-sm text-[#004777]">
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <div class="font-semibold">Tonton minimal 70% video untuk menyelesaikan materi.</div>
+                                    <div class="font-semibold">Tonton minimal 80% video untuk menyelesaikan materi.</div>
                                     <div class="mt-1 text-xs text-slate-600" x-show="!isUnlocked">
                                         Sisa waktu tonton:
                                         <span class="font-semibold text-[#004777]" x-text="formattedRemaining"></span>
@@ -302,6 +353,7 @@
                         @endif
                     </div>
                     </div>
+                    @endif {{-- end $activeMaterialLocked --}}
                 @elseif($hasMaterials)
                     <div class="rounded-2xl border border-dashed bg-slate-50 p-6">
                         <div class="font-semibold text-slate-900">{{ __('general.topic_player.materials.select_hint.title') }}</div>
@@ -346,7 +398,7 @@
                     $attendanceBadgeClass = match ($attendance?->status) {
                         'present' => 'border-emerald-200 bg-emerald-100 text-emerald-700',
                         'late' => 'border-amber-200 bg-amber-100 text-amber-700',
-                        'absent' => 'border-rose-200 bg-rose-100 text-rose-700',
+                        'online', 'absent' => 'border-sky-200 bg-sky-100 text-sky-700',
                         default => 'border-slate-200 bg-slate-100 text-slate-700',
                     };
                 @endphp
@@ -369,7 +421,7 @@
 
                         @if($attendance)
                             <span class="rounded-full border px-2 py-1 text-[11px] {{ $attendanceBadgeClass }}">
-                                {{ strtoupper($attendance->status) }}
+                                {{ strtoupper($attendance->status === 'absent' ? 'online' : $attendance->status) }}
                             </span>
                         @endif
                     </div>
@@ -403,7 +455,7 @@
                                 </span>
                             @elseif($attendance && $phase === 'live')
                                 <span class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-medium text-amber-700">
-                                    Clock out tersedia mulai 15 menit sebelum sesi berakhir hingga 2 jam setelah sesi selesai
+                                    Clock out tersedia mulai 15 menit sebelum pertemuan berakhir hingga 2 jam setelah pertemuan selesai
                                 </span>
                             @else
                                 <button
@@ -569,7 +621,7 @@
                     return {
                         materialId: config.materialId,
                         youtubeId: config.youtubeId,
-                        requiredPercent: config.requiredPercent ?? 70,
+                        requiredPercent: config.requiredPercent ?? 80,
                         autoCompleteEnabled: !!config.autoCompleteEnabled,
                         isUnlocked: !!config.initiallyUnlocked,
                         autoCompleteTriggered: false,
@@ -580,7 +632,7 @@
                         durationSeconds: 0,
                         watchedSeconds: 0,
                         progressPercent: config.initiallyUnlocked ? 100 : 0,
-                        progressLabel: config.initiallyUnlocked ? '70% terpenuhi' : '0%',
+                        progressLabel: config.initiallyUnlocked ? '80% terpenuhi' : '0%',
                         formattedRemaining: '--:--',
 
                         async init() {
@@ -680,7 +732,7 @@
 
                             this.progressPercent = percent;
                             this.progressLabel = this.isUnlocked
-                                ? '70% terpenuhi'
+                                ? '80% terpenuhi'
                                 : `${percent}% dari target`;
                             this.formattedRemaining = this.formatDuration(remaining);
                         },

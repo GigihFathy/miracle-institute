@@ -53,6 +53,7 @@ class MyLearning extends Component
     public function render(ProgressService $progressService)
     {
         $user = auth()->user();
+        $view = $this->view;
         $summary = array_merge([
             'courses_enrolled' => 0,
             'certificates' => 0,
@@ -60,7 +61,7 @@ class MyLearning extends Component
 
         $hasEnrollments = CourseEnrollment::where('user_id', $user->id)->exists();
 
-        $filteredEnrollments = CourseEnrollment::with(['course.studyProgram', 'course.topics'])
+        $filteredEnrollments = CourseEnrollment::with(['course.topics'])
             ->where('user_id', $user->id)
             ->latest()
             ->get()
@@ -129,7 +130,12 @@ class MyLearning extends Component
         $coursePreview = $filteredEnrollments->take(6)->values();
         $certificatePreview = $filteredCertificates->take(6)->values();
 
+        $showAllCourses = $this->view === 'courses';
+        $showAllCertificates = $this->view === 'certificates';
+        $showAllSessions = $this->view === 'sessions';
+
         return view('livewire.dashboard.my-learning', compact(
+            'view',
             'summary',
             'hasEnrollments',
             'filteredEnrollments',
@@ -137,7 +143,10 @@ class MyLearning extends Component
             'coursePreview',
             'certificatePreview',
             'upcomingSessions',
-            'calendarSessions'
+            'calendarSessions',
+            'showAllCourses',
+            'showAllCertificates',
+            'showAllSessions'
         ))->layout('layouts.learning');
     }
 }

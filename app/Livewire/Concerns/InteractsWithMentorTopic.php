@@ -11,8 +11,7 @@ trait InteractsWithMentorTopic
     {
         return Topic::query()
             ->with([
-                'course.studyProgram',
-                'course.assessment',
+                'course.assessment.teacher',
             ])
             ->findOrFail($topicId);
     }
@@ -61,7 +60,7 @@ trait InteractsWithMentorTopic
             'manage_sessions' => 'Kelola Sesi',
             'manage_assessments' => 'Kelola Assessment',
             'manage_attendance' => 'Kelola Absensi',
-            'manage_students' => 'Kelola Siswa',
+            'manage_students' => 'Kelola Murid',
             'publish_topics' => 'Publikasi Topik',
             'view_reports' => 'Lihat Laporan',
             'manage_certificates' => 'Kelola Sertifikat',
@@ -139,5 +138,22 @@ trait InteractsWithMentorTopic
         }
 
         return (string) $topic->teacher_id === (string) $user->id;
+    }
+
+    protected function canManageAssessmentForTopic(Topic $topic): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        $assessment = $topic->course?->assessment;
+
+        return $assessment && (string) $assessment->teacher_id === (string) $user->id;
     }
 }

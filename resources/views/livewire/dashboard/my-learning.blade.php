@@ -25,10 +25,10 @@
         if ($courseImage) {
             if (Str::startsWith($courseImage, ['http://', 'https://'])) {
                 $courseImageSrc = $courseImage;
-            } elseif (Str::startsWith($courseImage, 'images/')) {
-                $courseImageSrc = asset($courseImage);
+            } elseif ($thumbnailUrl = course_thumbnail_url($courseImage)) {
+                $courseImageSrc = $thumbnailUrl;
             } else {
-                $courseImageSrc = asset('images/thumbnail/' . $courseImage);
+                $courseImageSrc = course_thumbnail_url($courseImage);
             }
         } elseif (!empty($course?->image)) {
             $courseImageSrc = asset('storage/' . $course->image);
@@ -141,7 +141,7 @@
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-[#004777] sm:text-3xl">{{ __('general.my_learning.sessions.title') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500">Pilih bulan dan tanggal untuk melihat semua sesi pembelajaran yang kamu ikuti.</p>
+                    <p class="mt-1 text-sm text-slate-500">Pilih bulan dan tanggal untuk melihat semua pertemuan pembelajaran yang kamu ikuti.</p>
                 </div>
 
                 <a
@@ -198,7 +198,7 @@
                             <template x-if="sessionCount(day) > 0">
                                 <div class="absolute bottom-2 left-2 right-2 flex items-center justify-start sm:justify-between">
                                     <div class="h-2 w-2 rounded-full bg-blue-500 sm:hidden"></div>
-                                    <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' sesi'"></span>
+                                    <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' pertemuan'"></span>
                                 </div>
                             </template>
                         </button>
@@ -232,11 +232,11 @@
                     </div>
 
                     <div x-show="selectedDate && selectedSessions.length === 0" class="mt-4 text-sm text-slate-500">
-                        Tidak ada sesi pada tanggal ini.
+                        Tidak ada pertemuan pada tanggal ini.
                     </div>
 
                     <div x-show="!selectedDate" class="mt-4 text-sm text-slate-500">
-                        Klik tanggal pada kalender untuk melihat sesi yang berlangsung pada hari itu.
+                        Klik tanggal pada kalender untuk melihat pertemuan yang berlangsung pada hari itu.
                     </div>
                 </div>
             </div>
@@ -248,7 +248,7 @@
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <h2 class="text-2xl font-bold text-[#004777] sm:text-3xl">{{ __('general.my_learning.courses.title') }}</h2>
-                    <p class="mt-1 text-sm text-slate-500">Daftar kursus yang sedang kamu ikuti.</p>
+                    <p class="mt-1 text-sm text-slate-500">Daftar topik pembelajaran yang sedang kamu ikuti.</p>
                 </div>
 
                 <a
@@ -419,7 +419,7 @@
                             $courseImageSrc = $resolveCourseImage($course);
                         @endphp
 
-                        <article class="group flex h-full flex-col rounded-[1.5rem] border border-slate-200 bg-white p-3 transition hover:-translate-y-1 hover:border-[#35A7FF]">
+                        <article class="group flex h-full flex-col rounded-[1.5rem] border border-slate-200 bg-white p-3 transition hover:border-[#35A7FF]">
                             <div class="relative overflow-hidden rounded-2xl">
                                 @if($courseImageSrc)
                                     <img src="{{ $courseImageSrc }}" alt="{{ $course?->title ?? __('general.my_learning.certificates.default_course_certificate') }}" class="h-48 w-full object-cover transition duration-500 group-hover:scale-105">
@@ -473,7 +473,7 @@
                             $courseImageSrc = $resolveCourseImage($course);
                         @endphp
 
-                        <article class="group flex w-[290px] shrink-0 flex-col rounded-[1.5rem] border border-slate-200 bg-white p-3 transition hover:-translate-y-1 hover:border-[#35A7FF]">
+                        <article class="group flex w-[290px] shrink-0 flex-col rounded-[1.5rem] border border-slate-200 bg-white p-3 transition hover:border-[#35A7FF]">
                             <div class="relative overflow-hidden rounded-2xl">
                                 @if($courseImageSrc)
                                     <img src="{{ $courseImageSrc }}" alt="{{ $course?->title ?? __('general.my_learning.certificates.default_course_certificate') }}" class="h-44 w-full object-cover transition duration-500 group-hover:scale-105">

@@ -16,7 +16,7 @@ class AssessmentTab extends Component
     {
         $this->topic = $this->loadTopic($topicId);
 
-        abort_unless($this->canManageTopic($this->topic), 403);
+        abort_unless($this->canManageAssessmentForTopic($this->topic), 403);
     }
 
     public function render()

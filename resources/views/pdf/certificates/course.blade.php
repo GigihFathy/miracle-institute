@@ -14,6 +14,12 @@
         $participantNameLength >= 28 => '60px',
         default => '70px',
     };
+    $formatTopicStatus = static function (?string $status): string {
+        return match ($status) {
+            'Present' => 'Hadir',
+            default => $status ?: 'Online',
+        };
+    };
 
     $toDataUri = static function (?string $path): ?string {
         if (!$path || !file_exists($path)) {
@@ -43,7 +49,7 @@
         ],
         [
             'name' => 'Dr. Indrawati Kabul',
-            'title' => 'Miracle Institute',
+            'title' => 'Rektor Miracle Institute',
             'image' => $signature2,
         ],
     ];
@@ -353,16 +359,16 @@
                         <img src="{{ $logo }}" alt="Miracle Institute Logo">
                     @endif
                 </div>
-                <h2 class="certificate-title">CERTIFICATE</h2>
-                <p style="font-size: 20px; color: #1f5684; letter-spacing: 3px;">OF ACCOMPLISHMENT</p>
+                <h2 class="certificate-title">SERTIFIKAT</h2>
+                <p style="font-size: 20px; color: #1f5684; letter-spacing: 3px;">PENCAPAIAN</p>
                 <p style="font-size: 16px; color: #000; font-weight: bold; margin: 6px 0;">No. {{ $certificateNumber }}</p>
-                <p style="font-size: 16px; color: #000;">This certificate is proudly presented to</p>
+                <p style="font-size: 16px; color: #000;">Sertifikat ini dengan bangga diberikan kepada</p>
                 <div class="participant-name">
                     <span style="font-size: {{ $participantNameFontSize }};">{{ $participantName }}</span>
                 </div>
                 <div style="font-size: 18px; color: #000; margin: 10px 0; max-width: 80%; margin-left: auto; margin-right: auto;">
-                    Has attended and completed <strong>{{ $course->title ?? '-' }}</strong>
-                    As a <strong>Participant</strong> of the MIRACLE INSTITUTE online discipleship program.
+                    Telah mengikuti dan menyelesaikan <strong>{{ $course->title ?? '-' }}</strong>
+                    sebagai <strong>Peserta</strong> dalam program pemuridan online MIRACLE INSTITUTE.
                 </div>
                 <p style="font-size: 20px; color: #000; margin: 20px 0 0 0;">
                     <strong>{{ $issuedAt->locale('id')->isoFormat('D MMMM Y') }}</strong>
@@ -404,19 +410,19 @@
                 @endif
 
                 <h1 class="second-title">
-                    Summary of Learning Materials
+                    Ringkasan Materi Pembelajaran
                 </h1>
 
                 <p class="material-title">
-                    Material For {{ ($course->title ?? '-') }}.
+                    Materi untuk {{ ($course->title ?? '-') }}.
                 </p>
 
                 <table class="material-table">
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Topic</th>
-                            <th>Present/Online</th>
+                            <th>Sesi</th>
+                            <th>Hadir/Online</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -424,23 +430,23 @@
                             <tr>
                                 <td class="no">{{ $index + 1 }}</td>
                                 <td class="topic">{{ $topic['topic_name'] ?? '-' }}</td>
-                                <td class="duration">{{ $topic['topic_status'] ?? 'Online' }}</td>
+                                <td class="duration">{{ $formatTopicStatus($topic['topic_status'] ?? null) }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" style="text-align:center;">No materials available</td>
+                                <td colspan="3" style="text-align:center;">Belum ada materi tersedia</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
 
                 <div class="achievement-message">
-                    Congratulations, <strong>{{ $participantName }}</strong>. You have successfully completed
+                    Selamat, <strong>{{ $participantName }}</strong>. Anda telah berhasil menyelesaikan
                     <strong>{{ $course->title ?? '-' }}</strong>
                     @if($achievementSummary['assessment_score'] !== null)
-                        with an assessment score of <strong>{{ $achievementSummary['assessment_score'] }}</strong>.
+                        dengan nilai asesmen <strong>{{ $achievementSummary['assessment_score'] }}</strong>.
                     @else
-                        and fulfilled the course completion requirements.
+                        dan memenuhi persyaratan kelulusan topik pembelajaran.
                     @endif
                 </div>
                 

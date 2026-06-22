@@ -16,7 +16,7 @@ class ScheduleVideoSessionReminder
             return;
         }
 
-        $reminderAt = $session->start_at->copy()->subDays(3);
+        $reminderAt = $session->start_at->copy()->subDays(2);
 
         if ($reminderAt->isPast()) {
             return;

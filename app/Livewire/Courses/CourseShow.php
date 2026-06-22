@@ -8,9 +8,12 @@ use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
+use App\Models\MaterialProgress;
 use App\Models\Topic;
 use App\Models\TopicProgress;
 use App\Services\CourseService;
+use App\Services\LearningAccessRequirementService;
+use App\Services\ProgressService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -32,6 +35,7 @@ class CourseShow extends Component
     public ?Certificate $courseCertificate = null;
 
     public array $topicStatusMap = [];
+    public array $materialProgressMap = [];
 
     public ?Assessment $assessment = null;
     public bool $hasStudentFinishedAssessment = false;
@@ -41,6 +45,7 @@ class CourseShow extends Component
     public bool $showEnrollModal = false;
     public bool $showTopicAccessWarningModal = false;
     public string $topicAccessWarningName = '';
+    public array $videoCompletionUnlocked = [];
 
     public string $topicSearch = '';
     public string $topicSort = 'sort_asc';
@@ -50,8 +55,10 @@ class CourseShow extends Component
     public string $activeTopicTab = 'general';
     public ?string $selectedMentorTopicId = null;
     public ?string $selectedMentorMaterialId = null;
+    public ?string $selectedMentorSessionId = null;
     public ?string $selectedStudentTopicId = null;
     public ?string $selectedStudentMaterialId = null;
+    public ?string $selectedStudentSessionId = null;
 
     public Collection $mentoredTopics;
     public bool $hasMentoredTopics = false;
@@ -66,7 +73,6 @@ class CourseShow extends Component
 
         $this->course = Course::query()
             ->with([
-                'studyProgram',
                 'enrollments.user',
                 'enrollments.topicProgresses',
                 'topics' => function ($q) {
@@ -119,10 +125,7 @@ class CourseShow extends Component
                     ->latest()
                     ->first();
 
-                $this->topicStatusMap = TopicProgress::query()
-                    ->where('course_enrollment_id', $enrollment->id)
-                    ->pluck('status', 'topic_id')
-                    ->toArray();
+                $this->hydrateStudentProgressMaps($enrollment->id, $user->id);
             }
         }
 
@@ -132,15 +135,20 @@ class CourseShow extends Component
         if ($this->mentoredTopics->isNotEmpty()) {
             $this->selectedMentorTopicId = $this->mentoredTopics->first()->id;
             $this->selectedMentorMaterialId = $this->mentoredTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedMentorSessionId = $this->resolveLatestSessionId($this->mentoredTopics->first());
         }
 
-        if ($this->course->topics->isNotEmpty()) {
-            $this->selectedStudentTopicId = $this->course->topics->first()->id;
-            $this->selectedStudentMaterialId = $this->course->topics->first()?->materials->sortBy('sort_order')->first()?->id;
+        $studentTopics = $this->studentTopics();
+
+        if ($studentTopics->isNotEmpty()) {
+            $this->selectedStudentTopicId = $studentTopics->first()->id;
+            $this->selectedStudentMaterialId = $studentTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedStudentSessionId = $this->resolveLatestSessionId($studentTopics->first());
         }
 
         $requestedTab = request()->query('tab');
         $requestedTopicId = request()->query('topic');
+        $requestedSessionId = request()->query('session');
 
         if (auth()->check() && session('active_role') === 'disciples') {
             $this->activeTopicTab = 'overview';
@@ -159,6 +167,14 @@ class CourseShow extends Component
                 $this->selectStudentTopic($requestedTopicId);
             }
         }
+
+        if (is_string($requestedSessionId) && $requestedSessionId !== '') {
+            if (auth()->check() && session('active_role') === 'disciples') {
+                $this->selectMentorSession($requestedSessionId);
+            } else {
+                $this->selectStudentSession($requestedSessionId);
+            }
+        }
     }
 
     public function setTopicTab(string $tab): void
@@ -166,7 +182,7 @@ class CourseShow extends Component
         $allowedTabs = auth()->check() && session('active_role') === 'disciples'
             ? ['overview', 'topics', 'students']
             : (auth()->check() && session('active_role') === 'student'
-                ? ['overview', 'topics']
+                ? $this->studentAllowedTabs()
                 : ['general', 'mentored']);
 
         if (!in_array($tab, $allowedTabs, true)) {
@@ -209,6 +225,7 @@ class CourseShow extends Component
         if ($this->hasMentoredTopics) {
             $this->selectedMentorTopicId = $this->mentoredTopics->first()->id;
             $this->selectedMentorMaterialId = $this->mentoredTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedMentorSessionId = $this->resolveLatestSessionId($this->mentoredTopics->first());
         }
     }
 
@@ -218,7 +235,23 @@ class CourseShow extends Component
             $this->selectedMentorTopicId = $topicId;
             $topic = $this->mentoredTopics->firstWhere('id', $topicId);
             $this->selectedMentorMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedMentorSessionId = $this->resolveLatestSessionId($topic);
         }
+    }
+
+    public function selectMentorSession(string $sessionId): void
+    {
+        $topic = $this->mentoredTopics->first(function (Topic $topic) use ($sessionId) {
+            return $topic->videoSessions->contains(fn ($session) => (string) $session->id === (string) $sessionId);
+        });
+
+        if (! $topic) {
+            return;
+        }
+
+        $this->selectedMentorTopicId = $topic->id;
+        $this->selectedMentorMaterialId = $topic->materials->sortBy('sort_order')->first()?->id;
+        $this->selectedMentorSessionId = $sessionId;
     }
 
     public function selectMentorMaterial(string $materialId): void
@@ -232,20 +265,112 @@ class CourseShow extends Component
 
     public function selectStudentTopic(string $topicId): void
     {
-        if ($this->course->topics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
+        $studentTopics = $this->studentTopics();
+
+        if ($studentTopics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
             $this->selectedStudentTopicId = $topicId;
-            $topic = $this->course->topics->firstWhere('id', $topicId);
+            $topic = $studentTopics->firstWhere('id', $topicId);
             $this->selectedStudentMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedStudentSessionId = $this->resolveLatestSessionId($topic);
         }
+    }
+
+    public function selectStudentSession(string $sessionId): void
+    {
+        $topic = $this->studentTopics()->first(function (Topic $topic) use ($sessionId) {
+            return $topic->videoSessions->contains(fn ($session) => (string) $session->id === (string) $sessionId);
+        });
+
+        if (! $topic) {
+            return;
+        }
+
+        $this->selectedStudentTopicId = $topic->id;
+        $this->selectedStudentMaterialId = $topic->materials->sortBy('sort_order')->first()?->id;
+        $this->selectedStudentSessionId = $sessionId;
     }
 
     public function selectStudentMaterial(string $materialId): void
     {
-        $topic = $this->course->topics->firstWhere('id', $this->selectedStudentTopicId);
+        $topic = $this->studentTopics()->firstWhere('id', $this->selectedStudentTopicId);
 
         if ($topic && $topic->materials->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
             $this->selectedStudentMaterialId = $materialId;
         }
+    }
+
+    public function unlockStudentVideoCompletion(string $materialId): void
+    {
+        abort_unless(auth()->check() && session('active_role') === 'student', 403);
+
+        $topic = $this->studentTopics()->firstWhere('id', $this->selectedStudentTopicId);
+        $material = $topic?->materials->firstWhere('id', $materialId);
+
+        if (! $material || $material->type !== 'video') {
+            return;
+        }
+
+        if (! $this->extractYoutubeVideoId((string) $material->external_url)) {
+            return;
+        }
+
+        $this->videoCompletionUnlocked[$materialId] = true;
+    }
+
+    public function markStudentMaterialComplete(string $materialId, ProgressService $progressService): void
+    {
+        abort_unless(auth()->check() && session('active_role') === 'student', 403);
+
+        if (! $this->enrolled) {
+            session()->flash('error', 'Kamu harus terdaftar pada course ini terlebih dahulu.');
+            return;
+        }
+
+        $topic = $this->studentTopics()->firstWhere('id', $this->selectedStudentTopicId);
+        $material = $topic?->materials->firstWhere('id', $materialId);
+
+        if (! $topic || ! $material) {
+            session()->flash('error', 'Material tidak ditemukan.');
+            return;
+        }
+
+        if (
+            $material->type === 'video' &&
+            $this->extractYoutubeVideoId((string) $material->external_url) &&
+            ! ($this->videoCompletionUnlocked[$materialId] ?? false)
+        ) {
+            session()->flash('error', 'Video harus ditonton minimal 70% sebelum bisa diselesaikan.');
+            return;
+        }
+
+        if (! $this->topicHasCompletedSessions($topic)) {
+            session()->flash('error', 'Material baru bisa diselesaikan setelah sesi topic ini selesai.');
+            return;
+        }
+
+        $result = $progressService->markMaterialCompleted((string) auth()->id(), $materialId);
+
+        $enrollment = auth()->user()?->courseEnrollments()
+            ->where('course_id', $this->course->id)
+            ->first();
+
+        if ($enrollment) {
+            $this->hydrateStudentProgressMaps($enrollment->id, (string) auth()->id());
+        }
+
+        $this->courseCertificate = Certificate::query()
+            ->where('user_id', auth()->id())
+            ->where('course_id', $this->course->id)
+            ->latest()
+            ->first();
+
+        session()->flash(
+            'success',
+            $result['snapshot']['can_complete']
+                ? 'Material selesai. Topik ini juga dinyatakan completed.'
+                : 'Material berhasil diselesaikan.'
+        );
+        $this->dispatch('toast', type: 'success', message: session('success'));
     }
 
     public function hydrateMentorStudents(): void
@@ -289,39 +414,20 @@ class CourseShow extends Component
 
     private function topicHasCompletedSessions(Topic $topic): bool
     {
-        if ($topic->videoSessions->isEmpty()) {
+        $studentSessions = $this->studentRelevantSessions($topic);
+
+        if ($studentSessions->isEmpty()) {
             return false;
         }
 
-        return $topic->videoSessions->every(function ($session) {
+        return $studentSessions->every(function ($session) {
             return $session->status === 'completed';
         });
     }
 
-    private function topicSessionStatus(Topic $topic): string
-    {
-        if ($topic->videoSessions->isEmpty()) {
-            return 'no_session';
-        }
-
-        if ($topic->videoSessions->every(fn ($session) => $session->status === 'completed')) {
-            return 'completed';
-        }
-
-        if ($topic->videoSessions->contains(fn ($session) => $session->status === 'ongoing')) {
-            return 'ongoing';
-        }
-
-        if ($topic->videoSessions->contains(fn ($session) => $session->status === 'scheduled')) {
-            return 'scheduled';
-        }
-
-        return 'cancelled';
-    }
-
     public function getFilteredTopicsProperty()
     {
-        $topics = $this->course->topics->map(function (Topic $topic) {
+        $topics = $this->studentTopics()->map(function (Topic $topic) {
             $status = $this->isGuest
                 ? 'available'
                 : ($this->topicStatusMap[$topic->id] ?? 'not_started');
@@ -334,7 +440,6 @@ class CourseShow extends Component
 
             $topic->setAttribute('progress_status', $status);
             $topic->setAttribute('progress_percent', $percent);
-            $topic->setAttribute('session_status', $this->topicSessionStatus($topic));
             $topic->setAttribute('materials_count', $topic->materials_count ?? $topic->materials->count());
             $topic->setAttribute('sessions_count', $topic->video_sessions_count ?? $topic->videoSessions->count());
 
@@ -383,7 +488,7 @@ class CourseShow extends Component
 
     public function getNotStartedTopicsCountProperty(): int
     {
-        return $this->course->topics->count()
+        return $this->studentTopics()->count()
             - $this->completedTopicsCount
             - $this->inProgressTopicsCount;
     }
@@ -394,13 +499,25 @@ class CourseShow extends Component
             return false;
         }
 
-        if ($this->course->topics->isEmpty()) {
+        if ($this->upcomingTopicsCount > 0) {
             return false;
         }
 
-        return $this->course->topics->every(function ($topic) {
+        if ($this->studentTopics()->isEmpty()) {
+            return false;
+        }
+
+        return $this->studentTopics()->every(function ($topic) {
             return ($this->topicStatusMap[$topic->id] ?? null) === 'completed';
         });
+    }
+
+    public function getUpcomingTopicsCountProperty(): int
+    {
+        return $this->course->topics
+            ->filter(fn (Topic $topic) => ! $this->topicIsVisibleToStudents($topic))
+            ->filter(fn (Topic $topic) => $this->topicHasUpcomingStudentContent($topic))
+            ->count();
     }
 
     public function getActiveAttemptProperty()
@@ -447,19 +564,32 @@ class CourseShow extends Component
             'note' => $this->enrolled ? 'Course enrolled' : 'Enroll course first',
         ];
 
-        $hasTopics = $this->course->topics->isNotEmpty();
+        $hasTopics = $this->studentTopics()->isNotEmpty();
+        $hasAssessmentQuestions = app(LearningAccessRequirementService::class)
+            ->courseHasAssessmentQuestions($this->course);
         $checks[] = [
             'label' => 'Course has topics',
             'done' => $hasTopics,
             'note' => $hasTopics ? 'Topics available' : 'No topic yet',
         ];
 
-        $allTopicsCompleted = $hasTopics && $this->completedTopicsCount === $this->course->topics->count();
+        $checks[] = [
+            'label' => 'Course has questions',
+            'done' => $hasAssessmentQuestions,
+            'note' => $hasAssessmentQuestions ? 'Questions available' : 'Add at least one question first',
+        ];
+
+        $hasUpcomingTopics = $this->upcomingTopicsCount > 0;
+        $allTopicsCompleted = ! $hasUpcomingTopics
+            && $hasTopics
+            && $this->completedTopicsCount === $this->studentTopics()->count();
 
         $checks[] = [
             'label' => 'All topics completed',
             'done' => $allTopicsCompleted,
-            'note' => $allTopicsCompleted ? 'All topics completed' : 'Finish remaining topics',
+            'note' => $allTopicsCompleted
+                ? 'All topics completed'
+                : ($hasUpcomingTopics ? 'Wait for remaining topics to be published' : 'Finish remaining topics'),
         ];
 
         $assessmentOk = true;
@@ -477,6 +607,7 @@ class CourseShow extends Component
         $eligible = auth()->check()
             && $this->enrolled
             && $hasTopics
+            && $hasAssessmentQuestions
             && $allTopicsCompleted
             && $assessmentOk
             && !$this->courseCertificate;
@@ -493,8 +624,14 @@ class CourseShow extends Component
             $reasons[] = 'Course ini belum memiliki topic.';
         }
 
+        if (! $hasAssessmentQuestions) {
+            $reasons[] = 'Sertifikat belum tersedia karena course ini belum memiliki soal.';
+        }
+
         if ($hasTopics && !$allTopicsCompleted) {
-            $reasons[] = 'Selesaikan seluruh topic untuk membuka sertifikat.';
+            $reasons[] = $hasUpcomingTopics
+                ? 'Masih ada topik yang belum terbit. Tunggu semua topik tersedia terlebih dahulu.'
+                : 'Selesaikan seluruh topic untuk membuka sertifikat.';
         }
 
         if ($this->assessment && !$assessmentOk) {
@@ -622,10 +759,7 @@ class CourseShow extends Component
                 ->first();
 
             if ($enrollment) {
-                $this->topicStatusMap = TopicProgress::query()
-                    ->where('course_enrollment_id', $enrollment->id)
-                    ->pluck('status', 'topic_id')
-                    ->toArray();
+                $this->hydrateStudentProgressMaps($enrollment->id, (string) auth()->id());
             }
 
             session()->flash('success', 'Course berhasil diikuti.');
@@ -645,7 +779,7 @@ class CourseShow extends Component
                 $activeTab = 'overview';
             }
         } elseif (auth()->check() && session('active_role') === 'student') {
-            if (!in_array($activeTab, ['overview', 'topics'], true)) {
+            if (!in_array($activeTab, $this->studentAllowedTabs(), true)) {
                 $activeTab = 'overview';
             }
         } elseif ($activeTab === 'mentored' && (!auth()->check() || session('active_role') !== 'disciples')) {
@@ -655,6 +789,7 @@ class CourseShow extends Component
         return view('livewire.courses.course-show', [
             'filteredTopics' => $this->filteredTopics,
             'paginatedTopics' => $this->paginatedTopics,
+            'studentTopics' => $this->studentTopics(),
             'assessment' => $this->assessment,
             'assessmentMeta' => $this->assessmentMeta,
             'certificateEligibility' => $this->certificateEligibility,
@@ -663,5 +798,131 @@ class CourseShow extends Component
             'mentorStudents' => $this->mentorStudents,
             'activeTab' => $activeTab,
         ])->layout('layouts.learning');
+    }
+
+    private function hydrateStudentProgressMaps(string $enrollmentId, string $userId): void
+    {
+        $this->topicStatusMap = TopicProgress::query()
+            ->where('course_enrollment_id', $enrollmentId)
+            ->pluck('status', 'topic_id')
+            ->toArray();
+
+        $materialIds = $this->studentTopics()
+            ->flatMap(fn (Topic $topic) => $topic->materials->pluck('id'))
+            ->filter()
+            ->values();
+
+        $this->materialProgressMap = MaterialProgress::query()
+            ->where('user_id', $userId)
+            ->whereIn('material_id', $materialIds)
+            ->pluck('status', 'material_id')
+            ->toArray();
+    }
+
+    private function topicIsVisibleToStudents(Topic $topic): bool
+    {
+        $requirements = app(LearningAccessRequirementService::class);
+
+        return $requirements->topicIsPublished($topic)
+            && $requirements->topicHasStudentAccessRequirements($topic);
+    }
+
+    private function topicHasUpcomingStudentContent(Topic $topic): bool
+    {
+        return $this->studentRelevantSessions($topic)->isNotEmpty();
+    }
+
+    private function studentRelevantSessions(Topic $topic): Collection
+    {
+        return $topic->videoSessions
+            ->filter(fn ($session) => $session->status !== 'draft')
+            ->values();
+    }
+
+    private function studentTopics(): Collection
+    {
+        if (auth()->check() && session('active_role') === 'student') {
+            return $this->course->topics
+                ->filter(fn (Topic $topic) => $this->topicIsVisibleToStudents($topic))
+                ->values();
+        }
+
+        return $this->course->topics;
+    }
+
+    private function resolveLatestSessionId(?Topic $topic): ?string
+    {
+        if (! $topic) {
+            return null;
+        }
+
+        return $this->studentRelevantSessions($topic)
+            ->sortByDesc('start_at')
+            ->first()?->id;
+    }
+
+    private function extractYoutubeVideoId(string $input): ?string
+    {
+        $input = trim(html_entity_decode($input));
+
+        if ($input === '') {
+            return null;
+        }
+
+        if (preg_match('/^[A-Za-z0-9_-]{11}$/', $input)) {
+            return $input;
+        }
+
+        $parts = parse_url($input);
+
+        if (! empty($parts['query'])) {
+            parse_str($parts['query'], $query);
+
+            if (! empty($query['v']) && preg_match('/^[A-Za-z0-9_-]{11}$/', $query['v'])) {
+                return $query['v'];
+            }
+        }
+
+        $host = strtolower($parts['host'] ?? '');
+        $path = trim($parts['path'] ?? '', '/');
+
+        if ($path !== '') {
+            $segments = explode('/', $path);
+
+            if (str_contains($host, 'youtu.be') && isset($segments[0]) && preg_match('/^[A-Za-z0-9_-]{11}$/', $segments[0])) {
+                return $segments[0];
+            }
+
+            foreach (['embed', 'shorts', 'live'] as $prefix) {
+                $index = array_search($prefix, $segments, true);
+
+                if ($index !== false && isset($segments[$index + 1]) && preg_match('/^[A-Za-z0-9_-]{11}$/', $segments[$index + 1])) {
+                    return $segments[$index + 1];
+                }
+            }
+        }
+
+        $patterns = [
+            '/v=([A-Za-z0-9_-]{11})/',
+            '/youtu\.be\/([A-Za-z0-9_-]{11})/',
+            '/embed\/([A-Za-z0-9_-]{11})/',
+            '/shorts\/([A-Za-z0-9_-]{11})/',
+            '/live\/([A-Za-z0-9_-]{11})/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $input, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
+    }
+
+    private function studentAllowedTabs(): array
+    {
+        return $this->enrolled
+            ? ['overview', 'topics']
+            : ['overview'];
     }
 }

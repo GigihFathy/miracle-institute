@@ -33,7 +33,7 @@
                 <option value="">{{ __('mentor.topic_tabs.attendances.filters.all_status') }}</option>
                 <option value="present">{{ __('mentor.topic_tabs.attendances.status.present') }}</option>
                 <option value="late">{{ __('mentor.topic_tabs.attendances.status.late') }}</option>
-                <option value="absent">{{ __('mentor.topic_tabs.attendances.status.absent') }}</option>
+                <option value="online">{{ __('mentor.topic_tabs.attendances.status.online') }}</option>
             </select>
 
             <select
@@ -81,7 +81,7 @@
                             </td>
                             <td class="px-5 py-4">
                                 <span class="inline-flex rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-[var(--mentor-primary)]">
-                                    {{ __('mentor.topic_tabs.attendances.status.' . $attendance->status, [], $attendance->status) }}
+                                    {{ __('mentor.topic_tabs.attendances.status.' . $attendance->status) }}
                                 </span>
                             </td>
                             <td class="px-5 py-4 text-[var(--mentor-primary)]">

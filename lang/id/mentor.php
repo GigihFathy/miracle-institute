@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
     'dashboard' => [
@@ -8,42 +8,42 @@ return [
         'welcome' => [
             'eyebrow' => 'Selamat Datang',
             'title' => 'Halo, :name',
-            'subtitle' => 'Pantau topik yang kamu bimbing dan cek sesi mengajar terdekat dari sini.',
+            'subtitle' => 'Pantau sesi yang kamu bimbing dan cek pertemuan mengajar terdekat dari sini.',
         ],
 
         'sessions' => [
             'title' => 'Jadwal Mengajar',
-            'subtitle' => 'Sesi terdekat yang akan kamu bawakan.',
+            'subtitle' => 'Pertemuan terdekat yang akan kamu bawakan.',
             'view_more' => 'Lihat Jadwal',
             'calendar_title' => 'Jadwal Mengajar',
-            'calendar_subtitle' => 'Pilih bulan dan tanggal untuk melihat semua sesi mengajar.',
+            'calendar_subtitle' => 'Pilih bulan dan tanggal untuk melihat semua pertemuan mengajar.',
             'back' => 'Kembali',
-            'empty' => 'Belum ada sesi mengajar terjadwal.',
-            'empty_selected' => 'Tidak ada sesi pada tanggal ini.',
-            'click_day' => 'Klik tanggal pada kalender untuk melihat sesi yang berlangsung pada hari itu.',
+            'empty' => 'Belum ada pertemuan mengajar terjadwal.',
+            'empty_selected' => 'Tidak ada pertemuan pada tanggal ini.',
+            'click_day' => 'Klik tanggal pada kalender untuk melihat pertemuan yang berlangsung pada hari itu.',
         ],
 
         'stats' => [
-            'topics' => 'Topik',
-            'topics_hint' => 'Topik yang kamu kelola',
+            'topics' => 'Sesi',
+            'topics_hint' => 'Sesi yang kamu kelola',
             'materials' => 'Materi',
             'materials_hint' => 'Materi yang kamu upload',
-            'students' => 'Siswa',
-            'students_hint' => 'Siswa yang terhubung',
+            'students' => 'Murid',
+            'students_hint' => 'Murid yang terhubung',
         ],
 
         'managed_courses' => [
-            'title' => 'Course yang Dikelola',
-            'subtitle' => 'Daftar course yang bisa kamu kelola.',
-            'search_placeholder' => 'Cari course yang dikelola...',
-            'no_course' => 'Tidak Ada Course',
-            'topic_count' => '{0} tidak ada topik|{1} :count topik|[2,*] :count topik',
+            'title' => 'Topik pembelajaran yang Dikelola',
+            'subtitle' => 'Daftar topik pembelajaran yang bisa kamu kelola.',
+            'search_placeholder' => 'Cari topik pembelajaran yang dikelola...',
+            'no_course' => 'Tidak Ada Topik pembelajaran',
+            'topic_count' => '{0} tidak ada sesi|{1} :count sesi|[2,*] :count sesi',
             'active_badge' => 'Aktif',
             'hide' => 'Sembunyikan',
             'show' => 'Tampilkan',
             'manage' => 'Kelola',
             'empty' => 'Belum ada topic yang kamu kelola.',
-            'not_found' => 'Tidak ada course yang cocok dengan pencarian.',
+            'not_found' => 'Tidak ada topik pembelajaran yang cocok dengan pencarian.',
         ],
 
         'recent_materials' => [
@@ -55,18 +55,18 @@ return [
 
     'topics' => [
         'index' => [
-            'page_title' => 'Topik yang Dimoderasi',
+            'page_title' => 'Sesi yang Dimoderasi',
             'page_subtitle' => 'Daftar topic yang bisa kamu kelola.',
             'back' => 'Kembali',
             'search_placeholder' => 'Cari topic...',
             'open' => 'Buka',
             'empty' => [
                 'title' => 'Belum ada topic',
-                'description' => 'Kamu belum menjadi mentor di topik mana pun.',
+                'description' => 'Kamu belum menjadi mentor di sesi mana pun.',
             ],
             'metrics' => [
                 'materials' => 'Materi',
-                'students' => 'Siswa',
+                'students' => 'Murid',
                 'active' => 'AKTIF',
                 'inactive' => 'NONAKTIF',
                 'assessment' => 'Assessment',
@@ -79,26 +79,26 @@ return [
         'subtitle' => 'Workspace ringkas untuk mengelola materi, session, attendance, collaborator, dan assessment.',
         'visit_topic' => 'Kunjungi Topic',
         'cards' => [
-            'topic' => 'Topik',
-            'course' => 'Course',
+            'topic' => 'Sesi',
+            'course' => 'Topik pembelajaran',
             'program' => 'Program',
         ],
     ],
 
     'topic_tabs' => [
         'overview' => [
-            'title' => 'Ringkasan Topik',
+            'title' => 'Ringkasan Sesi',
             'no_description' => 'Belum ada deskripsi topic.',
             'access' => [
                 'materials' => 'Akses Materi',
-                'sessions' => 'Akses Sesi',
+                'sessions' => 'Akses Pertemuan',
                 'students' => 'Akses Student',
             ],
             'cards' => [
                 'category' => 'Kategori',
                 'visibility' => 'Visibilitas',
                 'materials' => 'Materi',
-                'session_status' => 'Status Sesi',
+                'session_status' => 'Status Pertemuan',
             ],
         ],
 
@@ -139,7 +139,7 @@ return [
                 'name_placeholder' => 'Nama material',
                 'type' => 'Tipe',
                 'select' => 'Pilih',
-                'no_types_left' => 'Semua tipe sudah dipakai pada topik ini.',
+                'no_types_left' => 'Semua tipe sudah dipakai pada sesi ini.',
                 'status' => 'Status',
                 'status_active' => 'Active',
                 'status_inactive' => 'Inactive',
@@ -154,7 +154,7 @@ return [
         ],
 
         'sessions' => [
-            'title' => 'Sesi',
+            'title' => 'Pertemuan',
             'subtitle' => 'Session online dengan para student.',
             'actions' => [
                 'edit' => 'Edit',
@@ -166,7 +166,7 @@ return [
             'modal' => [
                 'add_title' => 'Tambah Session',
                 'edit_title' => 'Edit Session',
-                'subtitle' => 'Session untuk topik terkini.',
+                'subtitle' => 'Session untuk sesi terkini.',
             ],
             'form' => [
                 'title' => 'Judul',
@@ -198,12 +198,14 @@ return [
             'stats' => [
                 'present' => 'Hadir :count',
                 'late' => 'Terlambat :count',
-                'absent' => 'Absen :count',
+                'online' => 'Online :count',
+                'absent' => 'Online :count',
             ],
             'status' => [
                 'present' => 'Hadir',
                 'late' => 'Terlambat',
-                'absent' => 'Absen',
+                'online' => 'Online',
+                'absent' => 'Online',
             ],
             'table' => [
                 'session' => 'Session',

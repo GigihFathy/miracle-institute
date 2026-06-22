@@ -11,7 +11,7 @@ class MaterialAssetService
 {
     public function __construct(
         private readonly GoogleDriveService $drive,
-        public readonly YouTubeService $youtube
+        public readonly YoutubeService $youtube
     ) {
     }
 

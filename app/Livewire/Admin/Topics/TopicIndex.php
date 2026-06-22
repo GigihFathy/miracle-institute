@@ -10,6 +10,7 @@ use App\Models\Material;
 use App\Models\Topic;
 use App\Models\User;
 use App\Models\VideoSession;
+use App\Services\LearningAccessRequirementService;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -24,7 +25,6 @@ class TopicIndex extends Component
     public string $teacher_id = '';
     public string $name = '';
     public string $description = '';
-    public string $visibility = 'Public';
     public string $status = 'draft';
     public int $sort_order = 0;
 
@@ -53,10 +53,9 @@ class TopicIndex extends Component
     {
         return [
             'course_id' => 'required|exists:courses,id',
-            'teacher_id' => 'required|exists:users,id',
+            'teacher_id' => 'nullable|exists:users,id',
             'name' => 'required|string|max:70',
             'description' => 'required|string',
-            'visibility' => 'required|string|max:50',
             'status' => 'required|in:published,archived,draft',
             'sort_order' => 'nullable|integer|min:0',
         ];
@@ -99,10 +98,9 @@ class TopicIndex extends Component
 
         $this->editingId = $row->id;
         $this->course_id = $row->course_id;
-        $this->teacher_id = $row->teacher_id;
+        $this->teacher_id = $row->teacher_id ?? '';
         $this->name = $row->name;
         $this->description = $row->description;
-        $this->visibility = $row->visibility;
         $this->status = $row->status === 'active' ? 'published' : $row->status;
         $this->sort_order = (int) ($row->sort_order ?? 0);
 
@@ -113,18 +111,39 @@ class TopicIndex extends Component
     {
         $this->validate();
 
-        $course = Course::with('studyProgram')->findOrFail($this->course_id);
+        $course = Course::findOrFail($this->course_id);
+        $topic = $this->editingId ? Topic::findOrFail($this->editingId) : new Topic();
+
+        $topic->forceFill([
+            'course_id' => $this->course_id,
+            'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
+            'name' => $this->name,
+            'category' => Str::slug($course->title),
+            'slug' => Str::slug($this->name),
+            'description' => $this->description,
+            'status' => $this->normalizeStatus($this->status),
+            'sort_order' => $this->sort_order,
+        ]);
+
+        if ($this->normalizeStatus($this->status) === 'published') {
+            try {
+                app(LearningAccessRequirementService::class)->ensureTopicCanBePublished($topic);
+            } catch (\RuntimeException $e) {
+                $this->addError('status', $e->getMessage());
+
+                return;
+            }
+        }
 
         Topic::updateOrCreate(
             ['id' => $this->editingId],
             [
                 'course_id' => $this->course_id,
-                'teacher_id' => $this->teacher_id,
+                'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
                 'name' => $this->name,
-                'category' => strtolower($course->studyProgram->title),
+                'category' => Str::slug($course->title),
                 'slug' => Str::slug($this->name),
                 'description' => $this->description,
-                'visibility' => $this->visibility,
                 'status' => $this->normalizeStatus($this->status),
                 'sort_order' => $this->sort_order,
             ]
@@ -203,12 +222,10 @@ class TopicIndex extends Component
             'teacher_id',
             'name',
             'description',
-            'visibility',
             'status',
             'sort_order',
         ]);
 
-        $this->visibility = 'Public';
         $this->status = 'draft';
         $this->sort_order = 1;
     }

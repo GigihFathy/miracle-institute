@@ -16,6 +16,10 @@
                     class="admin-edit-button rounded-xl border px-4 py-2 text-sm">
                     {{ __('admin.assessments.actions.edit') }}
                 </button>
+                <button wire:click="confirmDelete('{{ $selectedAssessment->id }}')"
+                    class="admin-delete-button rounded-xl px-4 py-2 text-sm">
+                    {{ __('admin.assessments.actions.delete') }}
+                </button>
 
                 <button wire:click="createQuestion"
                     class="admin-primary-button rounded-xl border border-brand-dark/20 px-4 py-2 text-sm transition">
@@ -38,10 +42,14 @@
             </div>
 
             @if($selectedAssessment)
-                <div class="grid grid-cols-1 gap-3 md:grid-cols-4">
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
                     <div class="rounded-2xl border bg-slate-50 p-4">
                         <div class="text-xs text-slate-500">{{ __('admin.assessments.table.assessment') }}</div>
                         <div class="mt-1 font-semibold">{{ $selectedAssessment->title }}</div>
+                    </div>
+                    <div class="rounded-2xl border bg-slate-50 p-4">
+                        <div class="text-xs text-slate-500">Pengajar</div>
+                        <div class="mt-1 font-semibold">{{ $selectedAssessment->teacher?->name ?? '-' }}</div>
                     </div>
                     <div class="rounded-2xl border bg-slate-50 p-4">
                         <div class="text-xs text-slate-500">{{ __('admin.question_manager.stats.passing_grade') }}</div>
@@ -84,7 +92,7 @@
                                     <td class="space-y-1 p-4 text-xs text-slate-700">
                                         @foreach($question->options as $option)
                                             <div class="{{ $option->is_correct ? 'font-semibold text-emerald-600' : '' }}">
-                                                {{ $option->is_correct ? '✓' : '•' }} {{ $option->option_text }}
+                                                {{ $option->is_correct ? 'âœ“' : 'â€¢' }} {{ $option->option_text }}
                                             </div>
                                         @endforeach
                                     </td>
@@ -133,7 +141,7 @@
                 </x-ui.table-shell>
             @else
                 <div class="rounded-2xl border border-dashed bg-slate-50 p-6 text-slate-600">
-                    Belum ada assessment untuk kursus ini.
+                    Belum ada assessment untuk topik pembelajaran ini.
                 </div>
             @endif
         </div>
@@ -152,7 +160,7 @@
                     </h2>
 
                     <button type="button" wire:click="$set('showModal', false)" class="text-slate-500 hover:text-black">
-                        ✕
+                        âœ•
                     </button>
                 </div>
 
@@ -179,7 +187,7 @@
                     @else
                         <div class="space-y-1">
                             <label class="mb-1 block text-xs font-semibold text-slate-600">
-                                Kursus <span class="text-rose-500">*</span>
+                                Topik pembelajaran <span class="text-rose-500">*</span>
                             </label>
                             <select wire:model="course_id" class="w-full rounded-xl border px-4 py-2">
                             <option value="">{{ __('admin.assessments.form.select_course') }}</option>
@@ -193,6 +201,21 @@
                             @enderror
                         </div>
                     @endif
+
+                    <div class="space-y-1">
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">
+                            Pengajar Pengelola Assessment
+                        </label>
+                        <select wire:model="teacher_id" class="w-full rounded-xl border px-4 py-2">
+                            <option value="">{{ __('admin.assessments.form.select_teacher') }}</option>
+                            @foreach($teachers as $teacher)
+                                <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('teacher_id')
+                            <p class="text-sm text-rose-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                     <div class="space-y-1">
                         <label class="mb-1 block text-xs font-semibold text-slate-600">
@@ -284,7 +307,7 @@
                     </h2>
 
                     <button type="button" wire:click="$set('questionModalOpen', false)" class="text-slate-500 hover:text-black">
-                        ✕
+                        âœ•
                     </button>
                 </div>
 
@@ -300,64 +323,7 @@
                     @endif
 
                     @if($selectedAssessment)
-                        <div class="rounded-xl border px-4 py-2 bg-slate-50 text-sm">{{ $selectedCourse?->title }} · {{ $selectedAssessment->title }}</div>
-                    @endif
-
-                    @if($questionEditingId)
-                    <x-ui.table-shell class="table-auto">
-                        <table class="w-full text-sm">
-                            <thead class="admin-table-head">
-                                <tr>
-                                    <th class="p-4">{{ __('admin.question_manager.table.order') }}</th>
-                                    <th class="p-4 text-left">{{ __('admin.question_manager.table.question') }}</th>
-                                    <th class="p-4 text-left">{{ __('admin.question_manager.table.options') }}</th>
-                                    <th class="p-4">{{ __('admin.question_manager.table.action') }}</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @if($selectedAssessment)
-                                    @forelse($selectedAssessment->questions as $q)
-                                        <tr class="align-top border-t">
-                                            <td class="p-4 text-center">{{ $q->sort_order }}</td>
-                                            <td class="p-4">
-                                                <div class="font-medium">{{ $q->question }}</div>
-                                                <div class="text-xs text-slate-500">{{ $q->question_type }}</div>
-                                            </td>
-
-                                            <td class="space-y-1 p-4 text-xs">
-                                                @foreach($q->options as $opt)
-                                                    <div class="{{ $opt->is_correct ? 'font-semibold text-emerald-600' : 'text-slate-500' }}">
-                                                        {{ $opt->is_correct ? '✓' : '•' }} {{ $opt->option_text }}
-                                                    </div>
-                                                @endforeach
-                                            </td>
-
-                                            <td class="p-4">
-                                                <div class="flex justify-center gap-2">
-                                                    <button wire:click="editQuestion('{{ $q->id }}')"
-                                                        class="admin-edit-button rounded-lg px-3 py-1.5 text-xs">
-                                                        {{ __('admin.question_manager.actions.edit') }}
-                                                    </button>
-
-                                                    <button wire:click="deleteQuestion('{{ $q->id }}')"
-                                                        class="admin-delete-button rounded-lg px-3 py-1.5 text-xs">
-                                                        {{ __('admin.question_manager.actions.delete') }}
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="p-6 text-center text-slate-500">
-                                                {{ __('admin.question_manager.empty') }}
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                @endif
-                            </tbody>
-                        </table>
-                    </x-ui.table-shell>
+                        <div class="rounded-xl border px-4 py-2 bg-slate-50 text-sm">{{ $selectedCourse?->title }} Â· {{ $selectedAssessment->title }}</div>
                     @endif
 
                     <div class="space-y-4">
@@ -384,7 +350,7 @@
                                         wire:click="$set('question_correctIndex', {{ $i }})"
                                         class="flex h-5 w-5 items-center justify-center rounded border {{ $question_correctIndex === $i ? 'bg-emerald-600 text-white' : 'bg-white' }}"
                                     >
-                                        @if($question_correctIndex === $i) ✓ @endif
+                                        @if($question_correctIndex === $i) âœ“ @endif
                                     </button>
 
                                     <input type="text"
@@ -429,6 +395,33 @@
                     <button wire:click="saveQuestion"
                         class="admin-primary-button rounded-xl border border-brand-dark/20 px-4 py-2 transition">
                         {{ __('admin.question_manager.actions.save') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($showDeleteModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                <h2 class="text-lg font-semibold text-slate-900">
+                    {{ __('admin.assessments.delete.title') }}
+                </h2>
+                <p class="mt-2 text-sm text-slate-600">
+                    {{ __('admin.assessments.delete.subtitle') }}
+                </p>
+
+                <div class="mt-6 flex justify-end gap-2">
+                    <button
+                        type="button"
+                        wire:click="$set('showDeleteModal', false)"
+                        class="rounded-xl border px-4 py-2"
+                    >
+                        {{ __('admin.assessments.actions.cancel') }}
+                    </button>
+
+                    <button wire:click="delete" class="admin-delete-button rounded-xl px-4 py-2">
+                        {{ __('admin.assessments.actions.delete') }}
                     </button>
                 </div>
             </div>

@@ -57,7 +57,7 @@
                 <option value="">{{ __('admin.attendances.filters.all_status') }}</option>
                 <option value="present">{{ __('admin.attendances.status.present') }}</option>
                 <option value="late">{{ __('admin.attendances.status.late') }}</option>
-                <option value="absent">{{ __('admin.attendances.status.absent') }}</option>
+                <option value="online">{{ __('admin.attendances.status.absent') }}</option>
             </select>
 
             <select wire:model.live="perPage" class="rounded-xl border px-4 py-2">
@@ -159,7 +159,7 @@
                     </div>
                 @endif
 
-                <label class="mb-1 block text-xs font-semibold text-slate-600">Sesi <span class="text-rose-500">*</span></label>
+                <label class="mb-1 block text-xs font-semibold text-slate-600">Pertemuan <span class="text-rose-500">*</span></label>
                 <select wire:model="video_session_id" class="w-full rounded-xl border px-4 py-2">
                     <option value="">{{ __('admin.attendances.form.select_session') }}</option>
                     @foreach($sessions as $session)
@@ -185,7 +185,7 @@
                 <select wire:model="status" class="w-full rounded-xl border px-4 py-2">
                     <option value="present">{{ __('admin.attendances.status.present') }}</option>
                     <option value="late">{{ __('admin.attendances.status.late') }}</option>
-                    <option value="absent">{{ __('admin.attendances.status.absent') }}</option>
+                    <option value="online">{{ __('admin.attendances.status.absent') }}</option>
                 </select>
                 @error('status') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
 

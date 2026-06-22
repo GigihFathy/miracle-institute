@@ -4,7 +4,7 @@ namespace App\Livewire\Sessions;
 
 use App\Models\Attendance;
 use App\Models\VideoSession;
-use App\Services\AttendanceAutomationService;
+use App\Services\AttendanceService;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -61,7 +61,7 @@ class AttendanceButton extends Component
         $this->syncState();
     }
 
-    public function joinSession(AttendanceAutomationService $automationService)
+    public function joinSession(AttendanceService $attendanceService)
     {
         abort_unless(auth()->check(), 403);
 
@@ -71,10 +71,9 @@ class AttendanceButton extends Component
         }
 
         try {
-            $attendance = $automationService->recordSessionAccess(
-                $this->session,
-                auth()->user(),
-                request()->ip()
+            $attendance = $attendanceService->checkIn(
+                (string) auth()->id(),
+                (string) $this->session->id
             );
 
             $this->attendance = $attendance->fresh();
@@ -152,7 +151,7 @@ class AttendanceButton extends Component
             : match ($this->attendance->status) {
                 'present' => 'Present',
                 'late' => 'Late',
-                'absent' => 'Absent',
+                'online', 'absent' => 'Online',
                 default => 'Checked in',
             };
     }

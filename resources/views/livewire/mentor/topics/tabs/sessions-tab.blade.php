@@ -1,23 +1,7 @@
 <section class="mentor-workspace-panel">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-            <h2 class="mentor-workspace-heading">{{ __('mentor.topic_tabs.sessions.title') }}</h2>
-            <p class="mentor-workspace-subheading">{{ __('mentor.topic_tabs.sessions.subtitle') }}</p>
-        </div>
-
-        @if($session)
-            <button type="button"
-                    wire:click="editSession"
-                    class="admin-edit-button rounded-xl px-4 py-2 text-sm">
-                {{ __('mentor.topic_tabs.sessions.actions.edit') }}
-            </button>
-        @else
-            <button type="button"
-                    wire:click="editSession"
-                    class="admin-primary-button rounded-xl px-4 py-2 text-sm">
-                {{ __('mentor.topic_tabs.sessions.actions.add') }}
-            </button>
-        @endif
+    <div>
+        <h2 class="mentor-workspace-heading">{{ __('mentor.topic_tabs.sessions.title') }}</h2>
+        <p class="mentor-workspace-subheading">{{ __('mentor.topic_tabs.sessions.subtitle') }}</p>
     </div>
 
     <div class="mt-5">
@@ -50,61 +34,4 @@
         @endif
     </div>
 
-    <x-ui.mentor.modal
-        :show="$showSessionModal"
-        title="{{ $session ? __('mentor.topic_tabs.sessions.modal.edit_title') : __('mentor.topic_tabs.sessions.modal.add_title') }}"
-        subtitle="{{ __('mentor.topic_tabs.sessions.modal.subtitle') }}"
-        wire:click="closeSessionModal"
-    >
-        <form wire:submit.prevent="saveSession" class="space-y-4">
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div class="sm:col-span-2">
-                    <label class="text-xs font-medium text-[color:color-mix(in_oklab,#004777_60%,white)]">{{ __('mentor.topic_tabs.sessions.form.title') }}</label>
-                    <input wire:model.defer="sessionTitle" class="mentor-workspace-field mt-1" placeholder="{{ __('mentor.topic_tabs.sessions.form.title_placeholder') }}">
-                </div>
-
-                <div>
-                    <label class="text-xs font-medium text-[color:color-mix(in_oklab,#004777_60%,white)]">{{ __('mentor.topic_tabs.sessions.form.start_at') }}</label>
-                    <input wire:model.defer="sessionStartAt" type="datetime-local" class="mentor-workspace-field mt-1">
-                </div>
-
-                <div>
-                    <label class="text-xs font-medium text-[color:color-mix(in_oklab,#004777_60%,white)]">{{ __('mentor.topic_tabs.sessions.form.end_at') }}</label>
-                    <input wire:model.defer="sessionEndAt" type="datetime-local" class="mentor-workspace-field mt-1">
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label class="text-xs font-medium text-[color:color-mix(in_oklab,#004777_60%,white)]">{{ __('mentor.topic_tabs.sessions.form.zoom_link') }}</label>
-                    <input wire:model.defer="sessionZoomLink" class="mentor-workspace-field mt-1" placeholder="https://...">
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label class="text-xs font-medium text-[color:color-mix(in_oklab,#004777_60%,white)]">{{ __('mentor.topic_tabs.sessions.form.status') }}</label>
-                    <select wire:model.defer="sessionStatus" class="mentor-workspace-field mt-1">
-                        <option value="scheduled">{{ __('mentor.topic_tabs.sessions.status.scheduled') }}</option>
-                        <option value="ongoing">{{ __('mentor.topic_tabs.sessions.status.ongoing') }}</option>
-                        <option value="completed">{{ __('mentor.topic_tabs.sessions.status.completed') }}</option>
-                        <option value="cancelled">{{ __('mentor.topic_tabs.sessions.status.cancelled') }}</option>
-                    </select>
-                </div>
-
-                <div class="sm:col-span-2">
-                    @error('sessionTitle') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
-                    @error('sessionStartAt') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
-                    @error('sessionEndAt') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
-                    @error('sessionZoomLink') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
-                    @error('sessionStatus') <p class="mt-1 text-sm text-rose-600">{{ $message }}</p> @enderror
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 border-t border-slate-200 pt-4">
-                <button type="button" wire:click="closeSessionModal" class="admin-neutral-button rounded-xl px-4 py-2 text-sm">
-                    {{ __('mentor.topic_tabs.sessions.form.cancel') }}
-                </button>
-                <button type="submit" class="admin-primary-button rounded-xl px-4 py-2 text-sm">
-                    {{ $session ? __('mentor.topic_tabs.sessions.form.update') : __('mentor.topic_tabs.sessions.form.save') }}
-                </button>
-            </div>
-        </form>
-    </x-ui.mentor.modal>
 </section>

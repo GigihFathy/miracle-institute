@@ -19,18 +19,10 @@
 
     <section class="space-y-4">
         <div class="rounded-2xl border bg-white p-4 space-y-3">
-            <div class="grid grid-cols-1 gap-3 md:grid-cols-4">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <input wire:model.live="search"
                        class="rounded-xl border px-4 py-2"
                        placeholder="{{ __('admin.courses.search_placeholder') }}">
-
-                <select wire:model.live="studyProgramFilter"
-                        class="rounded-xl border px-4 py-2">
-                    <option value="">{{ __('admin.courses.filters.all_programs') }}</option>
-                    @foreach($studyPrograms as $sp)
-                        <option value="{{ $sp->id }}">{{ $sp->title }}</option>
-                    @endforeach
-                </select>
 
                 <select wire:model.live="statusFilter"
                         class="rounded-xl border px-4 py-2">
@@ -69,10 +61,8 @@
                                 if ($row->poster) {
                                     if (\Illuminate\Support\Str::startsWith($row->poster, ['http://', 'https://'])) {
                                         $posterSrc = $row->poster;
-                                    } elseif (file_exists(public_path($row->poster))) {
-                                        $posterSrc = asset($row->poster);
-                                    } elseif (file_exists(public_path('storage/' . $row->poster))) {
-                                        $posterSrc = asset('storage/' . $row->poster);
+                                    } elseif ($thumbnailUrl = course_thumbnail_url($row->poster)) {
+                                        $posterSrc = $thumbnailUrl;
                                     }
                                 }
                             @endphp
@@ -96,7 +86,6 @@
 
                                 <div class="min-w-0">
                                     <div class="font-medium text-slate-900">{{ $row->title }}</div>
-                                    <div class="text-xs text-slate-500">{{ $row->studyProgram?->title ?? '-' }}</div>
                                     <div class="mt-1 text-[11px] text-slate-400">
                                         {{ __('admin.courses.form.certificate_course_number_label') }}:
                                         {{ $row->certificate_course_number ? str_pad((string) $row->certificate_course_number, 3, '0', STR_PAD_LEFT) : '-' }}
@@ -140,7 +129,7 @@
                                     wire:click="openRecap('{{ $row->id }}')"
                                     class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 transition hover:bg-sky-100"
                                 >
-                                    Rekap Kursus
+                                    Rekap Topik pembelajaran
                                 </button>
 
                                 <div class="my-1 w-full border-t"></div>
@@ -233,22 +222,9 @@
                     @endif
 
                     <div>
-                        <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Program Studi <span class="text-rose-500">*</span>
-                        </label>
-                        <select wire:model="study_program_id" class="w-full rounded-xl border px-4 py-2">
-                            <option value="">{{ __('admin.courses.form.select_program') }}</option>
-                            @foreach($studyPrograms as $sp)
-                                <option value="{{ $sp->id }}">{{ $sp->title }}</option>
-                            @endforeach
-                        </select>
-                        @error('study_program_id') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div>
                         <div class="mb-1 flex items-center justify-between gap-3">
                             <label class="block text-xs font-semibold text-slate-600">
-                                Judul Kursus <span class="text-rose-500">*</span>
+                                Judul Topik pembelajaran <span class="text-rose-500">*</span>
                             </label>
                             <span class="text-[11px] text-slate-400">{{ mb_strlen($title ?? '') }}/150</span>
                         </div>
@@ -295,7 +271,7 @@
                             {{ $this->certificateNumberPreview }}
                         </div>
                         <p class="mt-2 text-[11px] leading-5 text-slate-600">
-                            Preview ini mengikuti format sertifikat kursus yang dipakai sistem saat sertifikat diterbitkan.
+                            Preview ini mengikuti format sertifikat topik pembelajaran yang dipakai sistem saat sertifikat diterbitkan.
                         </p>
                     </div>
 
@@ -325,7 +301,7 @@
                             <div id="file:thumbnail" class="grid max-h-64 grid-cols-2 gap-2 overflow-auto rounded-lg border p-2 sm:grid-cols-3 lg:grid-cols-4">
                                 @foreach($thumbnails as $t)
                                     <button type="button" wire:click="selectThumbnail('{{ $t }}')" class="overflow-hidden rounded-md border p-0 {{ $poster === $t ? 'ring-2 ring-slate-900' : '' }}">
-                                        <img src="{{ asset($t) }}" class="h-20 w-full object-cover" alt="thumb">
+                                        <img src="{{ course_thumbnail_url($t) }}" class="h-20 w-full object-cover" alt="thumb">
                                     </button>
                                 @endforeach
 
@@ -372,15 +348,13 @@
 
     @if($showRecapModal && $selectedCourseRecap)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <button type="button" class="absolute inset-0" wire:click="closeRecapModal" aria-label="Tutup rekap kursus"></button>
+            <button type="button" class="absolute inset-0" wire:click="closeRecapModal" aria-label="Tutup rekap topik pembelajaran"></button>
 
             <div class="relative z-10 flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
                 <div class="flex items-start justify-between gap-4 border-b p-5">
                     <div>
-                        <h2 class="text-lg font-semibold text-slate-900">Rekap Kursus</h2>
-                        <p class="mt-1 text-sm text-slate-500">
-                            {{ $selectedCourseRecap->title }} · {{ $selectedCourseRecap->studyProgram?->title ?? '-' }}
-                        </p>
+                        <h2 class="text-lg font-semibold text-slate-900">Rekap Topik pembelajaran</h2>
+                        <p class="mt-1 text-sm text-slate-500">{{ $selectedCourseRecap->title }}</p>
                     </div>
 
                     <button type="button" wire:click="closeRecapModal" class="rounded-xl border px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50">
@@ -404,7 +378,7 @@
                             </div>
                         </div>
                         <div class="rounded-2xl border bg-slate-50 p-4">
-                            <div class="text-xs uppercase tracking-wide text-slate-500">Total Sesi</div>
+                            <div class="text-xs uppercase tracking-wide text-slate-500">Total Pertemuan</div>
                             <div class="mt-2 text-2xl font-bold text-slate-900">{{ $courseRecapSummary['sessions_total'] ?? 0 }}</div>
                         </div>
                         <div class="rounded-2xl border bg-emerald-50 p-4">
@@ -426,10 +400,10 @@
                             </div>
                         </div>
                         <div class="rounded-2xl border bg-rose-50 p-4">
-                            <div class="text-xs uppercase tracking-wide text-rose-700">Absent</div>
+                            <div class="text-xs uppercase tracking-wide text-sky-700">Online</div>
                             <div class="mt-2 flex items-end gap-2">
-                                <span class="text-2xl font-bold text-rose-800">{{ $courseRecapSummary['attendance_absent'] ?? 0 }}</span>
-                                <span class="pb-0.5 text-xs font-medium text-rose-700/80">
+                                <span class="text-2xl font-bold text-sky-800">{{ $courseRecapSummary['attendance_absent'] ?? 0 }}</span>
+                                <span class="pb-0.5 text-xs font-medium text-sky-700/80">
                                     ({{ (($courseRecapSummary['attendance_present'] ?? 0) + ($courseRecapSummary['attendance_late'] ?? 0) + ($courseRecapSummary['attendance_absent'] ?? 0)) > 0 ? round((($courseRecapSummary['attendance_absent'] ?? 0) / (($courseRecapSummary['attendance_present'] ?? 0) + ($courseRecapSummary['attendance_late'] ?? 0) + ($courseRecapSummary['attendance_absent'] ?? 0))) * 100) : 0 }}%)
                                 </span>
                             </div>
@@ -440,13 +414,13 @@
                         <table class="min-w-full text-sm">
                             <thead class="admin-table-head text-left text-slate-600">
                                 <tr>
-                                    <th class="px-4 py-3 font-medium">Topik</th>
                                     <th class="px-4 py-3 font-medium">Sesi</th>
+                                    <th class="px-4 py-3 font-medium">Pertemuan</th>
                                     <th class="px-4 py-3 font-medium">Jadwal</th>
                                     <th class="px-4 py-3 font-medium">Status</th>
                                     <th class="px-4 py-3 font-medium">Present</th>
                                     <th class="px-4 py-3 font-medium">Late</th>
-                                    <th class="px-4 py-3 font-medium">Absent</th>
+                                    <th class="px-4 py-3 font-medium">Online</th>
                                     <th class="px-4 py-3 font-medium">Total Kehadiran</th>
                                 </tr>
                             </thead>
@@ -463,13 +437,13 @@
                                         </td>
                                         <td class="px-4 py-3 text-emerald-700">{{ $session['present'] }}</td>
                                         <td class="px-4 py-3 text-amber-700">{{ $session['late'] }}</td>
-                                        <td class="px-4 py-3 text-rose-700">{{ $session['absent'] }}</td>
+                                        <td class="px-4 py-3 text-sky-700">{{ $session['absent'] }}</td>
                                         <td class="px-4 py-3 text-slate-700">{{ $session['attendance_total'] }}</td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="8" class="px-4 py-8 text-center text-slate-500">
-                                            Belum ada sesi pada kursus ini.
+                                            Belum ada pertemuan pada topik pembelajaran ini.
                                         </td>
                                     </tr>
                                 @endforelse
@@ -491,7 +465,7 @@ function showCourseImagePreview(src, title) {
     if (!modal || !image) return;
 
     image.src = src;
-    image.alt = title || 'Pratinjau gambar kursus';
+    image.alt = title || 'Pratinjau gambar topik pembelajaran';
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.classList.add('overflow-hidden');

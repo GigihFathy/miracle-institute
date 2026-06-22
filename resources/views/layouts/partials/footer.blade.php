@@ -3,7 +3,7 @@
     $hasSocialLinks = filled($company?->facebook)
         || filled($company?->instagram)
         || filled($company?->youtube)
-        || filled($company?->whatsapp);
+        || filled($company?->email);
 @endphp
 
 <footer class="bg-[#004777] text-slate-300">
@@ -33,6 +33,8 @@
             <ul class="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-1">
                 <li><a href="{{ localized_route('explore.dashboard') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.dashboard') }}</a></li>
                 <li><a href="{{ localized_route('courses.index') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.courses') }}</a></li>
+                <li><a href="{{ localized_route('legal.terms') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">Terms &amp; Conditions</a></li>
+                <li><a href="{{ localized_route('legal.privacy') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">Privacy Policy</a></li>
 
                 @auth
                     <li><a href="{{ localized_route('learning.dashboard') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.my_learning') }}</a></li>
@@ -75,13 +77,13 @@
                         </a>
                     @endif
 
-                    @if(filled($company?->whatsapp))
-                        <a href="https://wa.me/{{ $company->whatsapp }}" target="_blank"
-                           aria-label="{{ __('general.footer.contact.whatsapp') }}"
+                    @if(filled($company?->email))
+                        <a href="mailto:{{ $company->email }}"
+                           aria-label="{{ __('general.footer.contact.email') }}"
                            class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-lg transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/20 hover:text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.057 23.535a.75.75 0 0 0 .916.932l5.853-1.53A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.713 9.713 0 0 1-4.953-1.355l-.355-.21-3.676.961.983-3.584-.229-.368A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/>
+                                <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z"/>
                             </svg>
                         </a>
                     @endif
@@ -92,8 +94,12 @@
     </div>
 
     <div class="border-t border-white/10 px-4 sm:px-6">
-        <div class="mx-auto flex max-w-6xl items-center justify-center py-5 text-center text-xs text-slate-400">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-center gap-2 py-5 text-center text-xs text-slate-400">
             <span>{{ __('general.footer.copyright', ['year' => date('Y')]) }}</span>
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="{{ localized_route('legal.terms') }}" class="underline underline-offset-4 hover:text-white">Terms &amp; Conditions</a>
+                <a href="{{ localized_route('legal.privacy') }}" class="underline underline-offset-4 hover:text-white">Privacy Policy</a>
+            </div>
         </div>
     </div>
 

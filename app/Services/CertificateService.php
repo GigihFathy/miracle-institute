@@ -24,6 +24,8 @@ class CertificateService
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            app(LearningAccessRequirementService::class)->ensureCourseCanIssueCertificate($course);
+
             $enrollment = CourseEnrollment::query()
                 ->where('course_id', $course->id)
                 ->where('user_id', $user->id)
@@ -115,9 +117,10 @@ class CertificateService
             abort(404);
         }
 
+        app(LearningAccessRequirementService::class)->ensureCourseCanIssueCertificate($course);
+
         $course->loadMissing([
             'topics.videoSessions',
-            'studyProgram',
         ]);
 
         $user = $certificate->user()->firstOrFail();
@@ -231,12 +234,12 @@ class CertificateService
                 ->where('attendances.status', 'late')
                 ->count();
 
-        $absent = $sessionIds->isEmpty()
+        $online = $sessionIds->isEmpty()
             ? 0
             : Attendance::query()
                 ->where('attendances.user_id', $user->id)
                 ->whereIn('attendances.video_session_id', $sessionIds)
-                ->where('attendances.status', 'absent')
+                ->whereIn('attendances.status', ['online', 'absent'])
                 ->count();
 
         $assessmentAttempt = AssessmentAttempt::query()
@@ -257,7 +260,7 @@ class CertificateService
             'attendance_present_full' => $presentFull,
             'attendance_checked_in' => $presentFull + $late,
             'attendance_late' => $late,
-            'attendance_absent' => $absent,
+            'attendance_absent' => $online,
         ];
     }
 
@@ -375,7 +378,6 @@ class CertificateService
         return [
             'participant_name' => $user->name,
             'course_title' => $course->title,
-            'program_title' => $course->studyProgram?->title ?? '-',
             'total_topics' => $totalTopics,
         ];
     }

@@ -187,7 +187,7 @@
                                 <template x-if="sessionCount(day) > 0">
                                     <div class="absolute bottom-2 left-2 right-2 flex items-center justify-start sm:justify-between">
                                         <div class="h-2 w-2 rounded-full bg-blue-500 sm:hidden"></div>
-                                        <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' sesi'"></span>
+                                        <span class="hidden text-[10px] font-semibold sm:inline" x-text="sessionCount(day) + ' pertemuan'"></span>
                                     </div>
                                 </template>
                             </button>
@@ -267,12 +267,10 @@
                             if ($poster) {
                                 if (Str::startsWith($poster, ['http://', 'https://'])) {
                                     $posterSrc = $poster;
-                                } elseif (file_exists(public_path($poster))) {
-                                    $posterSrc = asset($poster);
-                                } elseif (file_exists(public_path('storage/' . $poster))) {
-                                    $posterSrc = asset('storage/' . $poster);
+                                } elseif ($thumbnailUrl = course_thumbnail_url($poster)) {
+                                    $posterSrc = $thumbnailUrl;
                                 } elseif ($course->poster) {
-                                    $posterSrc = asset('images/thumbnail/' . $poster);
+                                    $posterSrc = course_thumbnail_url($poster);
                                 }
                             }
                         @endphp
@@ -302,7 +300,6 @@
                                             {{ $course->title ?? __('mentor.dashboard.managed_courses.no_course') }}
                                         </h3>
                                         <p class="mt-1 text-xs leading-5 text-slate-500">
-                                            {{ $course->studyProgram?->title ?? '-' }} &middot;
                                             {{ trans_choice('mentor.dashboard.managed_courses.topic_count', $courseTopics->count(), ['count' => $courseTopics->count()]) }}
                                         </p>
                                     </div>

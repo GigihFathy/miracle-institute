@@ -41,6 +41,21 @@
             @error('password_confirmation') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
 
+        <label class="flex items-start gap-3 text-sm text-[#004777]">
+            <input
+                type="checkbox"
+                wire:model.live="accept_legal"
+                class="mt-1 h-4 w-4 rounded border-[#004777]/30 text-[#004777] focus:ring-[#35A7FF]"
+            >
+            <span class="leading-6">
+                Saya menyetujui
+                <a href="{{ localized_route('legal.terms') }}" class="font-medium underline decoration-[#35A7FF]/50 underline-offset-4">Terms &amp; Conditions</a>
+                dan
+                <a href="{{ localized_route('legal.privacy') }}" class="font-medium underline decoration-[#35A7FF]/50 underline-offset-4">Privacy Policy</a>.
+            </span>
+        </label>
+        @error('accept_legal') <p class="-mt-2 text-sm text-red-600">{{ $message }}</p> @enderror
+
         <button
             type="submit"
             wire:loading.attr="disabled"

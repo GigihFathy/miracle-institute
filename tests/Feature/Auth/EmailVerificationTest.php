@@ -38,6 +38,7 @@ class EmailVerificationTest extends TestCase
             ->set('email', 'budi@example.test')
             ->set('password', 'password123')
             ->set('password_confirmation', 'password123')
+            ->set('accept_legal', true)
             ->call('submit')
             ->assertRedirect(route('verification.notice'));
 
@@ -49,6 +50,29 @@ class EmailVerificationTest extends TestCase
         $this->assertTrue($user->roles()->where('name', 'student')->exists());
 
         Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_registration_requires_terms_and_privacy_acceptance(): void
+    {
+        Notification::fake();
+        Role::create([
+            'name' => 'student',
+            'label' => 'Student',
+        ]);
+
+        Livewire::test(Register::class)
+            ->set('name', 'Budi')
+            ->set('email', 'budi@example.test')
+            ->set('password', 'password123')
+            ->set('password_confirmation', 'password123')
+            ->set('accept_legal', false)
+            ->call('submit')
+            ->assertHasErrors(['accept_legal' => 'accepted']);
+
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', [
+            'email' => 'budi@example.test',
+        ]);
     }
 
     public function test_unverified_user_cannot_login_before_verifying_email(): void

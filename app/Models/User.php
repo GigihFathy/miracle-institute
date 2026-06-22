@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'dob' => 'date',
         'google_token_expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function hasRole(string $role): bool
@@ -99,6 +100,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function taughtTopics()
     {
         return $this->hasMany(Topic::class, 'teacher_id');
+    }
+
+    public function managedAssessments()
+    {
+        return $this->hasMany(Assessment::class, 'teacher_id');
     }
 
     public function getFullNameAttribute()

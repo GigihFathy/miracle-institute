@@ -3,18 +3,13 @@
 namespace Database\Seeders\Learning;
 
 use App\Models\Course;
-use App\Models\StudyProgram;
 use Illuminate\Database\Seeder;
 
 class CourseSeeder extends Seeder
 {
     public function run(): void
     {
-        $discipleship = StudyProgram::where('slug', 'discipleship')->firstOrFail();
-        $sermon = StudyProgram::where('slug', 'sermon')->firstOrFail();
-
         Course::factory()->create([
-            'study_program_id' => $discipleship->id,
             'title' => 'Foundational Discipleship',
             'slug' => 'foundational-discipleship',
             'poster' => 'images/dummyPNG.png',
@@ -23,7 +18,6 @@ class CourseSeeder extends Seeder
         ]);
 
         Course::factory()->create([
-            'study_program_id' => $sermon->id,
             'title' => 'Sermon Basics',
             'slug' => 'sermon-basics',
             'poster' => 'images/dummyPNG.png',

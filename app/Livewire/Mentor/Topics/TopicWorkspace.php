@@ -18,7 +18,6 @@ class TopicWorkspace extends Component
     {
         $this->topic = Topic::query()
             ->with([
-                'course.studyProgram',
                 'course.assessment',
             ])
             ->where('slug', $slug)
@@ -65,9 +64,9 @@ class TopicWorkspace extends Component
             $tabs['students'] = 'Students';
         }
 
-        // if ($this->canAccessTopic($this->topic, ['manage_assessments', 'manage_topics'])) {
-        //     $tabs['assessment'] = 'Assessment';
-        // }
+        if ($this->canManageAssessmentForTopic($this->topic)) {
+            $tabs['assessment'] = 'Assessment';
+        }
 
         return $tabs;
     }
@@ -83,7 +82,7 @@ class TopicWorkspace extends Component
                 'sessions' => \App\Livewire\Mentor\Topics\Tabs\SessionsTab::class,
                 'attendances' => \App\Livewire\Mentor\Topics\Tabs\AttendancesTab::class,
                 'students' => \App\Livewire\Mentor\Topics\Tabs\StudentsTab::class,
-                // 'assessment' => \App\Livewire\Mentor\Topics\Tabs\AssessmentTab::class,
+                'assessment' => \App\Livewire\Mentor\Topics\Tabs\AssessmentTab::class,
                 default => \App\Livewire\Mentor\Topics\Tabs\OverviewTab::class,
             },
         ])->layout('layouts.learning');

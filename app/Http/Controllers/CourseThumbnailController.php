@@ -16,15 +16,22 @@ class CourseThumbnailController extends Controller
         ]);
 
         $file = $validated['thumbnail'];
-        $dir = public_path('images/thumbnail');
-
-        File::ensureDirectoryExists($dir);
-
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $extension = $file->getClientOriginalExtension();
-        $filename = Str::slug($originalName) . '-' . Str::lower(Str::random(6)) . '.' . $extension;
+        $filename = Str::slug($originalName) . '-' . Str::lower(Str::random(6)) . '.' . Str::lower($extension);
+        $targetDirectory = public_path('images/thumbnail');
+        $targetPath = $targetDirectory . DIRECTORY_SEPARATOR . $filename;
 
-        $file->move($dir, $filename);
+        try {
+            File::ensureDirectoryExists($targetDirectory);
+            File::put($targetPath, File::get($file->getRealPath()));
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors([
+                'thumbnail' => 'Thumbnail gagal diupload ke public/images/thumbnail. Periksa permission folder server.',
+            ])->withInput();
+        }
 
         return back()->with('success', 'Thumbnail berhasil diupload dan masuk ke library sistem.');
     }

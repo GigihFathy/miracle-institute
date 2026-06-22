@@ -6,11 +6,6 @@
             'active_routes' => ['admin.dashboard'],
         ],
         [
-            'label' => __('admin.sidebar.study_programs'),
-            'route' => 'admin.study-programs.index',
-            'active_routes' => ['admin.study-programs.*'],
-        ],
-        [
             'label' => __('admin.sidebar.courses'),
             'route' => 'admin.courses.index',
             'active_routes' => [
@@ -46,8 +41,6 @@
 
     $canMap = [
         'admin.dashboard' => 'view_reports',
-        'admin.study-programs.index' => 'manage_courses',
-
         'admin.courses.index' => 'manage_courses',
         'admin.topics.index' => 'manage_topics',
         'admin.materials.index' => 'manage_topics',

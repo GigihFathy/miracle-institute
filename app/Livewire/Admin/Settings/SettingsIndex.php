@@ -9,7 +9,11 @@ use Illuminate\Support\Facades\Cache;
 
 class SettingsIndex extends Component
 {
+    private const GOOGLE_DISCONNECT_PASSWORD = 'beedik2512';
+
     public bool $isGoogleConnected = false;
+    public bool $showDisconnectGoogleModal = false;
+    public string $disconnectGooglePassword = '';
 
     public string $name = '';
     public string $description = '';
@@ -20,7 +24,7 @@ class SettingsIndex extends Component
     public string $facebook = '';
     public string $instagram = '';
     public string $youtube = '';
-    public string $whatsapp = '';
+    public string $email = '';
 
     public function mount(): void
     {
@@ -29,7 +33,7 @@ class SettingsIndex extends Component
         if ($company) {
             $this->fill($company->only([
                 'name','description','address','vision','mission','logo',
-                'facebook','instagram','youtube','whatsapp',
+                'facebook','instagram','youtube','email',
             ]));
         }
 
@@ -49,13 +53,42 @@ class SettingsIndex extends Component
 
     public function disconnectGoogle()
     {
+        $this->validate([
+            'disconnectGooglePassword' => ['required', 'string'],
+        ], [
+            'disconnectGooglePassword.required' => 'Password wajib diisi untuk memutus koneksi.',
+        ]);
+
+        if ($this->disconnectGooglePassword !== self::GOOGLE_DISCONNECT_PASSWORD) {
+            $this->addError('disconnectGooglePassword', 'Password default tidak sesuai.');
+
+            return;
+        }
+
         SystemSetting::where('key', 'google_master_refresh_token')->delete();
         
         Cache::forget('google_master_access_token');
         
         $this->isGoogleConnected = false;
+        $this->showDisconnectGoogleModal = false;
+        $this->disconnectGooglePassword = '';
+        $this->resetErrorBag('disconnectGooglePassword');
 
         $this->dispatch('toast', type: 'success', message: 'Koneksi Google Drive berhasil diputus.');
+    }
+
+    public function openDisconnectGoogleModal(): void
+    {
+        $this->disconnectGooglePassword = '';
+        $this->resetErrorBag('disconnectGooglePassword');
+        $this->showDisconnectGoogleModal = true;
+    }
+
+    public function closeDisconnectGoogleModal(): void
+    {
+        $this->showDisconnectGoogleModal = false;
+        $this->disconnectGooglePassword = '';
+        $this->resetErrorBag('disconnectGooglePassword');
     }
 
     public function save(): void
@@ -70,7 +103,7 @@ class SettingsIndex extends Component
             'facebook' => 'nullable|url',
             'instagram' => 'nullable|url',
             'youtube' => 'nullable|url',
-            'whatsapp' => 'nullable|url',
+            'email' => 'nullable|email',
         ]);
 
         Company::updateOrCreate(
@@ -85,7 +118,7 @@ class SettingsIndex extends Component
                 'facebook' => $this->facebook,
                 'instagram' => $this->instagram,
                 'youtube' => $this->youtube,
-                'whatsapp' => $this->whatsapp,
+                'email' => $this->email,
             ]
         );
 
