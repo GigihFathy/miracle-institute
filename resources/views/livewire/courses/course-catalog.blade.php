@@ -1,4 +1,4 @@
-﻿@php
+@php
     use Illuminate\Support\Str;
 
     $isMentor = session('active_role') === 'disciples';

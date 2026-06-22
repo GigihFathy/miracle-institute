@@ -1,4 +1,4 @@
-﻿@component('emails.layouts.learning', [
+@component('emails.layouts.learning', [
     'title' => 'Pengingat Pertemuan',
 ])
     <p style="margin:0 0 16px 0;">

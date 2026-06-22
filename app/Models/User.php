@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'dob' => 'date',
         'google_token_expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function hasRole(string $role): bool

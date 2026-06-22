@@ -1,4 +1,4 @@
-﻿<section class="mentor-workspace-panel">
+<section class="mentor-workspace-panel">
     <h2 class="mentor-workspace-heading">Assessment</h2>
     <p class="mentor-workspace-subheading">Ringkasan singkat assessment pada topik pembelajaran ini.</p>
 

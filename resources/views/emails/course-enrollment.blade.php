@@ -1,4 +1,4 @@
-﻿<x-mail::message>
+<x-mail::message>
 # Enrollment Berhasil
 
 Halo {{ $user->full_name }},

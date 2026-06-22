@@ -1,4 +1,4 @@
-﻿@php
+@php
     $isMentor = auth()->check() && session('active_role') === 'disciples';
     $isStudent = auth()->check() && session('active_role') === 'student';
     $canTrack = auth()->check() && $enrolled;

@@ -44,6 +44,12 @@ class Login extends Component
             return;
         }
 
+        if (! $user->is_active) {
+            $this->addError('email', 'Akun Anda telah dinonaktifkan. Hubungi administrator.');
+
+            return;
+        }
+
         if (! $user->hasVerifiedEmail()) {
             try {
                 $user->sendEmailVerificationNotification();

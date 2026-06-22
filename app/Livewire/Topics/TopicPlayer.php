@@ -55,6 +55,10 @@ class TopicPlayer extends Component
         $this->activeMaterialId = $this->materialsQuery()->value('id');
 
         $this->hydrateTopicCompletion();
+
+        if ($this->canStudentInteract) {
+            $this->autoCompleteAttendedVideos();
+        }
     }
 
     public function setTab(string $tab): void
@@ -69,6 +73,10 @@ class TopicPlayer extends Component
         $exists = $this->materialsQuery()->whereKey($materialId)->exists();
 
         if (! $exists) {
+            return;
+        }
+
+        if ($this->canStudentInteract && ! $this->isMaterialAccessible($materialId)) {
             return;
         }
 
@@ -125,12 +133,17 @@ class TopicPlayer extends Component
 
         $activeMaterial = $this->materialsQuery()->find($this->activeMaterialId);
 
+        if ($activeMaterial && ! $this->isMaterialAccessible($this->activeMaterialId)) {
+            session()->flash('error', 'Materi ini belum bisa diakses.');
+            return;
+        }
+
         if (
             $activeMaterial?->type === 'video' &&
             $this->extractYoutubeVideoId((string) $activeMaterial->external_url) &&
             ! ($this->videoCompletionUnlocked[$this->activeMaterialId] ?? false)
         ) {
-            session()->flash('error', 'Video harus ditonton minimal 70% sebelum bisa diselesaikan.');
+            session()->flash('error', 'Video harus ditonton minimal 80% sebelum bisa diselesaikan.');
             return;
         }
 
@@ -392,6 +405,19 @@ class TopicPlayer extends Component
             }
         }
 
+        $materialProgresses = collect();
+        if (auth()->check() && $this->canStudentInteract) {
+            $materialIds = $materials->pluck('id');
+            if ($materialIds->isNotEmpty()) {
+                $materialProgresses = MaterialProgress::query()
+                    ->where('user_id', auth()->id())
+                    ->whereIn('material_id', $materialIds)
+                    ->get();
+            }
+        }
+
+        $materialAccessMap = $this->buildMaterialAccessMap($materials, $sessionAttendances, $materialProgresses);
+
         $this->topicStatus = $topicStatus;
         $this->topicCompleted = $topicCompleted;
 
@@ -445,6 +471,7 @@ class TopicPlayer extends Component
         $hasSessionEnded = $completionSnapshot['all_sessions_closed'] ?? false;
 
         return view('livewire.topics.topic-player', [
+            'materialAccessMap' => $materialAccessMap,
             'activeMaterialProgress' => $activeMaterialProgress,
             'completionSnapshot' => $completionSnapshot,
             'canMarkComplete' => $canMarkComplete,
@@ -482,6 +509,132 @@ class TopicPlayer extends Component
         }
 
         return $query;
+    }
+
+    private function buildMaterialAccessMap($materials, $sessionAttendances, $materialProgresses): array
+    {
+        if (! $this->canStudentInteract) {
+            return $materials->mapWithKeys(fn ($m) => [(string) $m->id => 'accessible'])->all();
+        }
+
+        $sessions = $this->topic->videoSessions->filter(fn ($s) => $s->start_at !== null);
+
+        if ($sessions->isEmpty()) {
+            return $materials->mapWithKeys(fn ($m) => [(string) $m->id => 'accessible'])->all();
+        }
+
+        $now = now();
+        $sessionPassed = $sessions->some(fn ($s) => $now->gte($s->start_at));
+
+        if (! $sessionPassed) {
+            return $materials->mapWithKeys(fn ($m) => [(string) $m->id => 'locked_time'])->all();
+        }
+
+        $attended = $sessionAttendances->whereIn('status', ['present', 'late', 'online'])->isNotEmpty();
+
+        $completedIds = $materialProgresses->where('status', 'completed')->pluck('material_id')->flip();
+
+        $videoMaterials = $materials->filter(fn ($m) => $m->type === 'video');
+        $allVideosCompleted = $videoMaterials->isEmpty()
+            || $videoMaterials->every(fn ($m) => $completedIds->has((string) $m->id));
+
+        return $materials->mapWithKeys(function ($material) use ($attended, $allVideosCompleted) {
+            if ($material->type === 'video') {
+                return [(string) $material->id => 'accessible'];
+            }
+
+            return [(string) $material->id => ($attended || $allVideosCompleted) ? 'accessible' : 'locked_video'];
+        })->all();
+    }
+
+    private function isMaterialAccessible(string $materialId): bool
+    {
+        $material = Material::find($materialId);
+        if (! $material) {
+            return false;
+        }
+
+        $sessions = $this->topic->videoSessions->filter(fn ($s) => $s->start_at !== null);
+
+        if ($sessions->isEmpty()) {
+            return true;
+        }
+
+        $now = now();
+        if ($sessions->every(fn ($s) => $now->lt($s->start_at))) {
+            return false;
+        }
+
+        if ($material->type === 'video') {
+            return true;
+        }
+
+        $sessionIds = $sessions->pluck('id');
+
+        $attended = Attendance::query()
+            ->where('user_id', auth()->id())
+            ->whereIn('video_session_id', $sessionIds)
+            ->whereIn('status', ['present', 'late', 'online'])
+            ->exists();
+
+        if ($attended) {
+            return true;
+        }
+
+        $videoMaterialIds = $this->topic->materials()
+            ->where('type', 'video')
+            ->where('status', 'active')
+            ->where('visibility', 'public')
+            ->pluck('id');
+
+        if ($videoMaterialIds->isEmpty()) {
+            return true;
+        }
+
+        return MaterialProgress::query()
+            ->where('user_id', auth()->id())
+            ->whereIn('material_id', $videoMaterialIds)
+            ->where('status', 'completed')
+            ->count() >= $videoMaterialIds->count();
+    }
+
+    private function autoCompleteAttendedVideos(): void
+    {
+        $sessionIds = $this->topic->videoSessions->pluck('id');
+
+        if ($sessionIds->isEmpty()) {
+            return;
+        }
+
+        $attended = Attendance::query()
+            ->where('user_id', auth()->id())
+            ->whereIn('video_session_id', $sessionIds)
+            ->whereIn('status', ['present', 'late', 'online'])
+            ->exists();
+
+        if (! $attended) {
+            return;
+        }
+
+        $progressService = app(ProgressService::class);
+
+        $videoMaterials = $this->topic->materials()
+            ->where('type', 'video')
+            ->where('status', 'active')
+            ->where('visibility', 'public')
+            ->get();
+
+        foreach ($videoMaterials as $material) {
+            $alreadyCompleted = MaterialProgress::query()
+                ->where('user_id', auth()->id())
+                ->where('material_id', $material->id)
+                ->where('status', 'completed')
+                ->exists();
+
+            if (! $alreadyCompleted) {
+                $progressService->markMaterialCompleted(auth()->id(), $material->id);
+            }
+        }
     }
 
     private function hydrateTopicCompletion(): void

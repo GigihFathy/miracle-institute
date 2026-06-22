@@ -1,4 +1,4 @@
-﻿<div class="space-y-6 lg:px-36">
+<div class="space-y-6 lg:px-36">
     <section class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>

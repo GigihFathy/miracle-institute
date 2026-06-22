@@ -1,4 +1,4 @@
-﻿@component('emails.layouts.learning', [
+@component('emails.layouts.learning', [
     'title' => 'Kendala Kehadiran',
     'accent' => '#be123c',
     'accentSoft' => '#fff1f2',

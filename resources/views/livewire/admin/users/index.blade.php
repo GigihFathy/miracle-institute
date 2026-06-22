@@ -1,4 +1,4 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
     <x-ui.page-header title="{{ __('admin.users.page_title') }}" subtitle="{{ __('admin.users.page_subtitle') }}" />
 
     <div class="rounded-2xl border bg-white p-4">
@@ -27,10 +27,11 @@
             <table class="table-fixed w-full min-w-full text-sm">
                 <thead class="admin-table-head text-left text-slate-600">
                     <tr>
-                        <th class="w-1/4 px-4 py-3 font-medium">{{ __('admin.users.table.name') }}</th>
-                        <th class="w-1/4 px-4 py-3 font-medium">{{ __('admin.users.table.email') }}</th>
-                        <th class="w-1/3 px-4 py-3 font-medium">{{ __('admin.users.table.roles') }}</th>
-                        <th class="w-1/6 px-4 py-3 text-right font-medium">{{ __('admin.users.table.action') }}</th>
+                        <th class="w-[22%] px-4 py-3 font-medium">{{ __('admin.users.table.name') }}</th>
+                        <th class="w-[22%] px-4 py-3 font-medium">{{ __('admin.users.table.email') }}</th>
+                        <th class="w-[28%] px-4 py-3 font-medium">{{ __('admin.users.table.roles') }}</th>
+                        <th class="w-[12%] px-4 py-3 font-medium">{{ __('admin.users.table.status') }}</th>
+                        <th class="w-[16%] px-4 py-3 text-right font-medium">{{ __('admin.users.table.action') }}</th>
                     </tr>
                 </thead>
 
@@ -57,6 +58,18 @@
                                 </div>
                             </td>
 
+                            <td class="px-4 py-3">
+                                @if($row->is_active)
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">
+                                        {{ __('admin.users.status.active') }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 ring-1 ring-red-200">
+                                        {{ __('admin.users.status.inactive') }}
+                                    </span>
+                                @endif
+                            </td>
+
                             <td class="px-4 py-3 text-right">
                                 <div class="flex justify-end gap-2">
                                     @if($row->roles->contains('name', 'student'))
@@ -75,6 +88,33 @@
                                             </button>
                                             <span class="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border border-sky-200 bg-white px-2 py-1 text-[11px] font-medium text-sky-700 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
                                                 Rekap Student
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    @if($row->id !== auth()->id())
+                                        <div class="relative group">
+                                            <button
+                                                type="button"
+                                                wire:click="toggleActive('{{ $row->id }}')"
+                                                wire:confirm="{{ $row->is_active ? __('admin.users.actions.deactivate') . ' ' . $row->full_name . '?' : __('admin.users.actions.activate') . ' ' . $row->full_name . '?' }}"
+                                                class="inline-flex h-9 w-9 items-center justify-center rounded-lg border transition {{ $row->is_active ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}"
+                                                aria-label="{{ $row->is_active ? __('admin.users.actions.deactivate') : __('admin.users.actions.activate') }}"
+                                            >
+                                                @if($row->is_active)
+                                                    {{-- Nonaktifkan: icon ban/block --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                                    </svg>
+                                                @else
+                                                    {{-- Aktifkan: icon check-circle --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+                                                @endif
+                                            </button>
+                                            <span class="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border bg-white px-2 py-1 text-[11px] font-medium opacity-0 transition group-hover:opacity-100 {{ $row->is_active ? 'border-red-200 text-red-600' : 'border-emerald-200 text-emerald-700' }}">
+                                                {{ $row->is_active ? __('admin.users.actions.deactivate') : __('admin.users.actions.activate') }}
                                             </span>
                                         </div>
                                     @endif

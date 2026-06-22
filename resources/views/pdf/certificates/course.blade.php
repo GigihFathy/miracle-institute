@@ -1,4 +1,4 @@
-﻿@php
+@php
     use Carbon\Carbon;
 
     $issuedAt = isset($issuedAt) && $issuedAt

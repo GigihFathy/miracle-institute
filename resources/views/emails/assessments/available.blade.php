@@ -1,4 +1,4 @@
-﻿@component('emails.layouts.learning', [
+@component('emails.layouts.learning', [
     'title' => 'Assessment Tersedia',
     'accent' => '#b45309',
     'accentSoft' => '#fffbeb',

@@ -1,4 +1,4 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
     <x-ui.page-header
         title="{{ __('admin.attendances.page_title') }}"
         subtitle="{{ __('admin.attendances.page_subtitle') }}"

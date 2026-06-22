@@ -1,4 +1,4 @@
-﻿@component('emails.layouts.learning', [
+@component('emails.layouts.learning', [
     'title' => 'Sesi Selesai',
     'accent' => '#4f46e5',
     'accentSoft' => '#eef2ff',

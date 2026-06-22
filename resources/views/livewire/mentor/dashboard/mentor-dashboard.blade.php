@@ -1,4 +1,4 @@
-﻿@php
+@php
     use Illuminate\Support\Str;
 
     $calendarSessionItems = ($calendarSessions ?? collect())->map(function ($session) {

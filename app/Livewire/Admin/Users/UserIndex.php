@@ -17,6 +17,21 @@ class UserIndex extends Component
     public ?User $selectedStudent = null;
     public array $studentRecapRows = [];
 
+    public function toggleActive(string $userId): void
+    {
+        abort_if($userId === auth()->id(), 403);
+
+        $user = User::findOrFail($userId);
+        $user->update(['is_active' => ! $user->is_active]);
+
+        $this->dispatch('toast',
+            type: $user->is_active ? 'success' : 'warning',
+            message: $user->is_active
+                ? __('admin.users.actions.activated', ['name' => $user->full_name])
+                : __('admin.users.actions.deactivated', ['name' => $user->full_name]),
+        );
+    }
+
     public function openStudentRecap(string $userId): void
     {
         $student = User::with('roles')->findOrFail($userId);

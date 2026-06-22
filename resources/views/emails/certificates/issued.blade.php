@@ -1,4 +1,4 @@
-﻿@component('emails.layouts.learning', [
+@component('emails.layouts.learning', [
     'title' => 'Sertifikat Siap',
     'accent' => '#7c3aed',
     'accentSoft' => '#f5f3ff',

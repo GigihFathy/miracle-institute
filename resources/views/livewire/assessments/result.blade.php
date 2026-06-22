@@ -1,4 +1,4 @@
-﻿@php
+@php
     use Illuminate\Support\Str;
 
     $score = (float) ($attempt->score ?? 0);

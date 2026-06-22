@@ -1,4 +1,4 @@
-﻿@php
+@php
     $appName = config('app.name', 'Miracle Institute');
     $defaultTitle = $appName;
     $defaultDescription = 'Miracle Institute adalah platform pembelajaran untuk bertumbuh dalam iman melalui topik pembelajaran, materi, dan pertemuan belajar yang terarah.';
