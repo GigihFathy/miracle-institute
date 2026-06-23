@@ -18,7 +18,7 @@
     $calendarMonths = __('admin.dashboard.calendar.months');
 @endphp
 
-<div class="min-h-screen bg-white px-4 pb-16 pt-8 text-[#0f172a] sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
+<div class="min-h-screen bg-white pb-16 text-[#0f172a] sm:pb-24">
     <main class="mx-auto max-w-6xl space-y-8">
         <section class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
             <div class="relative overflow-hidden rounded-[2rem] bg-[#eef8ff] px-7 py-9 sm:px-10 sm:py-12">

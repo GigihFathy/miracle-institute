@@ -66,6 +66,16 @@
     $showStudentZoomButton = filled($selectedStudentSession?->zoom_link)
         && (!$selectedStudentSession?->end_at || now()->lte($selectedStudentSession->end_at));
 
+    $selectedStudentTopicIndex = $studentTopicsToRender->values()->search(fn($t) => (string) $t->id === (string) ($selectedStudentTopic?->id ?? ''));
+    $selectedStudentTopicLabel = ($selectedStudentTopicIndex !== false)
+        ? (filled($selectedStudentTopic?->name) ? $selectedStudentTopic->name : 'Sesi ' . ($topicOffset + $selectedStudentTopicIndex + 1))
+        : (filled($selectedStudentTopic?->name) ? $selectedStudentTopic->name : 'Sesi');
+
+    $selectedMentorTopicIndex = $mentorTopicsToRender->values()->search(fn($t) => (string) $t->id === (string) ($selectedMentorTopic?->id ?? ''));
+    $selectedMentorTopicLabel = ($selectedMentorTopicIndex !== false)
+        ? (filled($selectedMentorTopic?->name) ? $selectedMentorTopic->name : 'Sesi ' . ($topicOffset + $selectedMentorTopicIndex + 1))
+        : (filled($selectedMentorTopic?->name) ? $selectedMentorTopic->name : 'Sesi');
+
     $poster = $course->poster ?? $course->image ?? null;
     $posterSrc = null;
 
@@ -330,7 +340,7 @@
                                 <button type="button"
                                         wire:click="selectStudentTopic('{{ $topic->id }}')"
                                         class="shrink-0 rounded-2xl border px-4 py-3 text-left transition {{ (string) ($selectedStudentTopic?->id) === (string) $topic->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-white text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
-                                    <div class="text-sm font-semibold">{{ $topic->name }}</div>
+                                    <div class="text-sm font-semibold">Sesi {{ $topicOffset + $loop->iteration }}</div>
                                 </button>
                             @endforeach
                         </div>
@@ -364,7 +374,7 @@
                                     @endif
                                 >
                                     <div>
-                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedStudentTopic->name }}</h3>
+                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedStudentTopicLabel }}</h3>
                                         <p class="mt-1 text-sm leading-6 text-[color:color-mix(in_oklab,#004777_70%,white)]">
                                             {{ $selectedStudentTopic->description ?: __('general.course_show.topic_description_fallback') }}
                                         </p>
@@ -566,7 +576,7 @@
                                 <button type="button"
                                         wire:click="selectMentorTopic('{{ $topic->id }}')"
                                         class="shrink-0 rounded-2xl border px-4 py-3 text-left transition {{ (string) ($selectedMentorTopic?->id) === (string) $topic->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-white text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
-                                    <div class="text-sm font-semibold">{{ $topic->name }}</div>
+                                    <div class="text-sm font-semibold">Sesi {{ $topicOffset + $loop->iteration }}</div>
                                 </button>
                             @endforeach
                         </div>
@@ -582,7 +592,7 @@
                                 <div class="mentor-workspace-card p-5">
                                     <div class="flex flex-col gap-4">
                                     <div>
-                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedMentorTopic->name }}</h3>
+                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedMentorTopicLabel }}</h3>
                                         <p class="mt-1 text-sm leading-6 text-[color:color-mix(in_oklab,#004777_70%,white)]">
                                             {{ $selectedMentorTopic->description ?: __('general.course_show.topic_description_fallback') }}
                                         </p>
