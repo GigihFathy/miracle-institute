@@ -37,6 +37,11 @@
             'route' => 'admin.settings.index',
             'active_routes' => ['admin.settings.*'],
         ],
+        [
+            'label' => __('admin.sidebar.profile'),
+            'route' => 'admin.profile.index',
+            'active_routes' => ['admin.profile.*'],
+        ],
     ];
 
     $canMap = [

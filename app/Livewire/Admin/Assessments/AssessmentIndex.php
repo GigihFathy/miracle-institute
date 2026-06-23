@@ -9,7 +9,6 @@ use App\Models\AssessmentAttempt;
 use App\Models\Course;
 use App\Models\Question;
 use App\Models\QuestionOption;
-use App\Models\User;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -19,7 +18,6 @@ class AssessmentIndex extends Component
 
     protected array $validationAttributes = [
         'course_id' => 'course',
-        'teacher_id' => 'pengajar pengelola assessment',
         'title' => 'judul assessment',
         'passing_grade' => 'nilai kelulusan',
         'question_limit' => 'batas pertanyaan',
@@ -57,7 +55,6 @@ class AssessmentIndex extends Component
     public ?string $editingId = null;
 
     public string $course_id = '';
-    public string $teacher_id = '';
     public string $title = '';
     public int $passing_grade = 70;
     public bool $randomize_questions = false;
@@ -102,7 +99,6 @@ class AssessmentIndex extends Component
                 'exists:courses,id',
                 Rule::unique('assessments', 'course_id')->ignore($this->editingId),
             ],
-            'teacher_id' => 'nullable|exists:users,id',
             'title' => 'required|string|max:255',
             'passing_grade' => 'required|integer|min:0|max:100',
             'randomize_questions' => 'boolean',
@@ -122,8 +118,7 @@ class AssessmentIndex extends Component
             return null;
         }
 
-        return Assessment::with(['course', 'teacher', 'questions.options'])
-            ->withCount(['attempts'])
+        return Assessment::with(['course', 'questions.options'])
             ->where('course_id', $this->courseFilter)
             ->first();
     }
@@ -282,7 +277,6 @@ class AssessmentIndex extends Component
 
         $this->editingId = $row->id;
         $this->course_id = $row->course_id;
-        $this->teacher_id = $row->teacher_id ?? '';
         $this->title = $row->title;
         $this->passing_grade = (int) $row->passing_grade;
         $this->randomize_questions = (bool) $row->randomize_questions;
@@ -313,7 +307,6 @@ class AssessmentIndex extends Component
             ['id' => $this->editingId],
             [
                 'course_id' => $this->course_id,
-                'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
                 'title' => $this->title,
                 'passing_grade' => $this->passing_grade,
                 'randomize_questions' => $this->randomize_questions,
@@ -361,9 +354,6 @@ class AssessmentIndex extends Component
 
         return view('livewire.admin.assessments.index', [
             'courses' => Course::orderBy('title')->get(),
-            'teachers' => User::whereHas('roles', fn ($q) => $q->where('name', 'disciples'))
-                ->orderBy('name')
-                ->get(),
             'selectedCourse' => $selectedCourse,
             'selectedAssessment' => $selectedAssessment,
             'selectedCourseHasAssessment' => (bool) $selectedAssessment,
@@ -377,7 +367,6 @@ class AssessmentIndex extends Component
             'editingId',
             'deleteId',
             'course_id',
-            'teacher_id',
             'title',
             'passing_grade',
             'randomize_questions',
@@ -408,14 +397,5 @@ class AssessmentIndex extends Component
         if (!$this->courseFilter) {
             abort(403);
         }
-
-        $assessment = Assessment::query()
-            ->where('course_id', $this->courseFilter)
-            ->first();
-
-        abort_unless(
-            $assessment && (string) $assessment->teacher_id === (string) $user->id,
-            403
-        );
     }
 }

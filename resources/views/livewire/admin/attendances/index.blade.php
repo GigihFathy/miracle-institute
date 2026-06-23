@@ -39,7 +39,7 @@
                 <option value="">{{ __('admin.attendances.filters.all_topics') }}</option>
                 @foreach($topics as $topic)
                     <option value="{{ $topic->id }}">
-                        {{ $topic->course?->title }} Â· {{ $topic->name }}
+                        {{ $topic->course?->title }} · {{ $topic->name }}
                     </option>
                 @endforeach
             </select>
@@ -48,7 +48,7 @@
                 <option value="">{{ __('admin.attendances.filters.all_sessions') }}</option>
                 @foreach($sessions as $session)
                     <option value="{{ $session->id }}">
-                        {{ $session->topic?->name }} Â· {{ $session->title }}
+                        {{ $session->topic?->name }} · {{ $session->title }}
                     </option>
                 @endforeach
             </select>
@@ -164,7 +164,7 @@
                     <option value="">{{ __('admin.attendances.form.select_session') }}</option>
                     @foreach($sessions as $session)
                         <option value="{{ $session->id }}">
-                            {{ $session->topic?->name }} Â· {{ $session->title }}
+                            {{ $session->topic?->name }} · {{ $session->title }}
                         </option>
                     @endforeach
                 </select>
@@ -175,7 +175,7 @@
                     <option value="">{{ __('admin.attendances.form.select_user') }}</option>
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">
-                            {{ $user->full_name }} Â· {{ $user->email }}
+                            {{ $user->full_name }} · {{ $user->email }}
                         </option>
                     @endforeach
                 </select>

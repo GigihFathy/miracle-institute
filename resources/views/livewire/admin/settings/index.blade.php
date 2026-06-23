@@ -2,7 +2,7 @@
     <x-ui.page-header title="{{ __('admin.settings.page_title') }}" subtitle="{{ __('admin.settings.page_subtitle') }}" />
 
     <!-- General Settings Card (Yang sudah kamu buat) -->
-    <div class="max-w-4xl space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+    <div class="max-w-4xl space-y-4 rounded-2xl border bg-white p-6">
         <div class="border-b pb-4 mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Profil Perusahaan</h3>
             <p class="text-sm text-gray-500">Atur informasi dasar dan kontak platform.</p>
@@ -92,7 +92,7 @@
         </button>
     </div>
 
-     <div class="max-w-4xl rounded-2xl border bg-white p-6 shadow-sm">
+     <div class="max-w-4xl rounded-2xl border bg-white p-6">
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
             <div class="space-y-1">
                 <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">

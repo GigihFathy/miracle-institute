@@ -42,14 +42,10 @@
             </div>
 
             @if($selectedAssessment)
-                <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
                     <div class="rounded-2xl border bg-slate-50 p-4">
                         <div class="text-xs text-slate-500">{{ __('admin.assessments.table.assessment') }}</div>
                         <div class="mt-1 font-semibold">{{ $selectedAssessment->title }}</div>
-                    </div>
-                    <div class="rounded-2xl border bg-slate-50 p-4">
-                        <div class="text-xs text-slate-500">Pengajar</div>
-                        <div class="mt-1 font-semibold">{{ $selectedAssessment->teacher?->name ?? '-' }}</div>
                     </div>
                     <div class="rounded-2xl border bg-slate-50 p-4">
                         <div class="text-xs text-slate-500">{{ __('admin.question_manager.stats.passing_grade') }}</div>
@@ -65,10 +61,6 @@
                                     : $selectedAssessment->questions->count(),
                             ]) }}
                         </div>
-                    </div>
-                    <div class="rounded-2xl border bg-slate-50 p-4">
-                        <div class="text-xs text-slate-500">{{ __('admin.question_manager.stats.attempts') }}</div>
-                        <div class="mt-1 font-semibold">{{ $selectedAssessment->attempts_count ?? 0 }}</div>
                     </div>
                 </div>
 
@@ -87,12 +79,11 @@
                                 <tr class="border-t align-top">
                                     <td class="p-4">
                                         <div class="font-medium text-slate-900">{{ $question->question }}</div>
-                                        <div class="text-xs text-slate-500">{{ $question->question_type }}</div>
                                     </td>
                                     <td class="space-y-1 p-4 text-xs text-slate-700">
                                         @foreach($question->options as $option)
                                             <div class="{{ $option->is_correct ? 'font-semibold text-emerald-600' : '' }}">
-                                                {{ $option->is_correct ? 'âœ“' : 'â€¢' }} {{ $option->option_text }}
+                                                {{ $option->is_correct ? '✓' : '•' }} {{ $option->option_text }}
                                             </div>
                                         @endforeach
                                     </td>
@@ -160,7 +151,7 @@
                     </h2>
 
                     <button type="button" wire:click="$set('showModal', false)" class="text-slate-500 hover:text-black">
-                        âœ•
+                        ✕
                     </button>
                 </div>
 
@@ -201,21 +192,6 @@
                             @enderror
                         </div>
                     @endif
-
-                    <div class="space-y-1">
-                        <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Pengajar Pengelola Assessment
-                        </label>
-                        <select wire:model="teacher_id" class="w-full rounded-xl border px-4 py-2">
-                            <option value="">{{ __('admin.assessments.form.select_teacher') }}</option>
-                            @foreach($teachers as $teacher)
-                                <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('teacher_id')
-                            <p class="text-sm text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
 
                     <div class="space-y-1">
                         <label class="mb-1 block text-xs font-semibold text-slate-600">
@@ -307,7 +283,7 @@
                     </h2>
 
                     <button type="button" wire:click="$set('questionModalOpen', false)" class="text-slate-500 hover:text-black">
-                        âœ•
+                        ✕
                     </button>
                 </div>
 
@@ -320,10 +296,6 @@
                         <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                             Periksa kembali field pertanyaan yang wajib diisi.
                         </div>
-                    @endif
-
-                    @if($selectedAssessment)
-                        <div class="rounded-xl border px-4 py-2 bg-slate-50 text-sm">{{ $selectedCourse?->title }} Â· {{ $selectedAssessment->title }}</div>
                     @endif
 
                     <div class="space-y-4">
@@ -350,7 +322,7 @@
                                         wire:click="$set('question_correctIndex', {{ $i }})"
                                         class="flex h-5 w-5 items-center justify-center rounded border {{ $question_correctIndex === $i ? 'bg-emerald-600 text-white' : 'bg-white' }}"
                                     >
-                                        @if($question_correctIndex === $i) âœ“ @endif
+                                        @if($question_correctIndex === $i) ✓ @endif
                                     </button>
 
                                     <input type="text"

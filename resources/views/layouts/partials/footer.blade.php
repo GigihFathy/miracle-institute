@@ -31,7 +31,7 @@
         <div>
             <h3 class="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-white">{{ __('general.footer.navigation.title') }}</h3>
             <ul class="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-1">
-                <li><a href="{{ localized_route('explore.dashboard') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.dashboard') }}</a></li>
+                <li><a href="{{ localized_route('explore.dashboard') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">Home</a></li>
                 <li><a href="{{ localized_route('courses.index') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">{{ __('general.navigation.courses') }}</a></li>
                 <li><a href="{{ localized_route('legal.terms') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">Terms &amp; Conditions</a></li>
                 <li><a href="{{ localized_route('legal.privacy') }}" class="block rounded-xl px-3 py-2.5 transition hover:bg-white/10 hover:text-white">Privacy Policy</a></li>

@@ -19,6 +19,12 @@ class UserRoleManager extends Component
 
     public function save(): void
     {
+        $roleNames = Role::whereIn('id', $this->selectedRoles)->pluck('name');
+        if ($roleNames->contains('admin') && $roleNames->intersect(['student', 'disciples'])->isNotEmpty()) {
+            $this->dispatch('toast', type: 'error', message: 'Admin tidak bisa digabung dengan role Student atau Disciples.');
+            return;
+        }
+
         $this->user->roles()->sync($this->selectedRoles);
         $this->dispatch('toast', type: 'success', message: 'Roles updated.');
     }

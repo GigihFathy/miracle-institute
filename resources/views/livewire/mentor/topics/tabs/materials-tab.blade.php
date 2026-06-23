@@ -76,10 +76,10 @@
                         wire:click="selectMaterial(@js($material->id))"
                         class="w-full rounded-xl border p-4 text-left transition {{ $selectedMaterial?->id === $material->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-[var(--mentor-primary-soft-2)] text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
                     <div class="truncate text-sm font-medium">
-                        #{{ $material->sort_order }} Â· {{ $material->name }}
+                        #{{ $material->sort_order }} · {{ $material->name }}
                     </div>
                     <div class="mt-1 text-xs">
-                        {{ strtoupper($material->type) }} Â· {{ ucfirst($material->status) }}
+                        {{ strtoupper($material->type) }} · {{ ucfirst($material->status) }}
                     </div>
                 </button>
             @empty
