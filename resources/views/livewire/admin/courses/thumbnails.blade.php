@@ -108,7 +108,7 @@
                     <img
                         src="{{ course_thumbnail_url($thumbnail['path']) }}"
                         alt="{{ $thumbnail['name'] }}"
-                        class="h-44 w-full object-cover"
+                        class="h-52 w-full object-cover"
                     >
 
                     <div class="space-y-3 p-4">
