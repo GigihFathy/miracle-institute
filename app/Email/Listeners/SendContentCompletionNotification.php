@@ -12,6 +12,8 @@ class SendContentCompletionNotification
 {
     public function handle(ContentCompleted $event): void
     {
+        return;
+
         if ($event->subjectType === 'course_enrollment') {
             $enrollment = CourseEnrollment::with(['user', 'course'])
                 ->findOrFail($event->subjectId);

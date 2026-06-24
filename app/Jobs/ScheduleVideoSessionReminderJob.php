@@ -15,7 +15,8 @@ class ScheduleVideoSessionReminderJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        public string $videoSessionId
+        public string $videoSessionId,
+        public string $reminderType = 'h2',
     ) {
         $this->onQueue('emails');
     }
@@ -28,6 +29,6 @@ class ScheduleVideoSessionReminderJob implements ShouldQueue
             return;
         }
 
-        event(new VideoSessionReminderTriggered($session->id));
+        event(new VideoSessionReminderTriggered($session->id, $this->reminderType));
     }
 }

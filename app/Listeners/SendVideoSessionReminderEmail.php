@@ -8,7 +8,6 @@ use App\Notifications\VideoSessionReminderNotification;
 
 class SendVideoSessionReminderEmail
 {
-
     public string $queue = 'emails';
 
     public function handle(VideoSessionReminderTriggered $event): void
@@ -22,12 +21,13 @@ class SendVideoSessionReminderEmail
             ])
             ->findOrFail($event->videoSessionId);
 
-        if ($session->reminder_sent_at) {
+        $sentAtField = $event->reminderType === 'h1' ? 'h1_reminder_sent_at' : 'reminder_sent_at';
+
+        if ($session->$sentAtField) {
             return;
         }
 
         foreach ($session->topic->course->enrollments as $enrollment) {
-
             if (!$enrollment->user) {
                 continue;
             }
@@ -38,7 +38,7 @@ class SendVideoSessionReminderEmail
         }
 
         $session->forceFill([
-            'reminder_sent_at' => now(),
+            $sentAtField => now(),
         ])->save();
     }
 }

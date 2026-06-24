@@ -10,6 +10,8 @@ class SendAssessmentSubmissionNotification
 {
     public function handle(AssessmentSubmissionProcessed $event): void
     {
+        return;
+
         $attempt = AssessmentAttempt::with(['user', 'assessment'])
             ->findOrFail($event->attemptId);
 
