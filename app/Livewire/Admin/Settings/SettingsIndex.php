@@ -31,10 +31,16 @@ class SettingsIndex extends Component
         $company = Company::first();
 
         if ($company) {
-            $this->fill($company->only([
-                'name','description','address','vision','mission','logo',
-                'facebook','instagram','youtube','email',
-            ]));
+            $this->name        = $company->name        ?? '';
+            $this->description = $company->description ?? '';
+            $this->address     = $company->address     ?? '';
+            $this->vision      = $company->vision      ?? '';
+            $this->mission     = $company->mission     ?? '';
+            $this->logo        = $company->logo        ?? '';
+            $this->facebook    = $company->facebook    ?? '';
+            $this->instagram   = $company->instagram   ?? '';
+            $this->youtube     = $company->youtube     ?? '';
+            $this->email       = $company->email       ?? '';
         }
 
         $this->checkGoogleConnection();
