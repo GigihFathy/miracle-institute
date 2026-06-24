@@ -147,6 +147,7 @@
                         @error('external_url') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     @elseif(in_array($type, ['pdf', 'ppt'], true))
                         <input type="file" wire:model="materialFile" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="w-full rounded-xl border px-4 py-2">
+                        <p class="mt-1 text-[11px] text-slate-500">Format: PDF, PPT, PPTX · Maks. 10 MB</p>
                         @error('materialFile') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     @endif
 

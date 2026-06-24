@@ -66,7 +66,7 @@ class MaterialIndex extends Component
             'visibility' => ['required', Rule::in(Material::VISIBILITIES)],
             'status' => ['required', Rule::in(Material::STATUSES)],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-            'materialFile' => ['nullable', 'file', 'mimes:pdf,ppt,pptx', 'max:51200'],
+            'materialFile' => ['nullable', 'file', 'mimes:pdf,ppt,pptx', 'max:10240'],
             'external_url' => [
                 'nullable',
                 Rule::requiredIf($this->type === 'video'),
