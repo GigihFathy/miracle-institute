@@ -143,7 +143,7 @@ class CourseShow extends Component
 
         if ($studentTopics->isNotEmpty()) {
             $this->selectedStudentTopicId = $studentTopics->first()->id;
-            $this->selectedStudentMaterialId = $studentTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedStudentMaterialId = $studentTopics->first()?->materials->where('status', 'active')->sortBy('sort_order')->first()?->id;
             $this->selectedStudentSessionId = $this->resolveLatestSessionId($studentTopics->first());
         }
 
@@ -276,7 +276,7 @@ class CourseShow extends Component
         if ($studentTopics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
             $this->selectedStudentTopicId = $topicId;
             $topic = $studentTopics->firstWhere('id', $topicId);
-            $this->selectedStudentMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedStudentMaterialId = $topic?->materials->where('status', 'active')->sortBy('sort_order')->first()?->id;
             $this->selectedStudentSessionId = $this->resolveLatestSessionId($topic);
         }
     }
@@ -292,7 +292,7 @@ class CourseShow extends Component
         }
 
         $this->selectedStudentTopicId = $topic->id;
-        $this->selectedStudentMaterialId = $topic->materials->sortBy('sort_order')->first()?->id;
+        $this->selectedStudentMaterialId = $topic->materials->where('status', 'active')->sortBy('sort_order')->first()?->id;
         $this->selectedStudentSessionId = $sessionId;
     }
 
@@ -300,7 +300,7 @@ class CourseShow extends Component
     {
         $topic = $this->studentTopics()->firstWhere('id', $this->selectedStudentTopicId);
 
-        if ($topic && $topic->materials->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
+        if ($topic && $topic->materials->where('status', 'active')->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
             $this->selectedStudentMaterialId = $materialId;
         }
     }
@@ -879,7 +879,7 @@ class CourseShow extends Component
             ->toArray();
 
         $materialIds = $this->studentTopics()
-            ->flatMap(fn (Topic $topic) => $topic->materials->pluck('id'))
+            ->flatMap(fn (Topic $topic) => $topic->materials->where('status', 'active')->pluck('id'))
             ->filter()
             ->values();
 

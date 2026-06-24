@@ -22,7 +22,6 @@ class MaterialFactory extends Factory
             'type' => 'pdf',
             'path' => null,
             'external_url' => null,
-            'visibility' => 'public',
             'sort_order' => 1,
             'status' => 'active',
         ];

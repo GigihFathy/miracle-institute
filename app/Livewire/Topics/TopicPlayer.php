@@ -504,8 +504,7 @@ class TopicPlayer extends Component
             ->orderBy('created_at');
 
         if (! $this->canOpenMentorWorkspace) {
-            $query->where('status', 'active')
-                ->where('visibility', 'public');
+            $query->where('status', 'active');
         }
 
         return $query;
@@ -584,7 +583,6 @@ class TopicPlayer extends Component
         $videoMaterialIds = $this->topic->materials()
             ->where('type', 'video')
             ->where('status', 'active')
-            ->where('visibility', 'public')
             ->pluck('id');
 
         if ($videoMaterialIds->isEmpty()) {
@@ -621,7 +619,6 @@ class TopicPlayer extends Component
         $videoMaterials = $this->topic->materials()
             ->where('type', 'video')
             ->where('status', 'active')
-            ->where('visibility', 'public')
             ->get();
 
         foreach ($videoMaterials as $material) {

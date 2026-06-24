@@ -44,7 +44,7 @@
         ?? $studentTopics->firstWhere('id', $this->selectedStudentTopicId)
         ?? $studentTopicsToRender->first()
         ?? $studentTopics->first();
-    $selectedStudentMaterials = $selectedStudentTopic?->materials->sortBy('sort_order')->values() ?? collect();
+    $selectedStudentMaterials = $selectedStudentTopic?->materials->where('status', 'active')->sortBy('sort_order')->values() ?? collect();
     $selectedStudentMaterial = $selectedStudentMaterials->firstWhere('id', $this->selectedStudentMaterialId) ?? $selectedStudentMaterials->first();
     $selectedStudentMaterialPreviewUrl = app(\App\Services\Materials\MaterialAssetService::class)->resolvePreviewUrl($selectedStudentMaterial);
     $selectedStudentMaterialProgress = $selectedStudentMaterial ? ($this->materialProgressMap[$selectedStudentMaterial->id] ?? 'not_started') : 'not_started';
@@ -543,7 +543,7 @@
                                 @endif
 
                                 <div class="mt-6">
-                                    <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">List Materi ({{ $selectedStudentTopic->materials_count ?? $selectedStudentTopic->materials->count() }})</div>
+                                    <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">List Materi ({{ $selectedStudentMaterials->count() }})</div>
                                     <div class="mt-3 space-y-2">
                                         @forelse($selectedStudentMaterials as $material)
                                             @php

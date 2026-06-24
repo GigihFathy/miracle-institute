@@ -188,7 +188,6 @@ class MaterialsTab extends Component
                     'type' => $this->materialType,
                     'path' => $asset['path'],
                     'external_url' => $asset['external_url'],
-                    'visibility' => 'public',
                     'sort_order' => $this->materialSortOrder,
                     'status' => $this->materialStatus,
                 ];

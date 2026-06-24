@@ -91,7 +91,7 @@ class ProgressService
     {
         $topic = Topic::query()
             ->with([
-                'materials:id,topic_id,name,sort_order',
+                'materials:id,topic_id,name,sort_order,status',
                 'videoSessions:id,topic_id,title,start_at,end_at,status',
             ])
             ->findOrFail($topicId);
@@ -100,7 +100,9 @@ class ProgressService
 
         $this->syncEndedSessionAbsences($userId, $topic);
 
-        $materialIds = $topic->materials->pluck('id')->all();
+        $activeMaterials = $topic->materials->where('status', 'active');
+
+        $materialIds = $activeMaterials->pluck('id')->all();
 
         $materialProgresses = MaterialProgress::query()
             ->where('user_id', $userId)
@@ -108,11 +110,11 @@ class ProgressService
             ->get()
             ->keyBy('material_id');
 
-        $completedMaterials = $topic->materials->filter(function ($material) use ($materialProgresses) {
+        $completedMaterials = $activeMaterials->filter(function ($material) use ($materialProgresses) {
             return ($materialProgresses[$material->id]->status ?? null) === 'completed';
         });
 
-        $incompleteMaterials = $topic->materials->filter(function ($material) use ($materialProgresses) {
+        $incompleteMaterials = $activeMaterials->filter(function ($material) use ($materialProgresses) {
             return ($materialProgresses[$material->id]->status ?? null) !== 'completed';
         });
 
@@ -155,9 +157,9 @@ class ProgressService
             ->values()
             ->all();
 
-        $allMaterialsCompleted = $topic->materials->isEmpty()
+        $allMaterialsCompleted = $activeMaterials->isEmpty()
             ? true
-            : $completedMaterials->count() === $topic->materials->count();
+            : $completedMaterials->count() === $activeMaterials->count();
 
         $allSessionsRequirementMet = $qualifyingSessions->isEmpty()
             ? true
@@ -182,7 +184,7 @@ class ProgressService
         }
 
         return [
-            'total_materials' => $topic->materials->count(),
+            'total_materials' => $activeMaterials->count(),
             'completed_materials' => $completedMaterials->count(),
             'incomplete_materials' => $incompleteMaterials->pluck('name')->values()->all(),
             'all_materials_completed' => $allMaterialsCompleted,
