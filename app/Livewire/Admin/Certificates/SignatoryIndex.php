@@ -67,6 +67,29 @@ class SignatoryIndex extends Component
     {
         $this->validate();
 
+        $activeFrom  = $this->active_from;
+        $activeUntil = $this->active_until ?: null;
+
+        $overlapping = CertificateSignatory::query()
+            ->when($this->editingId, fn ($q) => $q->where('id', '!=', $this->editingId))
+            ->where(function ($q) use ($activeFrom) {
+                $q->whereNull('active_until')
+                    ->orWhere('active_until', '>=', $activeFrom);
+            })
+            ->when($activeUntil, fn ($q) => $q->where('active_from', '<=', $activeUntil))
+            ->get();
+
+        if ($overlapping->count() >= 2) {
+            $this->addError('active_from', 'Sudah ada 2 penandatangan di periode yang sama. Maksimal 2 penandatangan per periode.');
+            return;
+        }
+
+        if ($overlapping->where('sort_order', $this->sort_order)->isNotEmpty()) {
+            $positionLabel = $this->sort_order === 0 ? 'Kiri' : 'Kanan';
+            $this->addError('sort_order', "Posisi {$positionLabel} sudah digunakan di periode yang sama.");
+            return;
+        }
+
         $data = [
             'name'         => $this->name,
             'title'        => $this->title,

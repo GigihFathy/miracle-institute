@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\RedirectUnverifiedUser::class,
         ]);
 
         $middleware->redirectUsersTo(fn (): string => localized_route('redirect.by.role'));
