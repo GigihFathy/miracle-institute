@@ -65,8 +65,8 @@
     $isStudentMaterialLocked = !$selectedStudentSession?->end_at || now()->lt($selectedStudentSession->end_at);
     $selectedStudentAttendanceStatus = $selectedStudentAttendance?->status;
     $videoMaterialInTopic = $selectedStudentMaterials->firstWhere('type', 'video');
-    $isVideoCompletedInTopic = !$videoMaterialInTopic
-        || ($this->materialProgressMap[$videoMaterialInTopic->id] ?? 'not_started') === 'completed';
+    $isVideoCompletedInTopic = $videoMaterialInTopic !== null
+        && ($this->materialProgressMap[$videoMaterialInTopic->id] ?? 'not_started') === 'completed';
     $nonVideoAccessible = !$isStudentMaterialLocked && (
         $selectedStudentAttendanceStatus === 'present'
         || (in_array($selectedStudentAttendanceStatus, ['late', 'online'], true) && $isVideoCompletedInTopic)
