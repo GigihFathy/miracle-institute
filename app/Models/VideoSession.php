@@ -72,7 +72,7 @@ class VideoSession extends Model
         return $this->start_at
             && $this->end_at
             && in_array($this->status, ['scheduled', 'ongoing'], true)
-            && $moment->betweenIncluded($this->start_at, $this->start_at->copy()->addHour());
+            && $moment->betweenIncluded($this->start_at, $this->end_at);
     }
 
     public function canClockInAt(CarbonInterface $moment): bool
