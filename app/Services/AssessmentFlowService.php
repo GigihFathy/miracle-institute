@@ -310,6 +310,7 @@ class AssessmentFlowService
 
         $topicIds = Topic::query()
             ->where('course_id', $assessment->course_id)
+            ->where('status', '!=', 'archived')
             ->pluck('id')
             ->all();
 

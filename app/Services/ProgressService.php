@@ -263,6 +263,7 @@ class ProgressService
 
         $topicIds = Topic::query()
             ->where('course_id', $courseId)
+            ->where('status', '!=', 'archived')
             ->pluck('id')
             ->all();
 

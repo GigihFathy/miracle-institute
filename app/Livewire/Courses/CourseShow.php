@@ -512,8 +512,10 @@ class CourseShow extends Component
 
     public function getCompletedTopicsCountProperty(): int
     {
+        $visibleTopicIds = $this->studentTopics()->pluck('id')->map(fn ($id) => (string) $id)->flip();
+
         return collect($this->topicStatusMap)
-            ->filter(fn ($status) => $status === 'completed')
+            ->filter(fn ($status, $topicId) => $status === 'completed' && $visibleTopicIds->has((string) $topicId))
             ->count();
     }
 
@@ -557,7 +559,7 @@ class CourseShow extends Component
     public function getUpcomingTopicsCountProperty(): int
     {
         return $this->course->topics
-            ->filter(fn (Topic $topic) => ! $this->topicIsVisibleToStudents($topic))
+            ->filter(fn (Topic $topic) => $topic->status === 'draft')
             ->filter(fn (Topic $topic) => $this->topicHasUpcomingStudentContent($topic))
             ->count();
     }
