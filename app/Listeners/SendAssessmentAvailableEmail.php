@@ -11,6 +11,8 @@ class SendAssessmentAvailableEmail
 {
     public function handle(AssessmentAvailable $event): void
     {
+        return;
+
         $assessment = Assessment::findOrFail($event->assessmentId);
         $user = User::findOrFail($event->userId);
 

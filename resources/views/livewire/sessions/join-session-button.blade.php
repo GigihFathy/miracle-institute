@@ -17,14 +17,16 @@
         </span>
     </div>
 
-    @if($clockInDeadlineLabel)
-        <div class="text-xs text-slate-500">
-            {{ __('general.session_join_button.clock_in_deadline') }}: {{ $clockInDeadlineLabel }}
-        </div>
-    @else
-        <div class="text-xs text-amber-600">
-            {{ __('general.session_join_button.schedule_incomplete') }}
-        </div>
+    @if(!$sessionEnded)
+        @if($clockInDeadlineLabel)
+            <div class="text-xs text-slate-500">
+                {{ __('general.session_join_button.clock_in_deadline') }}: {{ $clockInDeadlineLabel }}
+            </div>
+        @else
+            <div class="text-xs text-amber-600">
+                {{ __('general.session_join_button.schedule_incomplete') }}
+            </div>
+        @endif
     @endif
 
     <div class="flex flex-wrap gap-2">
@@ -54,7 +56,7 @@
                         class="rounded-xl border px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
                     {{ __('general.session_join_button.actions.clock_out') }}
                 </button>
-            @else
+            @elseif(!$sessionEnded)
                 <div class="text-sm text-emerald-700">
                     {{ __('general.session_join_button.attendance_completed') }}
                 </div>

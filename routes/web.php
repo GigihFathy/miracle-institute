@@ -14,6 +14,7 @@ use App\Models\User;
 
 use App\Livewire\Admin\Assessments\AssessmentIndex as AdminAssessmentIndex;
 use App\Livewire\Admin\Certificates\CertificateIndex;
+use App\Livewire\Admin\Certificates\SignatoryIndex;
 use App\Livewire\Admin\Courses\CourseIndex;
 use App\Livewire\Admin\Courses\ThumbnailIndex as AdminCourseThumbnailIndex;
 use App\Livewire\Admin\Dashboard\DashboardIndex;
@@ -21,6 +22,7 @@ use App\Livewire\Admin\Materials\MaterialIndex;
 use App\Livewire\Admin\Permissions\PermissionIndex;
 use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Sessions\VideoSessionIndex;
+use App\Livewire\Admin\Profile\AdminProfileIndex;
 use App\Livewire\Admin\Settings\SettingsIndex;
 use App\Livewire\Admin\Topics\TopicIndex;
 use App\Livewire\Admin\Users\UserIndex;
@@ -134,19 +136,19 @@ $registerLocalizedRoutes = function (bool $named): void {
         return redirect()->to(localized_route('explore.dashboard'));
     }), 'home');
 
-    $nameRoute(Route::get('/dashboard/explore', ExploreDashboard::class), 'explore.dashboard');
+    $nameRoute(Route::get('/dashboard/explore', ExploreDashboard::class)->middleware('admin.redirect'), 'explore.dashboard');
 
-    $nameRoute(Route::get('/courses', CourseCatalog::class), 'courses.index');
+    $nameRoute(Route::get('/courses', CourseCatalog::class)->middleware('admin.redirect'), 'courses.index');
 
     $nameRoute(
         Route::get('/courses/{slug}', CourseShow::class)
-            ->middleware(['auth', 'set.active.role']),
+            ->middleware(['auth', 'set.active.role', 'admin.redirect']),
         'courses.show'
     );
 
-    $nameRoute(Route::get('/articles', ArticleIndex::class), 'articles.index');
+    $nameRoute(Route::get('/articles', ArticleIndex::class)->middleware('admin.redirect'), 'articles.index');
 
-    $nameRoute(Route::get('/articles/{article}', ArticleShow::class), 'articles.show');
+    $nameRoute(Route::get('/articles/{article}', ArticleShow::class)->middleware('admin.redirect'), 'articles.show');
 
     $nameRoute(Route::view('/terms-and-conditions', 'legal.terms'), 'legal.terms');
     $nameRoute(Route::view('/privacy-policy', 'legal.privacy'), 'legal.privacy');
@@ -205,7 +207,7 @@ $registerLocalizedRoutes = function (bool $named): void {
             return redirect()->to(localized_route('redirect.by.role'));
         }), 'role.switch');
 
-        $nameRoute(Route::get('/profile', ProfilePage::class), 'profile.show');
+        $nameRoute(Route::get('/profile', ProfilePage::class)->middleware('admin.redirect'), 'profile.show');
         $nameRoute(Route::get('/email/verify', VerifyEmailNotice::class), 'verification.notice');
 
         $nameRoute(
@@ -530,6 +532,18 @@ $registerLocalizedRoutes = function (bool $named): void {
                     );
 
                     $nameRoute(
+                        Route::get('/certificate-signatories', SignatoryIndex::class)
+                            ->middleware('permission:manage_certificates'),
+                        'signatories.index'
+                    );
+
+                    $nameRoute(
+                        Route::get('/certificate-signatories/preview', [CertificateController::class, 'previewSignatories'])
+                            ->middleware('permission:manage_certificates'),
+                        'signatories.preview'
+                    );
+
+                    $nameRoute(
                         Route::get('/articles', \App\Livewire\Admin\Articles\ArticleIndex::class)
                             ->middleware('permission:view_reports'),
                         'articles.index'
@@ -545,6 +559,11 @@ $registerLocalizedRoutes = function (bool $named): void {
                         Route::get('/articles/{article}/edit', \App\Livewire\Admin\Articles\ArticleForm::class)
                             ->middleware('permission:view_reports'),
                         'articles.edit'
+                    );
+
+                    $nameRoute(
+                        Route::get('/profile', AdminProfileIndex::class),
+                        'profile.index'
                     );
 
                     $nameRoute(

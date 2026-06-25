@@ -38,7 +38,6 @@
                         <th class="px-4 py-3 font-medium">{{ __('admin.materials.table.name') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.materials.table.type') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.materials.table.source') }}</th>
-                        <th class="px-4 py-3 font-medium">{{ __('admin.materials.table.visibility') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.materials.table.status') }}</th>
                         <th class="px-4 py-3 font-medium">{{ __('admin.materials.table.action') }}</th>
                     </tr>
@@ -52,7 +51,6 @@
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ strtoupper($row->type) }}</td>
                             <td class="px-4 py-3 break-all text-xs text-slate-500">{{ $row->path ?: $row->external_url }}</td>
-                            <td class="px-4 py-3 whitespace-nowrap">{{ __('admin.materials.visibility.' . $row->visibility, [], $row->visibility) }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ __('admin.materials.status.' . $row->status, [], $row->status) }}</td>
                             <td class="px-4 py-3">
                                 <div class="flex flex-wrap gap-2">
@@ -147,27 +145,17 @@
                         @error('external_url') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     @elseif(in_array($type, ['pdf', 'ppt'], true))
                         <input type="file" wire:model="materialFile" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" class="w-full rounded-xl border px-4 py-2">
+                        <p class="mt-1 text-[11px] text-slate-500">Format: PDF, PPT, PPTX · Maks. 10 MB</p>
                         @error('materialFile') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     @endif
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                        <label class="mb-1 block text-xs font-semibold text-slate-600">Visibilitas <span class="text-rose-500">*</span></label>
-                            <select wire:model.live="visibility" class="w-full rounded-xl border px-4 py-2">
-                            <option value="public">{{ __('admin.materials.visibility.public') }}</option>
-                            <option value="private">{{ __('admin.materials.visibility.private') }}</option>
-                            </select>
-                            @error('visibility') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label class="mb-1 block text-xs font-semibold text-slate-600">Status <span class="text-rose-500">*</span></label>
-                            <select wire:model.live="status" class="w-full rounded-xl border px-4 py-2">
+                    <div>
+                        <label class="mb-1 block text-xs font-semibold text-slate-600">Status <span class="text-rose-500">*</span></label>
+                        <select wire:model.live="status" class="w-full rounded-xl border px-4 py-2">
                             <option value="active">{{ __('admin.materials.status.active') }}</option>
                             <option value="inactive">{{ __('admin.materials.status.inactive') }}</option>
-                            </select>
-                            @error('status') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-                        </div>
+                        </select>
+                        @error('status') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>
 
                     <div>

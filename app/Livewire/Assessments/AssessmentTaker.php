@@ -41,6 +41,10 @@ class AssessmentTaker extends Component
 
         $this->assessment = $assessment->loadMissing(['course']);
 
+        if ($assessment->available_from && now()->lt($assessment->available_from)) {
+            abort(403, 'Soal belum dapat diakses. Tersedia mulai ' . $assessment->available_from->format('d M Y H:i') . '.');
+        }
+
         $passedAttempt = $flowService->latestPassedAttempt($this->assessment->id, Auth::id());
         if ($passedAttempt) {
             redirect()->route('assessments.result', $passedAttempt->id);

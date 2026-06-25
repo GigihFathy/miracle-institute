@@ -16,14 +16,20 @@ class ScheduleVideoSessionReminder
             return;
         }
 
-        $reminderAt = $session->start_at->copy()->subDays(2);
+        $h2At = $session->start_at->copy()->subDays(2);
 
-        if ($reminderAt->isPast()) {
-            return;
+        if (! $h2At->isPast()) {
+            ScheduleVideoSessionReminderJob::dispatch($session->id, 'h2')
+                ->delay($h2At)
+                ->onQueue('emails');
         }
 
-        ScheduleVideoSessionReminderJob::dispatch($session->id)
-            ->delay($reminderAt)
-            ->onQueue('emails');
+        $h1At = $session->start_at->copy()->subHour();
+
+        if (! $h1At->isPast()) {
+            ScheduleVideoSessionReminderJob::dispatch($session->id, 'h1')
+                ->delay($h1At)
+                ->onQueue('emails');
+        }
     }
 }

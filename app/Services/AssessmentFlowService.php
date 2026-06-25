@@ -64,6 +64,12 @@ class AssessmentFlowService
             ]);
         }
 
+        if ($assessment->available_from && now()->lt($assessment->available_from)) {
+            throw ValidationException::withMessages([
+                'assessment' => 'Soal belum dapat diakses. Tersedia mulai ' . $assessment->available_from->format('d M Y H:i') . '.',
+            ]);
+        }
+
         $existingPassed = $this->latestPassedAttempt($assessmentId, $userId);
         if ($existingPassed) {
             return $existingPassed;
@@ -304,6 +310,7 @@ class AssessmentFlowService
 
         $topicIds = Topic::query()
             ->where('course_id', $assessment->course_id)
+            ->where('status', '!=', 'archived')
             ->pluck('id')
             ->all();
 
@@ -325,13 +332,8 @@ class AssessmentFlowService
     private function resolveQuestions(Assessment $assessment): Collection
     {
         $query = $assessment->questions()
-            ->with(['options' => fn ($q) => $q->orderBy('sort_order')]);
-
-        if ($assessment->randomize_questions) {
-            $query->inRandomOrder();
-        } else {
-            $query->orderBy('sort_order');
-        }
+            ->with(['options' => fn ($q) => $q->orderBy('sort_order')])
+            ->inRandomOrder();
 
         if ($assessment->question_limit) {
             $query->limit($assessment->question_limit);

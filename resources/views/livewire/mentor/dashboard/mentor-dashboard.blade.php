@@ -18,8 +18,8 @@
     $calendarMonths = __('admin.dashboard.calendar.months');
 @endphp
 
-<div class="min-h-screen bg-white px-4 pb-16 pt-8 text-[#0f172a] sm:px-6 sm:pb-24 sm:pt-12 lg:px-8">
-    <main class="mx-auto max-w-6xl space-y-8">
+<div class="min-h-screen bg-white pb-16 text-[#0f172a] sm:pb-24">
+    <div class="mx-auto max-w-6xl space-y-8">
         <section class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
             <div class="relative overflow-hidden rounded-[2rem] bg-[#eef8ff] px-7 py-9 sm:px-10 sm:py-12">
                 <div class="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#35A7FF]/10 blur-3xl" aria-hidden="true"></div>
@@ -232,7 +232,7 @@
             </section>
         @endif
 
-        <div class="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+        <div>
             <section class="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-7">
                 <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
@@ -344,41 +344,8 @@
                 @endif
             </section>
 
-            <section class="rounded-[1.5rem] border border-slate-200 bg-white p-5 sm:p-7">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-[#004777]">
-                        {{ __('mentor.dashboard.recent_materials.title') }}
-                    </h2>
-                    <p class="mt-1 text-sm leading-6 text-slate-500">
-                        {{ __('mentor.dashboard.recent_materials.subtitle') }}
-                    </p>
-                </div>
-
-                <div class="space-y-2">
-                    @forelse($latestMaterials as $material)
-                        <article class="rounded-xl border border-slate-200 px-4 py-3">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="min-w-0">
-                                    <h3 class="break-words text-sm font-semibold text-[#004777]">{{ $material->name }}</h3>
-                                    <p class="mt-1 break-words text-xs leading-5 text-slate-500">
-                                        {{ $material->topic?->course?->title }} &middot; {{ $material->topic?->name }}
-                                    </p>
-                                </div>
-
-                                <span class="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">
-                                    {{ strtoupper($material->type) }}
-                                </span>
-                            </div>
-                        </article>
-                    @empty
-                        <div class="rounded-2xl border border-dashed border-slate-300 px-6 py-10 text-center text-sm text-slate-500">
-                            {{ __('mentor.dashboard.recent_materials.empty') }}
-                        </div>
-                    @endforelse
-                </div>
-            </section>
         </div>
-    </main>
+    </div>
 </div>
 
 @push('scripts')

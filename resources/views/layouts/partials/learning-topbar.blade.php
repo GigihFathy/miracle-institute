@@ -17,7 +17,7 @@
 
             <div class="min-w-0 flex flex-1 items-center gap-5">
                 <a href="{{ localized_route('dashboard') }}" class="flex shrink-0 items-center gap-3">
-                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'LMS') }} logo" class="h-32 w-32 object-contain">
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name', 'LMS') }} logo" class="h-10 w-auto object-contain">
                     <span class="sr-only">{{ config('app.name', 'LMS') }}</span>
                 </a>
 

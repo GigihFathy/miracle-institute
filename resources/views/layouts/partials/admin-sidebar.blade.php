@@ -18,6 +18,11 @@
             ],
         ],
         [
+            'label' => 'Penandatangan',
+            'route' => 'admin.signatories.index',
+            'active_routes' => ['admin.signatories.*'],
+        ],
+        [
             'label' => __('admin.sidebar.users'),
             'route' => 'admin.users.index',
             'active_routes' => ['admin.users.*'],
@@ -37,6 +42,11 @@
             'route' => 'admin.settings.index',
             'active_routes' => ['admin.settings.*'],
         ],
+        [
+            'label' => __('admin.sidebar.profile'),
+            'route' => 'admin.profile.index',
+            'active_routes' => ['admin.profile.*'],
+        ],
     ];
 
     $canMap = [
@@ -49,6 +59,7 @@
         'admin.users.index' => 'manage_users',
         'admin.roles.index' => 'manage_users',
         'admin.permissions.index' => 'manage_users',
+        'admin.signatories.index' => 'manage_certificates',
         'admin.audit.index' => 'view_reports',
         'admin.settings.index' => 'view_reports',
     ];

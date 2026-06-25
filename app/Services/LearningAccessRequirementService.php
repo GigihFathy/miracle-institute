@@ -39,6 +39,14 @@ class LearningAccessRequirementService
                 'Sertifikat course belum tersedia karena course ini belum memiliki soal.'
             );
         }
+
+        $assessment = $course->assessment()->first();
+
+        if ($assessment && $assessment->status === 'active' && $assessment->available_from && now()->lt($assessment->available_from)) {
+            throw new RuntimeException(
+                'Sertifikat belum dapat diklaim karena soal baru tersedia mulai ' . $assessment->available_from->format('d M Y H:i') . '.'
+            );
+        }
     }
 
     public function topicHasStudentAccessRequirements(Topic $topic): bool

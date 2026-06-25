@@ -54,8 +54,8 @@ class TopicIndex extends Component
         return [
             'course_id' => 'required|exists:courses,id',
             'teacher_id' => 'nullable|exists:users,id',
-            'name' => 'required|string|max:70',
-            'description' => 'required|string',
+            'name' => 'nullable|string|max:70',
+            'description' => 'nullable|string',
             'status' => 'required|in:published,archived,draft',
             'sort_order' => 'nullable|integer|min:0',
         ];
@@ -114,16 +114,22 @@ class TopicIndex extends Component
         $course = Course::findOrFail($this->course_id);
         $topic = $this->editingId ? Topic::findOrFail($this->editingId) : new Topic();
 
-        $topic->forceFill([
+        $slug = filled($this->name)
+            ? Str::slug($this->name)
+            : ($this->editingId ? ($topic->slug ?: 'sesi-' . Str::random(8)) : 'sesi-' . Str::random(8));
+
+        $data = [
             'course_id' => $this->course_id,
             'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
             'name' => $this->name,
             'category' => Str::slug($course->title),
-            'slug' => Str::slug($this->name),
+            'slug' => $slug,
             'description' => $this->description,
             'status' => $this->normalizeStatus($this->status),
             'sort_order' => $this->sort_order,
-        ]);
+        ];
+
+        $topic->forceFill($data);
 
         if ($this->normalizeStatus($this->status) === 'published') {
             try {
@@ -135,19 +141,7 @@ class TopicIndex extends Component
             }
         }
 
-        Topic::updateOrCreate(
-            ['id' => $this->editingId],
-            [
-                'course_id' => $this->course_id,
-                'teacher_id' => $this->teacher_id !== '' ? $this->teacher_id : null,
-                'name' => $this->name,
-                'category' => Str::slug($course->title),
-                'slug' => Str::slug($this->name),
-                'description' => $this->description,
-                'status' => $this->normalizeStatus($this->status),
-                'sort_order' => $this->sort_order,
-            ]
-        );
+        Topic::updateOrCreate(['id' => $this->editingId], $data);
 
         $this->resetForm();
         $this->showModal = false;

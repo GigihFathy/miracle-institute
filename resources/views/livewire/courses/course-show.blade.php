@@ -44,7 +44,7 @@
         ?? $studentTopics->firstWhere('id', $this->selectedStudentTopicId)
         ?? $studentTopicsToRender->first()
         ?? $studentTopics->first();
-    $selectedStudentMaterials = $selectedStudentTopic?->materials->sortBy('sort_order')->values() ?? collect();
+    $selectedStudentMaterials = $selectedStudentTopic?->materials->where('status', 'active')->sortBy('sort_order')->values() ?? collect();
     $selectedStudentMaterial = $selectedStudentMaterials->firstWhere('id', $this->selectedStudentMaterialId) ?? $selectedStudentMaterials->first();
     $selectedStudentMaterialPreviewUrl = app(\App\Services\Materials\MaterialAssetService::class)->resolvePreviewUrl($selectedStudentMaterial);
     $selectedStudentMaterialProgress = $selectedStudentMaterial ? ($this->materialProgressMap[$selectedStudentMaterial->id] ?? 'not_started') : 'not_started';
@@ -63,8 +63,43 @@
         : null;
     $selectedStudentSessionEndLabel = $selectedStudentSession?->end_at?->format('d M Y H:i');
     $isStudentMaterialLocked = !$selectedStudentSession?->end_at || now()->lt($selectedStudentSession->end_at);
+    $selectedStudentAttendanceStatus = $selectedStudentAttendance?->status;
+    $videoMaterialInTopic = $selectedStudentMaterials->firstWhere('type', 'video');
+    $isVideoCompletedInTopic = $videoMaterialInTopic !== null
+        && ($this->materialProgressMap[$videoMaterialInTopic->id] ?? 'not_started') === 'completed';
+    $nonVideoAccessible = !$isStudentMaterialLocked && (
+        $selectedStudentAttendanceStatus === 'present'
+        || (in_array($selectedStudentAttendanceStatus, ['late', 'online'], true) && $isVideoCompletedInTopic)
+    );
+    $isSelectedMaterialLockedByAttendance = !$isStudentMaterialLocked
+        && $selectedStudentMaterial !== null
+        && $selectedStudentMaterial->type !== 'video'
+        && !$nonVideoAccessible;
+    $isSelectedStudentMaterialLocked = $isStudentMaterialLocked || $isSelectedMaterialLockedByAttendance;
     $showStudentZoomButton = filled($selectedStudentSession?->zoom_link)
         && (!$selectedStudentSession?->end_at || now()->lte($selectedStudentSession->end_at));
+
+    $selectedStudentTopicIndex = $studentTopicsToRender->values()->search(fn($t) => (string) $t->id === (string) ($selectedStudentTopic?->id ?? ''));
+    $selectedStudentTopicLabel = ($selectedStudentTopicIndex !== false)
+        ? (filled($selectedStudentTopic?->name) ? $selectedStudentTopic->name : 'Sesi ' . ($topicOffset + $selectedStudentTopicIndex + 1))
+        : (filled($selectedStudentTopic?->name) ? $selectedStudentTopic->name : 'Sesi');
+
+    $selectedMentorTopicIndex = $mentorTopicsToRender->values()->search(fn($t) => (string) $t->id === (string) ($selectedMentorTopic?->id ?? ''));
+    $selectedMentorTopicLabel = ($selectedMentorTopicIndex !== false)
+        ? (filled($selectedMentorTopic?->name) ? $selectedMentorTopic->name : 'Sesi ' . ($topicOffset + $selectedMentorTopicIndex + 1))
+        : (filled($selectedMentorTopic?->name) ? $selectedMentorTopic->name : 'Sesi');
+
+    $assessmentLockedUntil = $assessment && $assessment->available_from && now()->lt($assessment->available_from)
+        ? $assessment->available_from
+        : null;
+
+    $selectedStudentMaterialDownloadUrl = (
+        $selectedStudentMaterial
+        && in_array($selectedStudentMaterial->type, ['pdf', 'ppt'], true)
+        && $selectedStudentMaterial->path
+    )
+        ? app(\App\Services\Materials\GoogleDriveService::class)->toDownloadUrl($selectedStudentMaterial->path)
+        : null;
 
     $poster = $course->poster ?? $course->image ?? null;
     $posterSrc = null;
@@ -186,6 +221,8 @@
                                     <a href="{{ localized_route('assessments.take', $assessment->id) }}" class="admin-primary-button inline-flex rounded-lg px-3 py-1.5 text-xs">
                                         {{ $this->activeAttempt ? __('general.course_show.resume_test') : __('general.course_show.start_test') }}
                                     </a>
+                                @elseif($assessmentLockedUntil)
+                                    <span class="text-xs text-amber-700">Dapat diakses pada {{ $assessmentLockedUntil->translatedFormat('d M Y') }}</span>
                                 @else
                                     {{ __('general.course_show.locked') }}
                                 @endif
@@ -330,7 +367,7 @@
                                 <button type="button"
                                         wire:click="selectStudentTopic('{{ $topic->id }}')"
                                         class="shrink-0 rounded-2xl border px-4 py-3 text-left transition {{ (string) ($selectedStudentTopic?->id) === (string) $topic->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-white text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
-                                    <div class="text-sm font-semibold">{{ $topic->name }}</div>
+                                    <div class="text-sm font-semibold">Sesi {{ $topicOffset + $loop->iteration }}</div>
                                 </button>
                             @endforeach
                         </div>
@@ -357,16 +394,16 @@
                                         x-data="courseShowVideoProgressTracker({
                                             materialId: @js((string) $selectedStudentMaterial->id),
                                             youtubeId: @js($selectedStudentYoutubeId),
-                                            requiredPercent: 70,
-                                            initiallyUnlocked: @js($selectedStudentVideoUnlocked),
+                                            requiredPercent: 80,
+                                            initiallyUnlocked: @js($selectedStudentVideoUnlocked || $selectedStudentAttendanceStatus === 'present'),
                                         })"
                                         x-init="init()"
                                     @endif
                                 >
                                     <div>
-                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedStudentTopic->name }}</h3>
+                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedStudentTopicLabel }}</h3>
                                         <p class="mt-1 text-sm leading-6 text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                            {{ $selectedStudentTopic->description ?: __('general.course_show.topic_description_fallback') }}
+                                            {{ $selectedStudentTopic->description }}
                                         </p>
                                     </div>
 
@@ -382,28 +419,26 @@
                                                     </div>
                                                 </div>
 
-                                                @if(!$isStudentMaterialLocked)
-                                                    @if($selectedStudentMaterialProgress === 'completed')
-                                                        <span class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-                                                            <span>✓</span>
-                                                            Material selesai
-                                                        </span>
-                                                    @else
-                                                        <button
-                                                            type="button"
-                                                            wire:click="markStudentMaterialComplete('{{ $selectedStudentMaterial->id }}')"
-                                                            wire:loading.attr="disabled"
-                                                            wire:target="markStudentMaterialComplete('{{ $selectedStudentMaterial->id }}')"
-                                                            @if($isSelectedStudentTrackableVideo)
-                                                                x-bind:disabled="!isUnlocked"
-                                                                x-bind:class="!isUnlocked ? 'cursor-not-allowed opacity-50' : ''"
-                                                            @endif
-                                                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:opacity-70"
-                                                        >
-                                                            <span>✓</span>
-                                                            Tandai selesai
-                                                        </button>
-                                                    @endif
+                                                @if($selectedStudentMaterialProgress === 'completed')
+                                                    <span class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
+                                                        <span>✓</span>
+                                                        Material selesai
+                                                    </span>
+                                                @elseif(!$isSelectedStudentMaterialLocked)
+                                                    <button
+                                                        type="button"
+                                                        wire:click="markStudentMaterialComplete('{{ $selectedStudentMaterial->id }}')"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="markStudentMaterialComplete('{{ $selectedStudentMaterial->id }}')"
+                                                        @if($isSelectedStudentTrackableVideo)
+                                                            x-bind:disabled="!isUnlocked"
+                                                            x-bind:class="!isUnlocked ? 'cursor-not-allowed opacity-50' : ''"
+                                                        @endif
+                                                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#004777] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#00395f] disabled:opacity-70"
+                                                    >
+                                                        <span>✓</span>
+                                                        Tandai selesai
+                                                    </button>
                                                 @endif
                                             </div>
 
@@ -414,12 +449,23 @@
                                                         Materi bisa dibuka setelah pertemuan selesai{{ $selectedStudentSessionEndLabel ? ' pada ' . $selectedStudentSessionEndLabel : '' }}.
                                                     </div>
                                                 </div>
+                                            @elseif($isSelectedMaterialLockedByAttendance)
+                                                <div class="rounded-2xl border border-dashed border-amber-200 bg-amber-50 px-4 py-10 text-center">
+                                                    <div class="text-sm font-semibold text-amber-700">Akses materi dibatasi</div>
+                                                    <div class="mt-2 text-sm text-amber-700/90">
+                                                        @if(!$selectedStudentAttendanceStatus || $selectedStudentAttendanceStatus === 'absent')
+                                                            Hadir dalam pertemuan untuk membuka materi ini.
+                                                        @else
+                                                            Selesaikan materi video terlebih dahulu untuk mengakses materi ini.
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             @elseif($selectedStudentMaterial->type === 'video' && $selectedStudentMaterialPreviewUrl)
                                                 @if($isSelectedStudentTrackableVideo && $selectedStudentMaterialProgress !== 'completed')
                                                     <div class="rounded-2xl border border-[#35A7FF]/20 bg-[#eef8ff] p-4 text-sm text-[#004777]">
                                                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                                             <div>
-                                                                <div class="font-semibold">Tonton minimal 70% video untuk mengaktifkan tombol selesai.</div>
+                                                                <div class="font-semibold">Tonton minimal 80% video untuk mengaktifkan tombol selesai.</div>
                                                                 <div class="mt-1 text-xs text-slate-600" x-show="!isUnlocked">
                                                                     Sisa waktu tonton:
                                                                     <span class="font-semibold text-[#004777]" x-text="formattedRemaining"></span>
@@ -453,6 +499,21 @@
                                                     src="{{ $selectedStudentMaterialPreviewUrl }}"
                                                     class="min-h-[24rem] w-full rounded-2xl border border-slate-200 bg-white"
                                                 ></iframe>
+                                                @if($selectedStudentMaterialDownloadUrl)
+                                                    <div class="flex justify-end">
+                                                        <a
+                                                            href="{{ $selectedStudentMaterialDownloadUrl }}"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="inline-flex items-center gap-2 rounded-xl border border-[#004777]/20 bg-[#eef8ff] px-4 py-2 text-sm font-medium text-[#004777] transition hover:bg-[#004777] hover:text-white"
+                                                        >
+                                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                            </svg>
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                @endif
                                             @else
                                                 <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center text-sm text-[color:color-mix(in_oklab,#004777_70%,white)]">
                                                     Preview materi belum tersedia.
@@ -482,21 +543,23 @@
                                 @endif
 
                                 <div class="mt-6">
-                                    <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">List Materi ({{ $selectedStudentTopic->materials_count ?? $selectedStudentTopic->materials->count() }})</div>
+                                    <div class="text-xs font-semibold uppercase tracking-wide text-[color:color-mix(in_oklab,#004777_55%,white)]">List Materi ({{ $selectedStudentMaterials->count() }})</div>
                                     <div class="mt-3 space-y-2">
                                         @forelse($selectedStudentMaterials as $material)
                                             @php
                                                 $materialProgressStatus = $this->materialProgressMap[$material->id] ?? 'not_started';
+                                                $materialLockedByAttendance = !$isStudentMaterialLocked && $material->type !== 'video' && !$nonVideoAccessible;
+                                                $thisMaterialLocked = $isStudentMaterialLocked || $materialLockedByAttendance;
                                             @endphp
                                             <button type="button"
                                                     wire:key="student-material-{{ $material->id }}"
-                                                    @if(!$isStudentMaterialLocked) wire:click="selectStudentMaterial('{{ $material->id }}')" @endif
-                                                    class="w-full rounded-xl border p-4 text-left transition {{ (string) ($selectedStudentMaterial?->id) === (string) $material->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-[var(--mentor-primary-soft-2)] text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }} {{ $isStudentMaterialLocked ? 'cursor-not-allowed opacity-75' : '' }}">
+                                                    @if(!$thisMaterialLocked) wire:click="selectStudentMaterial('{{ $material->id }}')" @endif
+                                                    class="w-full rounded-xl border p-4 text-left transition {{ (string) ($selectedStudentMaterial?->id) === (string) $material->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-[var(--mentor-primary-soft-2)] text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }} {{ $thisMaterialLocked ? 'cursor-not-allowed opacity-75' : '' }}">
                                                 <div class="truncate text-sm font-medium">
                                                     #{{ $material->sort_order }} · {{ $material->name }}
                                                 </div>
                                                 <div class="mt-1 text-xs {{ (string) ($selectedStudentMaterial?->id) === (string) $material->id ? 'text-white/75' : '' }}">
-                                                    {{ strtoupper($material->type) }} · {{ ucfirst($material->status) }}{{ $isStudentMaterialLocked ? ' · Terkunci' : '' }}
+                                                    {{ strtoupper($material->type) }} · {{ ucfirst($material->status) }}{{ $thisMaterialLocked ? ' · Terkunci' : '' }}
                                                 </div>
                                                 <div class="mt-2 text-[11px] font-semibold {{ (string) ($selectedStudentMaterial?->id) === (string) $material->id ? 'text-white' : 'text-emerald-700' }}">
                                                     {{ $materialProgressStatus === 'completed' ? '✓ Selesai' : ($materialProgressStatus === 'in_progress' ? 'Sedang dipelajari' : 'Belum selesai') }}
@@ -566,7 +629,7 @@
                                 <button type="button"
                                         wire:click="selectMentorTopic('{{ $topic->id }}')"
                                         class="shrink-0 rounded-2xl border px-4 py-3 text-left transition {{ (string) ($selectedMentorTopic?->id) === (string) $topic->id ? 'border-[var(--mentor-primary)] bg-[var(--mentor-primary)] text-white shadow-md' : 'border-slate-200 bg-white text-[var(--mentor-primary)] hover:border-[var(--mentor-primary)]' }}">
-                                    <div class="text-sm font-semibold">{{ $topic->name }}</div>
+                                    <div class="text-sm font-semibold">Sesi {{ $topicOffset + $loop->iteration }}</div>
                                 </button>
                             @endforeach
                         </div>
@@ -582,9 +645,9 @@
                                 <div class="mentor-workspace-card p-5">
                                     <div class="flex flex-col gap-4">
                                     <div>
-                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedMentorTopic->name }}</h3>
+                                        <h3 class="text-lg font-semibold text-[var(--mentor-primary)]">{{ $selectedMentorTopicLabel }}</h3>
                                         <p class="mt-1 text-sm leading-6 text-[color:color-mix(in_oklab,#004777_70%,white)]">
-                                            {{ $selectedMentorTopic->description ?: __('general.course_show.topic_description_fallback') }}
+                                            {{ $selectedMentorTopic->description }}
                                         </p>
                                     </div>
 
@@ -809,6 +872,11 @@
                                         {{ __('general.course_show.start_test') }}
                                     </a>
                                 @endif
+                            @elseif($assessmentLockedUntil)
+                                <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                    Soal baru dapat dikerjakan mulai
+                                    <span class="font-semibold">{{ $assessmentLockedUntil->translatedFormat('d F Y') }}</span>.
+                                </div>
                             @else
                                 <span class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-500">
                                     {{ __('general.course_show.locked_until_complete') }}
@@ -947,7 +1015,7 @@
                     return {
                         materialId: config.materialId,
                         youtubeId: config.youtubeId,
-                        requiredPercent: config.requiredPercent ?? 70,
+                        requiredPercent: config.requiredPercent ?? 80,
                         isUnlocked: !!config.initiallyUnlocked,
                         player: null,
                         playerState: -1,
@@ -956,7 +1024,7 @@
                         durationSeconds: 0,
                         watchedSeconds: 0,
                         progressPercent: config.initiallyUnlocked ? 100 : 0,
-                        progressLabel: config.initiallyUnlocked ? '70% terpenuhi' : '0% dari target',
+                        progressLabel: config.initiallyUnlocked ? '80% terpenuhi' : '0% dari target',
                         formattedRemaining: '--:--',
 
                         async init() {
@@ -1055,7 +1123,7 @@
 
                             this.progressPercent = percent;
                             this.progressLabel = this.isUnlocked
-                                ? '70% terpenuhi'
+                                ? '80% terpenuhi'
                                 : `${percent}% dari target`;
                             this.formattedRemaining = this.formatDuration(remaining);
                         },

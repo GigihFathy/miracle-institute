@@ -85,6 +85,23 @@ class UserIndex extends Component
         $this->showStudentRecapModal = true;
     }
 
+    public function verifyUser(string $userId): void
+    {
+        $user = User::findOrFail($userId);
+
+        if ($user->hasVerifiedEmail()) {
+            return;
+        }
+
+        $user->markEmailAsVerified();
+
+        if ($this->selectedStudent && (string) $this->selectedStudent->id === $userId) {
+            $this->selectedStudent = $user->fresh(['roles']);
+        }
+
+        $this->dispatch('toast', type: 'success', message: 'Email ' . $user->full_name . ' berhasil diverifikasi.');
+    }
+
     public function closeStudentRecapModal(): void
     {
         $this->showStudentRecapModal = false;

@@ -4,6 +4,7 @@ namespace App\Livewire\Courses;
 
 use App\Livewire\Concerns\InteractsWithMentorTopic;
 use App\Models\Assessment;
+use App\Models\Attendance;
 use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
 use App\Models\Course;
@@ -129,7 +130,7 @@ class CourseShow extends Component
             }
         }
 
-        $this->hydrateMentoredTopics();
+        $this->loadMentoredTopics();
         $this->hydrateMentorStudents();
 
         if ($this->mentoredTopics->isNotEmpty()) {
@@ -142,7 +143,7 @@ class CourseShow extends Component
 
         if ($studentTopics->isNotEmpty()) {
             $this->selectedStudentTopicId = $studentTopics->first()->id;
-            $this->selectedStudentMaterialId = $studentTopics->first()?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedStudentMaterialId = $studentTopics->first()?->materials->where('status', 'active')->sortBy('sort_order')->first()?->id;
             $this->selectedStudentSessionId = $this->resolveLatestSessionId($studentTopics->first());
         }
 
@@ -193,7 +194,7 @@ class CourseShow extends Component
         $this->resetPage('topicsPage');
     }
 
-    public function hydrateMentoredTopics(): void
+    public function loadMentoredTopics(): void
     {
         $this->mentoredTopics = collect();
         $this->hasMentoredTopics = false;
@@ -231,19 +232,23 @@ class CourseShow extends Component
 
     public function selectMentorTopic(string $topicId): void
     {
-        if ($this->mentoredTopics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
-            $this->selectedMentorTopicId = $topicId;
-            $topic = $this->mentoredTopics->firstWhere('id', $topicId);
-            $this->selectedMentorMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
-            $this->selectedMentorSessionId = $this->resolveLatestSessionId($topic);
+        $topic = $this->course->topics
+            ->first(fn (Topic $t) => (string) $t->id === (string) $topicId && (string) $t->teacher_id === (string) auth()->id());
+
+        if (! $topic) {
+            return;
         }
+
+        $this->selectedMentorTopicId = $topicId;
+        $this->selectedMentorMaterialId = $topic->materials->sortBy('sort_order')->first()?->id;
+        $this->selectedMentorSessionId = $this->resolveLatestSessionId($topic);
     }
 
     public function selectMentorSession(string $sessionId): void
     {
-        $topic = $this->mentoredTopics->first(function (Topic $topic) use ($sessionId) {
-            return $topic->videoSessions->contains(fn ($session) => (string) $session->id === (string) $sessionId);
-        });
+        $topic = $this->course->topics
+            ->filter(fn (Topic $t) => (string) $t->teacher_id === (string) auth()->id())
+            ->first(fn (Topic $t) => $t->videoSessions->contains(fn ($s) => (string) $s->id === (string) $sessionId));
 
         if (! $topic) {
             return;
@@ -256,9 +261,10 @@ class CourseShow extends Component
 
     public function selectMentorMaterial(string $materialId): void
     {
-        $topic = $this->mentoredTopics->firstWhere('id', $this->selectedMentorTopicId);
+        $topic = $this->course->topics
+            ->first(fn (Topic $t) => (string) $t->id === (string) $this->selectedMentorTopicId && (string) $t->teacher_id === (string) auth()->id());
 
-        if ($topic && $topic->materials->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
+        if ($topic && $topic->materials->contains(fn ($m) => (string) $m->id === (string) $materialId)) {
             $this->selectedMentorMaterialId = $materialId;
         }
     }
@@ -270,7 +276,7 @@ class CourseShow extends Component
         if ($studentTopics->contains(fn (Topic $topic) => (string) $topic->id === (string) $topicId)) {
             $this->selectedStudentTopicId = $topicId;
             $topic = $studentTopics->firstWhere('id', $topicId);
-            $this->selectedStudentMaterialId = $topic?->materials->sortBy('sort_order')->first()?->id;
+            $this->selectedStudentMaterialId = $topic?->materials->where('status', 'active')->sortBy('sort_order')->first()?->id;
             $this->selectedStudentSessionId = $this->resolveLatestSessionId($topic);
         }
     }
@@ -286,7 +292,7 @@ class CourseShow extends Component
         }
 
         $this->selectedStudentTopicId = $topic->id;
-        $this->selectedStudentMaterialId = $topic->materials->sortBy('sort_order')->first()?->id;
+        $this->selectedStudentMaterialId = $topic->materials->where('status', 'active')->sortBy('sort_order')->first()?->id;
         $this->selectedStudentSessionId = $sessionId;
     }
 
@@ -294,7 +300,7 @@ class CourseShow extends Component
     {
         $topic = $this->studentTopics()->firstWhere('id', $this->selectedStudentTopicId);
 
-        if ($topic && $topic->materials->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
+        if ($topic && $topic->materials->where('status', 'active')->contains(fn ($material) => (string) $material->id === (string) $materialId)) {
             $this->selectedStudentMaterialId = $materialId;
         }
     }
@@ -339,13 +345,45 @@ class CourseShow extends Component
             $this->extractYoutubeVideoId((string) $material->external_url) &&
             ! ($this->videoCompletionUnlocked[$materialId] ?? false)
         ) {
-            session()->flash('error', 'Video harus ditonton minimal 70% sebelum bisa diselesaikan.');
-            return;
+            $session = $this->studentRelevantSessions($topic)->sortByDesc('start_at')->first();
+            $attendanceStatus = $session
+                ? Attendance::query()
+                    ->where('video_session_id', $session->id)
+                    ->where('user_id', auth()->id())
+                    ->value('status')
+                : null;
+
+            if ($attendanceStatus !== 'present') {
+                session()->flash('error', 'Video harus ditonton minimal 80% sebelum bisa diselesaikan.');
+                return;
+            }
         }
 
         if (! $this->topicHasCompletedSessions($topic)) {
             session()->flash('error', 'Material baru bisa diselesaikan setelah sesi topic ini selesai.');
             return;
+        }
+
+        if ($material->type !== 'video') {
+            $session = $this->studentRelevantSessions($topic)->sortByDesc('start_at')->first();
+            if ($session) {
+                $attendance = Attendance::query()
+                    ->where('video_session_id', $session->id)
+                    ->where('user_id', auth()->id())
+                    ->first();
+                $attendanceStatus = $attendance?->status;
+                $canAccess = $attendanceStatus === 'present';
+                if (!$canAccess && in_array($attendanceStatus, ['late', 'online'], true)) {
+                    $videoMaterial = $topic->materials->firstWhere('type', 'video');
+                    $canAccess = $videoMaterial
+                        && ($this->materialProgressMap[$videoMaterial->id] ?? 'not_started') === 'completed';
+                }
+                if (!$canAccess) {
+                    session()->flash('error', 'Selesaikan materi video terlebih dahulu atau hadiri pertemuan untuk menyelesaikan materi ini.');
+                    $this->dispatch('toast', type: 'error', message: session('error'));
+                    return;
+                }
+            }
         }
 
         $result = $progressService->markMaterialCompleted((string) auth()->id(), $materialId);
@@ -474,8 +512,10 @@ class CourseShow extends Component
 
     public function getCompletedTopicsCountProperty(): int
     {
+        $visibleTopicIds = $this->studentTopics()->pluck('id')->map(fn ($id) => (string) $id)->flip();
+
         return collect($this->topicStatusMap)
-            ->filter(fn ($status) => $status === 'completed')
+            ->filter(fn ($status, $topicId) => $status === 'completed' && $visibleTopicIds->has((string) $topicId))
             ->count();
     }
 
@@ -499,6 +539,10 @@ class CourseShow extends Component
             return false;
         }
 
+        if ($this->assessment->available_from && now()->lt($this->assessment->available_from)) {
+            return false;
+        }
+
         if ($this->upcomingTopicsCount > 0) {
             return false;
         }
@@ -515,7 +559,7 @@ class CourseShow extends Component
     public function getUpcomingTopicsCountProperty(): int
     {
         return $this->course->topics
-            ->filter(fn (Topic $topic) => ! $this->topicIsVisibleToStudents($topic))
+            ->filter(fn (Topic $topic) => $topic->status === 'draft')
             ->filter(fn (Topic $topic) => $this->topicHasUpcomingStudentContent($topic))
             ->count();
     }
@@ -545,6 +589,34 @@ class CourseShow extends Component
             ->whereNotNull('submitted_at')
             ->where('passed', true)
             ->exists();
+    }
+
+    public function getSelectedStudentAttendanceProperty(): ?Attendance
+    {
+        if (!auth()->check() || !$this->selectedStudentTopicId) {
+            return null;
+        }
+
+        $topic = $this->studentTopics()->firstWhere('id', $this->selectedStudentTopicId);
+        if (!$topic) {
+            return null;
+        }
+
+        $sessions = $topic->videoSessions
+            ->filter(fn ($s) => $s->status !== 'draft')
+            ->values();
+
+        $session = $sessions->firstWhere('id', $this->selectedStudentSessionId)
+            ?? $sessions->sortByDesc('start_at')->first();
+
+        if (!$session) {
+            return null;
+        }
+
+        return Attendance::query()
+            ->where('video_session_id', $session->id)
+            ->where('user_id', auth()->id())
+            ->first();
     }
 
     public function getCertificateEligibilityProperty(): array
@@ -796,6 +868,7 @@ class CourseShow extends Component
             'mentoredTopics' => $this->mentoredTopics,
             'hasMentoredTopics' => $this->hasMentoredTopics,
             'mentorStudents' => $this->mentorStudents,
+            'selectedStudentAttendance' => $this->selectedStudentAttendance,
             'activeTab' => $activeTab,
         ])->layout('layouts.learning');
     }
@@ -808,7 +881,7 @@ class CourseShow extends Component
             ->toArray();
 
         $materialIds = $this->studentTopics()
-            ->flatMap(fn (Topic $topic) => $topic->materials->pluck('id'))
+            ->flatMap(fn (Topic $topic) => $topic->materials->where('status', 'active')->pluck('id'))
             ->filter()
             ->values();
 

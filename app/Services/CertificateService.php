@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Attendance;
 use App\Models\AssessmentAttempt;
 use App\Models\Certificate;
+use App\Models\CertificateSignatory;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\TopicProgress;
@@ -131,6 +132,15 @@ class CertificateService
             ->orderBy('sort_order')
             ->get();
 
+        $dbSignatories = CertificateSignatory::activeAt(Carbon::instance($issuedAt));
+        $signatures = $dbSignatories->isNotEmpty()
+            ? $dbSignatories->map(fn ($s) => [
+                'name'  => $s->name,
+                'title' => $s->title,
+                'image' => $s->signatureDataUri(),
+            ])->all()
+            : null;
+
         $pdf = Pdf::loadView('pdf.certificates.course', [
             'certificateNumber' => $certificate->certificate_number,
             'courseCode' => $this->courseCode($course),
@@ -146,7 +156,7 @@ class CertificateService
             'logoBase64' => $this->placeholderImageBase64(),
             'background' => null,
             'backgroundBack' => null,
-            'signature' => null,
+            'signatures' => $signatures,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);

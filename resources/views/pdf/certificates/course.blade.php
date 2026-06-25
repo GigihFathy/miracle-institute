@@ -286,7 +286,9 @@
         }
 
         .signature-image img {
-            width: 200px;
+            max-height: 20mm;
+            max-width: 100%;
+            width: auto;
             height: auto;
         }
 

@@ -10,6 +10,8 @@ class SendCertificateReadyEmail
 {
     public function handle(CertificateIssued $event): void
     {
+        return;
+
         $certificate = Certificate::with([
             'user',
             'course'

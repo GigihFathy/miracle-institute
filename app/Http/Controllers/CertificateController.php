@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Certificate;
+use App\Models\CertificateSignatory;
 use App\Models\Course;
 use App\Services\CertificateService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -53,5 +56,53 @@ class CertificateController extends Controller
         $filename = Str::slug($certificate->certificate_number) . '.pdf';
 
         return $service->downloadCourseCertificate($certificate, $filename);
+    }
+
+    public function previewSignatories()
+    {
+        abort_unless(auth()->check() && auth()->user()->can('manage_certificates'), 403);
+
+        $fontPath = storage_path('fonts');
+        if (!is_dir($fontPath)) {
+            mkdir($fontPath, 0755, true);
+        }
+
+        $issuedAt = now();
+
+        $dbSignatories = CertificateSignatory::activeAt(Carbon::instance($issuedAt));
+        $signatures = $dbSignatories->isNotEmpty()
+            ? $dbSignatories->map(fn ($s) => [
+                'name'  => $s->name,
+                'title' => $s->title,
+                'image' => $s->signatureDataUri(),
+            ])->all()
+            : null;
+
+        $course = (object) ['title' => '[Preview] Kursus Contoh'];
+        $user   = (object) ['full_name' => 'Nama Peserta Contoh', 'name' => 'Nama Peserta Contoh'];
+
+        $pdf = Pdf::loadView('pdf.certificates.course', [
+            'certificateNumber'  => 'PREVIEW/000/MI/06/2026',
+            'certificate'        => null,
+            'course'             => $course,
+            'user'               => $user,
+            'issuedAt'           => $issuedAt,
+            'frontDate'          => $issuedAt->locale('id')->isoFormat('D MMMM Y'),
+            'sequenceLabel'      => '00000',
+            'frontSummary'       => [],
+            'backTopics'         => [
+                ['topic_name' => 'Topik Contoh 1', 'topic_status' => 'Present'],
+                ['topic_name' => 'Topik Contoh 2', 'topic_status' => 'Online'],
+            ],
+            'achievementSummary' => [
+                'assessment_score'  => null,
+                'assessment_passed' => false,
+            ],
+            'background'     => null,
+            'backgroundBack' => null,
+            'signatures'     => $signatures,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('preview-sertifikat.pdf');
     }
 }

@@ -280,7 +280,7 @@
                             <label class="mb-1 block text-xs font-semibold text-slate-600">{{ __('admin.courses.form.poster_preview') }}</label>
                             <div class="flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border bg-slate-100">
                                 @if($poster)
-                                    <img src="{{ asset($poster) }}" alt="poster" class="h-full w-full object-contain">
+                                    <img src="{{ course_thumbnail_url($poster) ?? asset($poster) }}" alt="poster" class="h-full w-full object-contain">
                                 @else
                                     <div class="text-xs text-slate-400">{{ __('admin.courses.form.no_poster') }}</div>
                                 @endif
@@ -311,6 +311,7 @@
                                     </div>
                                 @endif
                             </div>
+
                         </div>
                     </div>
 

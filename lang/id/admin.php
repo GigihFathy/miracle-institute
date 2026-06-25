@@ -126,7 +126,7 @@ return [
         'page_title' => 'Manajer Role Pengguna',
         'selected_roles' => 'Role terpilih',
         'toggle_hint' => 'Aktifkan/nonaktifkan role di bawah',
-        'back' => '← Kembali',
+        'back' => 'Kembali',
         'save' => 'Simpan Role',
     ],
 
@@ -495,12 +495,8 @@ return [
             'active' => 'Aktif',
             'inactive' => 'Nonaktif',
         ],
-        'visibility' => [
-            'public' => 'Publik',
-            'private' => 'Pribadi',
-        ],
         'course_group' => ':count sesi di topik pembelajaran ini',
-        'topic_meta' => ':materials materi · :visibility · :status',
+        'topic_meta' => ':materials materi · :status',
         'sort_order' => 'Urutan :count',
         'full_tooltip' => 'Sesi ini sudah memiliki 3 materi. Hapus salah satu untuk menambah baru.',
         'empty_materials' => 'Tidak ada materi.',
@@ -520,7 +516,6 @@ return [
             'name' => 'Nama',
             'type' => 'Tipe',
             'source' => 'Sumber',
-            'visibility' => 'Visibilitas',
             'status' => 'Status',
             'action' => 'Aksi',
         ],
@@ -680,6 +675,7 @@ return [
         'status' => [
             'present' => 'Hadir',
             'late' => 'Terlambat',
+            'online' => 'Online',
             'absent' => 'Online',
         ],
         'table' => [
@@ -813,5 +809,29 @@ return [
         'permissions' => 'Permission',
         'articles' => 'Artikel',
         'settings' => 'Pengaturan',
+        'profile' => 'Profil Saya',
+    ],
+
+    'profile' => [
+        'page_title' => 'Profil Saya',
+        'page_subtitle' => 'Kelola informasi akun dan keamanan Anda.',
+        'tabs' => [
+            'account' => 'Data Diri',
+            'password' => 'Kata Sandi',
+        ],
+        'form' => [
+            'name' => 'Nama lengkap',
+            'email' => 'Email',
+            'phone' => 'Nomor telepon',
+            'gender' => 'Jenis kelamin',
+            'dob' => 'Tanggal lahir',
+            'current_password' => 'Kata sandi saat ini',
+            'new_password' => 'Kata sandi baru',
+            'confirm_password' => 'Konfirmasi kata sandi baru',
+        ],
+        'actions' => [
+            'save' => 'Simpan Perubahan',
+            'update_password' => 'Ubah Kata Sandi',
+        ],
     ],
 ];

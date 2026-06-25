@@ -27,7 +27,7 @@
 
     <section class="space-y-4">
         <div class="rounded-2xl border bg-white p-4">
-            <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
                 <input wire:model.live="search"
                     class="rounded-xl border px-4 py-2"
                     placeholder="{{ __('admin.topics.search_placeholder') }}">
@@ -55,7 +55,7 @@
                 <div class="rounded-2xl border bg-white p-4">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <div class="font-medium text-slate-900">{{ $row->name }}</div>
+                            <div class="font-medium text-slate-900">{{ $row->name ?: 'Sesi ' . $row->sort_order }}</div>
                             <div class="mt-1 text-xs text-slate-500">{{ $row->category }}</div>
                         </div>
 
@@ -136,8 +136,8 @@
                 @forelse($rows as $row)
                     <tr class="align-top">
                         <td class="px-4 py-3">
-                            <div class="font-medium text-slate-900">{{ $row->name }}</div>
-                            <div class="text-xs text-slate-500">{{ $row->category }}</div>
+                            <div class="font-medium text-slate-900">{{ $row->name ?: 'Sesi ' . $row->sort_order }}</div>
+                            {{-- <div class="text-xs text-slate-500">{{ $row->category }}</div> --}}
                         </td>
 
                         <td class="whitespace-nowrap px-4 py-3">{{ $row->teacher?->full_name ?? '-' }}</td>
@@ -145,8 +145,7 @@
 
                         <td class="px-4 py-3 text-xs text-slate-500">
                             {{ __('admin.topics.metrics.materials', ['count' => $row->materials_count]) }}<br>
-                            {{ __('admin.topics.metrics.sessions', ['count' => $row->video_sessions_count]) }}<br>
-                            {{ __('admin.topics.metrics.certificates', ['count' => $row->certificates_count]) }}
+                            {{ __('admin.topics.metrics.sessions', ['count' => $row->video_sessions_count]) }}
                         </td>
 
                         <td class="whitespace-nowrap px-4 py-3">
@@ -286,7 +285,7 @@
                     <div>
                         <div class="mb-1 flex items-center justify-between gap-3">
                             <label class="block text-xs font-semibold text-slate-600">
-                                Nama Sesi <span class="text-rose-500">*</span>
+                                Nama Sesi
                             </label>
                             <span class="text-[11px] text-slate-400">{{ mb_strlen($name ?? '') }}/70</span>
                         </div>
@@ -336,7 +335,7 @@
 
                     <div>
                         <label class="mb-1 block text-xs font-semibold text-slate-600">
-                            Deskripsi <span class="text-rose-500">*</span>
+                            Deskripsi
                         </label>
                         <textarea wire:model="description" rows="4" class="w-full rounded-xl border px-4 py-2" placeholder="{{ __('admin.topics.form.description_placeholder') }}"></textarea>
                         @error('description') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror

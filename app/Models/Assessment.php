@@ -15,6 +15,15 @@ class Assessment extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'available_from' => 'datetime',
+    ];
+
+    public function isAvailable(): bool
+    {
+        return !$this->available_from || now()->gte($this->available_from);
+    }
+
     public function course()
     {
         return $this->belongsTo(Course::class);

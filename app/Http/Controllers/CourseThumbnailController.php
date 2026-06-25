@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CourseThumbnailController extends Controller
@@ -19,17 +19,15 @@ class CourseThumbnailController extends Controller
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $extension = $file->getClientOriginalExtension();
         $filename = Str::slug($originalName) . '-' . Str::lower(Str::random(6)) . '.' . Str::lower($extension);
-        $targetDirectory = public_path('images/thumbnail');
-        $targetPath = $targetDirectory . DIRECTORY_SEPARATOR . $filename;
+        $storagePath = 'images/thumbnail/' . $filename;
 
         try {
-            File::ensureDirectoryExists($targetDirectory);
-            File::put($targetPath, File::get($file->getRealPath()));
+            Storage::disk('public')->put($storagePath, file_get_contents($file->getRealPath()));
         } catch (\Throwable $exception) {
             report($exception);
 
             return back()->withErrors([
-                'thumbnail' => 'Thumbnail gagal diupload ke public/images/thumbnail. Periksa permission folder server.',
+                'thumbnail' => 'Thumbnail gagal diupload. Pastikan storage symlink sudah dibuat dengan: php artisan storage:link',
             ])->withInput();
         }
 

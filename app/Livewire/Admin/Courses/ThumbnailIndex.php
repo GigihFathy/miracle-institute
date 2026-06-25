@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Courses;
 
 use App\Models\Course;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -24,17 +25,21 @@ class ThumbnailIndex extends Component
             return;
         }
 
-        $fullPath = public_path($path);
+        $storagePath = $path; // e.g. images/thumbnail/file.jpg
+        $publicPath  = public_path($path);
 
-        if (! File::exists($fullPath)) {
+        if (Storage::disk('public')->exists($storagePath)) {
+            if (! Storage::disk('public')->delete($storagePath)) {
+                $this->dispatch('toast', type: 'error', message: 'Thumbnail gagal dihapus dari server.');
+                return;
+            }
+        } elseif (File::exists($publicPath)) {
+            if (! File::delete($publicPath)) {
+                $this->dispatch('toast', type: 'error', message: 'Thumbnail gagal dihapus dari server.');
+                return;
+            }
+        } else {
             $this->dispatch('toast', type: 'error', message: 'File thumbnail tidak ditemukan di server.');
-
-            return;
-        }
-
-        if (! File::delete($fullPath)) {
-            $this->dispatch('toast', type: 'error', message: 'Thumbnail gagal dihapus dari server.');
-
             return;
         }
 

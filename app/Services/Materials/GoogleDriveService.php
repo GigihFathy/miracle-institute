@@ -80,4 +80,13 @@ class GoogleDriveService
 
         return 'https://drive.google.com/file/d/' . $fileId . '/preview';
     }
+
+    public function toDownloadUrl(?string $fileId): ?string
+    {
+        if (!$fileId) {
+            return null;
+        }
+
+        return 'https://drive.google.com/uc?export=download&id=' . $fileId;
+    }
 }

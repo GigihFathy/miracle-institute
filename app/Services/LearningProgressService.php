@@ -14,13 +14,14 @@ class LearningProgressService
         $enrollment = $topicProgress
             ->courseEnrollment()
             ->with([
-                'topicProgresses',
+                'topicProgresses.topic',
                 'course.assessment',
             ])
             ->first();
 
         $unfinished = $enrollment
             ->topicProgresses
+            ->filter(fn ($tp) => $tp->topic?->status !== 'archived')
             ->where('status', '!=', 'completed')
             ->count();
 

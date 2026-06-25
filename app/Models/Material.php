@@ -13,7 +13,6 @@ class Material extends Model
     use HasFactory, HasUuid;
 
     public const TYPES = ['pdf', 'ppt', 'video'];
-    public const VISIBILITIES = ['public', 'private'];
     public const STATUSES = ['active', 'inactive'];
 
     public $incrementing = false;   
@@ -28,7 +27,6 @@ class Material extends Model
         'type',
         'path',
         'external_url',
-        'visibility',
         'sort_order',
         'status',
     ];
@@ -60,7 +58,7 @@ class Material extends Model
 
     public function scopeVisible(Builder $query): Builder
     {
-        return $query->where('status', 'active')->where('visibility', 'public');
+        return $query->where('status', 'active');
     }
 
     public function isVideo(): bool
@@ -78,11 +76,6 @@ class Material extends Model
         $this->attributes['type'] = strtolower(trim((string) $value));
     }
 
-    public function setVisibilityAttribute($value): void
-    {
-        $this->attributes['visibility'] = strtolower(trim((string) $value));
-    }
-
     public function setStatusAttribute($value): void
     {
         $this->attributes['status'] = strtolower(trim((string) $value));
@@ -96,6 +89,6 @@ class Material extends Model
 
     public function visibleMaterials()
     {
-        return $this->materials()->where('status', 'active')->where('visibility', 'public');
+        return $this->materials()->where('status', 'active');
     }
 }

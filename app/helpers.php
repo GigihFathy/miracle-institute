@@ -139,6 +139,7 @@ if (! function_exists('course_thumbnail_directories')) {
     function course_thumbnail_directories(): array
     {
         return [
+            storage_path('app/public/images/thumbnail'),
             public_path('images/thumbnail'),
         ];
     }
@@ -184,7 +185,18 @@ if (! function_exists('course_thumbnail_url')) {
             return null;
         }
 
-        return asset($relativePath);
+        // File uploaded to storage disk (new behaviour)
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($relativePath);
+        }
+
+        // Fallback: legacy files in public/images/thumbnail
+        if (is_file(public_path($relativePath))) {
+            return asset($relativePath);
+        }
+
+        // Default to storage URL even if file not found yet
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($relativePath);
     }
 }
 

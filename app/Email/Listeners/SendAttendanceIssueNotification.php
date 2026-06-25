@@ -11,6 +11,8 @@ class SendAttendanceIssueNotification
    
     public function handle(AttendanceIssueDetected $event): void
     {
+        return;
+
         $attendance = Attendance::with(['user', 'videoSession.topic.course'])
             ->findOrFail($event->attendanceId);
 

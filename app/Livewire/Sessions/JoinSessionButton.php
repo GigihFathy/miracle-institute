@@ -15,8 +15,9 @@ class JoinSessionButton extends Component
 
     public ?Attendance $attendance = null;
 
-    public string $stateLabel = 'Scheduled';
+    public string $stateLabel = 'Terjadwal';
     public string $stateBadgeClass = 'bg-slate-100 text-slate-700';
+    public bool $sessionEnded = false;
     public string $attendanceBadgeClass = 'bg-slate-100 text-slate-700';
     public string $attendanceLabel = 'Belum check-in';
 
@@ -45,17 +46,20 @@ class JoinSessionButton extends Component
         $now = now();
         $start = Carbon::parse($this->session->start_at);
         $end = Carbon::parse($this->session->end_at);
-        $clockInDeadline = $this->session->clockInClosesAt() ?? $start->copy()->addMinutes(45);
+        $clockInDeadline = $this->session->clockInClosesAt() ?? $start->copy()->addHour();
 
         if ($now->lt($start)) {
-            $this->stateLabel = 'Scheduled';
+            $this->stateLabel = 'Terjadwal';
             $this->stateBadgeClass = 'bg-amber-100 text-amber-700';
+            $this->sessionEnded = false;
         } elseif ($now->betweenIncluded($start, $end)) {
-            $this->stateLabel = 'Live';
+            $this->stateLabel = 'Berlangsung';
             $this->stateBadgeClass = 'bg-emerald-100 text-emerald-700';
+            $this->sessionEnded = false;
         } else {
-            $this->stateLabel = 'Completed';
+            $this->stateLabel = 'Selesai';
             $this->stateBadgeClass = 'bg-slate-100 text-slate-700';
+            $this->sessionEnded = true;
         }
 
         if (!$this->attendance) {

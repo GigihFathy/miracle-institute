@@ -27,7 +27,6 @@ class MaterialIndex extends Component
     public ?string $editingId = null;
     public ?string $topic_id = null;
     public string $name = '';
-    public string $visibility = 'public';
     public string $status = 'active';
     public int $sort_order = 0;
     public mixed $materialFile = null;
@@ -38,7 +37,6 @@ class MaterialIndex extends Component
     public string $courseFilter = '';
     public string $topicFilter = '';
     public string $typeFilter = '';
-    public string $visibilityFilter = '';
     public string $statusFilter = '';
 
     protected $listeners = ['materialsUpdated' => '$refresh'];
@@ -47,7 +45,6 @@ class MaterialIndex extends Component
         'search' => ['except' => ''],
         'courseFilter' => ['except' => ''],
         'typeFilter' => ['except' => ''],
-        'visibilityFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
     ];
 
@@ -63,10 +60,9 @@ class MaterialIndex extends Component
             'topic_id' => ['required', 'exists:topics,id'],
             'name' => ['required', 'string', 'max:50'],
             'type' => ['required', Rule::in(Material::TYPES)],
-            'visibility' => ['required', Rule::in(Material::VISIBILITIES)],
             'status' => ['required', Rule::in(Material::STATUSES)],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-            'materialFile' => ['nullable', 'file', 'mimes:pdf,ppt,pptx', 'max:51200'],
+            'materialFile' => ['nullable', 'file', 'mimes:pdf,ppt,pptx', 'max:10240'],
             'external_url' => [
                 'nullable',
                 Rule::requiredIf($this->type === 'video'),
@@ -125,7 +121,6 @@ class MaterialIndex extends Component
         $this->editingId = $row->id;
         $this->topic_id = $row->topic_id;
         $this->name = $row->name;
-        $this->visibility = $row->visibility;
         $this->status = $row->status;
         $this->sort_order = (int) ($row->sort_order ?? 0);
         $this->type = $row->type;
@@ -179,7 +174,6 @@ class MaterialIndex extends Component
             'type' => $this->type,
             'path' => $asset['path'],
             'external_url' => $asset['external_url'],
-            'visibility' => $this->visibility,
             'status' => $this->status,
             'sort_order' => $this->sort_order,
         ];
@@ -273,12 +267,10 @@ class MaterialIndex extends Component
             'materialFile',
             'external_url',
             'type',
-            'visibility',
             'status',
             'sort_order',
         ]);
 
-        $this->visibility = 'public';
         $this->status = 'active';
         $this->sort_order = 1;
         $this->type = null;

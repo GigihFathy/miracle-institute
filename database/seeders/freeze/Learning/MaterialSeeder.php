@@ -28,7 +28,6 @@ class MaterialSeeder extends Seeder
                     'type' => $template['type'],
                     'path' => null,
                     'external_url' => $template['external_url'],
-                    'visibility' => 'public',
                     'sort_order' => $index + 1,
                     'status' => 'active',
                 ]);
