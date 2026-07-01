@@ -15,6 +15,7 @@
             <input type="password" required minlength="8" autocomplete="new-password"
                    wire:model.debounce.300ms="password" placeholder="{{ __('auth.reset_password.password_placeholder') }}"
                    class="w-full rounded-xl border border-[#004777]/15 bg-[#f4faff] px-4 py-2.5 text-[#004777] outline-none transition placeholder:text-[#004777]/35 focus:border-[#35A7FF] focus:bg-white">
+            <p class="mt-1 text-xs text-[#004777]/60">{{ __('general.profile.form.password_help') }}</p>
             @error('password') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
 

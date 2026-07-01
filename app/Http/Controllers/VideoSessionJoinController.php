@@ -43,6 +43,12 @@ class VideoSessionJoinController extends Controller
             });
         }
 
-        return redirect()->away($videoSession->zoom_link);
+        $zoomLink = (string) $videoSession->zoom_link;
+        $parsed = parse_url($zoomLink);
+        $host = strtolower($parsed['host'] ?? '');
+        $isValidZoom = str_ends_with($host, 'zoom.us') || str_ends_with($host, 'zoomgov.com');
+        abort_unless($isValidZoom && ($parsed['scheme'] ?? '') === 'https', 403);
+
+        return redirect()->away($zoomLink);
     }
 }

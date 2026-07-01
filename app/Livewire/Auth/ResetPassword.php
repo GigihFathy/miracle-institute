@@ -4,6 +4,7 @@ namespace App\Livewire\Auth;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use Livewire\Component;
 
 class ResetPassword extends Component
@@ -13,11 +14,14 @@ class ResetPassword extends Component
     public $password = '';
     public $password_confirmation = '';
 
-    protected $rules = [
-        'email' => 'required|email',
-        'password' => 'required|string|min:8|confirmed',
-        'password_confirmation' => 'required|string|min:8',
-    ];
+    protected function rules(): array
+    {
+        return [
+            'email' => 'required|email',
+            'password' => ['required', 'string', 'confirmed', PasswordRule::min(8)->letters()->numbers()],
+            'password_confirmation' => 'required|string|min:8',
+        ];
+    }
 
     public function mount($token)
     {

@@ -64,10 +64,6 @@ class MentorDashboard extends Component
                 ->distinct()
                 ->count('course_enrollment_id');
 
-        $mentorMaterialsCount = Material::query()
-            ->where('uploader_id', $userId)
-            ->count();
-
         $managedCourses = Course::query()
             ->with([
                 'topics' => function ($query) use ($userId, $managedTopicIds) {
@@ -130,7 +126,6 @@ class MentorDashboard extends Component
         return view('livewire.mentor.dashboard.mentor-dashboard', [
             'view' => $this->view,
             'mentorTopicsCount' => $topics->count(),
-            'mentorMaterialsCount' => $mentorMaterialsCount,
             'mentorStudentsCount' => $mentorStudentsCount,
             'managedCourses' => $managedCourses,
             'latestMaterials' => $latestMaterials,

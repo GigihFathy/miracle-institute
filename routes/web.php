@@ -28,9 +28,6 @@ use App\Livewire\Admin\Topics\TopicIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Users\UserRoleManager;
 
-use App\Livewire\Articles\ArticleIndex;
-use App\Livewire\Articles\ArticleShow;
-
 use App\Livewire\Assessments\AssessmentIndex;
 use App\Livewire\Assessments\AssessmentResult;
 use App\Livewire\Assessments\AssessmentTaker;
@@ -145,10 +142,6 @@ $registerLocalizedRoutes = function (bool $named): void {
             ->middleware(['auth', 'set.active.role', 'admin.redirect']),
         'courses.show'
     );
-
-    $nameRoute(Route::get('/articles', ArticleIndex::class)->middleware('admin.redirect'), 'articles.index');
-
-    $nameRoute(Route::get('/articles/{article}', ArticleShow::class)->middleware('admin.redirect'), 'articles.show');
 
     $nameRoute(Route::view('/terms-and-conditions', 'legal.terms'), 'legal.terms');
     $nameRoute(Route::view('/privacy-policy', 'legal.privacy'), 'legal.privacy');
@@ -544,31 +537,13 @@ $registerLocalizedRoutes = function (bool $named): void {
                     );
 
                     $nameRoute(
-                        Route::get('/articles', \App\Livewire\Admin\Articles\ArticleIndex::class)
-                            ->middleware('permission:view_reports'),
-                        'articles.index'
-                    );
-
-                    $nameRoute(
-                        Route::get('/articles/create', \App\Livewire\Admin\Articles\ArticleForm::class)
-                            ->middleware('permission:view_reports'),
-                        'articles.create'
-                    );
-
-                    $nameRoute(
-                        Route::get('/articles/{article}/edit', \App\Livewire\Admin\Articles\ArticleForm::class)
-                            ->middleware('permission:view_reports'),
-                        'articles.edit'
-                    );
-
-                    $nameRoute(
                         Route::get('/profile', AdminProfileIndex::class),
                         'profile.index'
                     );
 
                     $nameRoute(
                         Route::get('/settings', SettingsIndex::class)
-                            ->middleware('permission:view_reports'),
+                            ->middleware('permission:manage_users'),
                         'settings.index'
                     );
 

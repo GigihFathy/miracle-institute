@@ -36,21 +36,13 @@
                     </p>
                 </div>
 
-                <div class="relative mt-8 grid gap-4 sm:grid-cols-3">
+                <div class="relative mt-8 grid gap-4 sm:grid-cols-2">
                     <div class="rounded-2xl border border-white/80 bg-white/80 p-5 backdrop-blur">
                         <div class="text-xs font-bold uppercase tracking-wide text-slate-500">
                             {{ __('mentor.dashboard.stats.topics') }}
                         </div>
                         <div class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorTopicsCount }}</div>
                         <p class="mt-2 text-sm text-slate-500">{{ __('mentor.dashboard.stats.topics_hint') }}</p>
-                    </div>
-
-                    <div class="rounded-2xl border border-white/80 bg-white/80 p-5 backdrop-blur">
-                        <div class="text-xs font-bold uppercase tracking-wide text-slate-500">
-                            {{ __('mentor.dashboard.stats.materials') }}
-                        </div>
-                        <div class="mt-3 text-3xl font-bold text-[#004777]">{{ $mentorMaterialsCount }}</div>
-                        <p class="mt-2 text-sm text-slate-500">{{ __('mentor.dashboard.stats.materials_hint') }}</p>
                     </div>
 
                     <div class="rounded-2xl border border-white/80 bg-white/80 p-5 backdrop-blur">

@@ -32,6 +32,8 @@ class TopicPlayer extends Component
     public bool $showSessionModal = false;
     public ?string $selectedSessionId = null;
 
+    public array $videoStartedAt = [];
+
     public function mount(string $slug): void
     {
         $this->topic = Topic::query()
@@ -159,6 +161,24 @@ class TopicPlayer extends Component
         );
     }
 
+    public function notifyVideoStarted(string $materialId, int $durationSeconds): void
+    {
+        abort_unless($this->canStudentInteract, 403);
+
+        $material = $this->materialsQuery()->find($materialId);
+
+        if (! $material || $material->type !== 'video') {
+            return;
+        }
+
+        if (! isset($this->videoStartedAt[$materialId])) {
+            $this->videoStartedAt[$materialId] = [
+                'at' => now()->timestamp,
+                'duration' => max(0, $durationSeconds),
+            ];
+        }
+    }
+
     public function unlockVideoCompletion(string $materialId): void
     {
         abort_unless($this->canStudentInteract, 403);
@@ -170,6 +190,20 @@ class TopicPlayer extends Component
         }
 
         if (! $this->extractYoutubeVideoId((string) $material->external_url)) {
+            return;
+        }
+
+        $tracking = $this->videoStartedAt[$materialId] ?? null;
+
+        if ($tracking === null) {
+            return;
+        }
+
+        $requiredSeconds = $tracking['duration'] > 0
+            ? (int) ceil($tracking['duration'] * 0.8)
+            : 60;
+
+        if ((now()->timestamp - $tracking['at']) < $requiredSeconds) {
             return;
         }
 

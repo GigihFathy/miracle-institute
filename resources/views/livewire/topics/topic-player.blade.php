@@ -625,6 +625,7 @@
                         autoCompleteEnabled: !!config.autoCompleteEnabled,
                         isUnlocked: !!config.initiallyUnlocked,
                         autoCompleteTriggered: false,
+                        trackingStarted: false,
                         player: null,
                         playerState: -1,
                         timer: null,
@@ -682,6 +683,11 @@
                         startTimer() {
                             if (this.timer || this.isUnlocked) {
                                 return;
+                            }
+
+                            if (!this.trackingStarted) {
+                                this.trackingStarted = true;
+                                this.$wire.notifyVideoStarted(this.materialId, Math.round(this.durationSeconds));
                             }
 
                             this.lastTickAt = Date.now();

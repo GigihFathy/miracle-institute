@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Cache;
 
 class SettingsIndex extends Component
 {
-    private const GOOGLE_DISCONNECT_PASSWORD = 'beedik2512';
-
     public bool $isGoogleConnected = false;
     public bool $showDisconnectGoogleModal = false;
     public string $disconnectGooglePassword = '';
@@ -65,7 +63,7 @@ class SettingsIndex extends Component
             'disconnectGooglePassword.required' => 'Password wajib diisi untuk memutus koneksi.',
         ]);
 
-        if ($this->disconnectGooglePassword !== self::GOOGLE_DISCONNECT_PASSWORD) {
+        if ($this->disconnectGooglePassword !== config('services.google.disconnect_password')) {
             $this->addError('disconnectGooglePassword', 'Password default tidak sesuai.');
 
             return;

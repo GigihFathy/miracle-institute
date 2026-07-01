@@ -112,13 +112,9 @@
                                 </div>
                             @endif
 
-                            @if($enrolled)
+                            @if($enrolled && !$isMentor)
                                 <span class="absolute left-3 top-3 rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white">
                                     {{ __('general.course_catalog.badges.enrolled') }}
-                                </span>
-                            @elseif($isMentor)
-                                <span class="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-[#004777] backdrop-blur">
-                                    {{ ucfirst($course->status) }}
                                 </span>
                             @endif
                         </div>

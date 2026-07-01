@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 use Throwable;
 
@@ -17,13 +18,16 @@ class Register extends Component
     public $password_confirmation = '';
     public bool $accept_legal = false;
 
-    protected $rules = [
-        'name' => 'required|string|min:2|max:35',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:8|confirmed',
-        'password_confirmation' => 'required|string|min:8',
-        'accept_legal' => 'accepted',
-    ];
+    protected function rules(): array
+    {
+        return [
+            'name' => 'required|string|min:2|max:35',
+            'email' => 'required|email|unique:users,email',
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()],
+            'password_confirmation' => 'required|string|min:8',
+            'accept_legal' => 'accepted',
+        ];
+    }
 
     protected $messages = [
         'name.required' => 'Nama wajib diisi.',

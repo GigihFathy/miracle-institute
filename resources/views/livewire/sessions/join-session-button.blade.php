@@ -31,21 +31,27 @@
 
     <div class="flex flex-wrap gap-2">
         @if(! $attendance)
-            <button wire:click="joinSession"
-                    wire:loading.attr="disabled"
-                    wire:target="joinSession,refreshAttendance"
-                    @disabled(! $canJoin)
-                    class="admin-primary-button rounded-xl px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
-                {{ __('general.session_join_button.actions.join_session') }}
-            </button>
+            @if($canJoin)
+                <a href="{{ localized_route('sessions.join', ['videoSession' => $session->id]) }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="admin-primary-button rounded-xl px-4 py-2 text-sm">
+                    {{ __('general.session_join_button.actions.join_session') }}
+                </a>
+            @else
+                <button type="button" disabled
+                        class="admin-primary-button rounded-xl px-4 py-2 text-sm cursor-not-allowed opacity-50">
+                    {{ __('general.session_join_button.actions.join_session') }}
+                </button>
+            @endif
         @else
             @if($this->canRejoin())
-                <button wire:click="joinSession"
-                        wire:loading.attr="disabled"
-                        wire:target="joinSession,refreshAttendance"
-                        class="admin-primary-button rounded-xl px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
+                <a href="{{ localized_route('sessions.join', ['videoSession' => $session->id]) }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="admin-primary-button rounded-xl px-4 py-2 text-sm">
                     Join Zoom
-                </button>
+                </a>
             @endif
 
             @if(! $attendance->clock_out_at)

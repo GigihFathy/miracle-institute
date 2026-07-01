@@ -29,11 +29,26 @@ class GoogleIntegrationController extends Controller
 
     public function redirect()
     {
-        return redirect($this->getClient()->createAuthUrl());
+        $state = bin2hex(random_bytes(16));
+        session(['google_integration_oauth_state' => $state]);
+
+        $client = $this->getClient();
+        $client->setState($state);
+
+        return redirect($client->createAuthUrl());
     }
 
     public function callback(Request $request)
     {
+        $expectedState = session('google_integration_oauth_state');
+
+        abort_unless(
+            $expectedState && hash_equals($expectedState, (string) $request->state),
+            403
+        );
+
+        session()->forget('google_integration_oauth_state');
+
         $client = $this->getClient();
         $token = $client->fetchAccessTokenWithAuthCode($request->code);
 
