@@ -100,18 +100,6 @@ class JoinSessionButton extends Component
         }
     }
 
-    public function joinSession()
-    {
-        $this->refreshAttendance();
-
-        if (!$this->canJoin) {
-            session()->flash('error', 'Session sudah tidak tersedia.');
-            return null;
-        }
-
-        return redirect()->route('sessions.join', ['videoSession' => $this->session->id]);
-    }
-
     public function canRejoin(): bool
     {
         return $this->canJoin
